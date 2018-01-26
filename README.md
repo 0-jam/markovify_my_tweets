@@ -1,4 +1,4 @@
-# Markovify My Tweets
+# Regenerate Sentences
 
 - マルコフ連鎖で文章つくって表示
 - [marcovify](marcovify)モジュールの基本機能なぞっただけ
