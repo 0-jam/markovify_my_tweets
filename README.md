@@ -5,8 +5,11 @@
 
 ## Usage
 
-`$ python marcovify_tweet.py`
-
-- 引数対応予定
+`$ python marcovify_tweet.py <FILENAME>`
 
 [markovify]: https://github.com/jsvine/markovify
+
+## Known Issues
+
+- 文字コード問題
+  - Windows環境ではファイルをShift JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`と表示されて動かない
