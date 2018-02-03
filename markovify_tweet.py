@@ -6,8 +6,8 @@ import markovify
 
 ## ファイル読む
 def marcovify_text(file):
-    with open(file) as tweets:
-        text = tweets.read()
+    with open(file) as str:
+        text = str.read()
 
     # 読んだテキストを表示
     # print(text)

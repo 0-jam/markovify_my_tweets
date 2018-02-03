@@ -103,5 +103,7 @@ ENV/
 # VS Code Settings
 .vscode
 
-# Actual CSV Data
+
+# Actual Data
 *.csv
+*.txt
