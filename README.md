@@ -26,6 +26,7 @@
 - [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
     - 半角記号を全角にする
     - 注釈記号などの除去
+- [ ] マルチスレッドにできないかな？
 
 ## インストール
 
@@ -40,13 +41,19 @@ $ pip install janome
 
 ## 使用法
 
-- 引数ないとエラー`IndexError: list index out of range`
+```bash
+# 前処理スクリプト
+$ python wakachi.py
+usage: wakachi.py [-h] input output
+wakachi.py: error: the following arguments are required: input, output
+$ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
 
-`$ python markovify_tweet.py <FILENAME>`
-
-- [Janome][janome]を用いた日本語テキスト前処理用スクリプト：`./wakachi.py`
-
-`$ python wakachi.py <FILENAME> <OUTPUT_FILE>`
+# 本体
+$ python markovify_sentence.py
+usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] input
+markovify_sentence.py: error: the following arguments are required: input
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+```
 
 ## Note
 

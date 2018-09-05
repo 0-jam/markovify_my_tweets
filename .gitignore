@@ -103,7 +103,7 @@ ENV/
 # VS Code Settings
 .vscode
 
-
 # Actual Data
 *.csv
 *.txt
+!text/Latin-Lipsum.txt
