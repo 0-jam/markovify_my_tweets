@@ -17,6 +17,7 @@ def marcovify_text(file):
 
 model = marcovify_text(sys.argv[1])
 
-for i in range(10):
-    # 作ったモデルから適当に文章つくって表示
-    print(model.make_sentence())
+with open('out.txt', 'w') as out:
+    for i in range(10):
+        # 作ったモデルから適当に文章つくってファイルに書き込む
+        out.write("".join(model.make_sentence()))

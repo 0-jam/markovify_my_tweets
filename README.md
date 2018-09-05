@@ -12,7 +12,10 @@
 
 ## Todo
 
-- Recurrent Neural Networkに対応
+- [ ] Recurrent Neural Networkに対応
+- [ ] 青空文庫テキスト整形用スクリプト
+    - 半角記号を全角にする
+    - 注釈記号などの除去
 
 ## Installation
 
@@ -39,8 +42,21 @@ $ pip install janome
 
 - 文字コード問題
     - Windows環境ではファイルをShift JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`と表示されて動かない
-- 日本語を学習してくれない
-    - ロジックとか自分で書くべきだろうか
+
+## Note
+
+- 半角記号は全角にしないとエラー
+    - > KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')
+- 学習対象データに青空文庫を使う場合、不要な文字を除去するために以下の正規表現を使う
+    - 段落などを示す全角スペース
+    - 獰悪《どうあく》のようなルビ
+    - ［＃ここから2字下げ］のような注釈
+    - ルビの付く文字列の始まりを示す｜（全角縦棒）
+    - 空行
+
+```
+　|《.+?》|［.+?］|｜|^\n
+```
 
 [markovify]: https://github.com/jsvine/markovify
 [janome]: http://mocobeta.github.io/janome/
