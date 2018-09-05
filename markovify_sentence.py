@@ -12,7 +12,7 @@ def marcovify_text(file):
     # 読んだテキストを表示
     # print(text)
 
-    ## 読んだテキストからマルコフ連鎖でモデル？生成
+    # 読んだテキストからマルコフ連鎖でモデル？生成
     return markovify.Text(text)
 
 model = marcovify_text(sys.argv[1])
