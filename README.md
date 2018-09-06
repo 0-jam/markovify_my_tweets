@@ -42,17 +42,24 @@ $ pip install janome
 ## 使用法
 
 ```bash
+## すべてのスクリプトは、-hオプションでヘルプが表示される
 # 前処理スクリプト
+# デフォルト値は存在せず、入力・出力両方のファイル名を指定しないとエラー
 $ python wakachi.py
 usage: wakachi.py [-h] input output
 wakachi.py: error: the following arguments are required: input, output
 $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
 
 # 本体
+# 出力ファイルのデフォルトはout.txt
 $ python markovify_sentence.py
 usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] input
 markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+
+# 一括実行スクリプト
+# デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し、その結果を./text/generated_(YYYYMMDD)に保存する
+$ bash run.sh
 ```
 
 ## Note
