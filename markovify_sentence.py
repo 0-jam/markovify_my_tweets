@@ -1,5 +1,6 @@
 import markovify
 import argparse
+import time
 
 parser = argparse.ArgumentParser(description="Generate sentence with Markov chain.")
 parser.add_argument("input", type=str, help="input file path")
@@ -18,15 +19,28 @@ def marcovify_text(file):
 model = marcovify_text(args.input)
 
 with open(args.output, 'w') as out:
-    arr = []
-    for i in range(args.number):
-        # 作ったモデルから文章生成
-        arr.append(model.make_sentence())
+    # 生成処理をした回数
+    count = 0
+    start_time = time.time()
 
-    # カラ(NoneType)の要素を削除
-    arr = list(filter(None, arr))
-    # ファイルに書き込む
-    out.write("\n".join(arr))
+    for _ in range(args.number):
+        while True:
+            count += 1
+            # 作ったモデルから文章生成
+            text = model.make_sentence()
 
-    # 指定した文（行）数に対して何文（行）生成されたか表示
-    print("Generated {} / Specified {} ({:.2f}%)".format(len(arr), args.number, (len(arr) / args.number * 100)))
+            if text is not None:
+                # ファイルに書き込む
+                out.write(text + "\n")
+                break
+
+    # 処理にかかった時間を記録
+    elapsed_time = time.time() - start_time
+
+    # 計測結果表示
+    print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
+        count,
+        args.number,
+        ((count - args.number) / count) * 100
+    ))
+    print("It takes {:.3f} seconds".format(elapsed_time))

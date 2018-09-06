@@ -16,9 +16,8 @@
 ## 環境
 
 - Python 3.6.6 on Miniconda 4.5.4
+    - インストールするタイミングによっては、Pythonのバージョンが3.7になっている場合もある
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- Python 3.7
-- Windows 10 Home 1803 (April 2018)
 
 ## Todo
 
@@ -57,8 +56,9 @@ $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa
 
 ## Note
 
+- 実行するときは単語が半角スペースで区切られている必要がある
 - 文字コード問題
-    - Windows環境ではファイルをShift JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`と表示されて動かない
+    - Windows環境ではファイルをShift-JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`
 - 半角記号は全角にしないとエラー
     - > KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')
 - 学習対象データに青空文庫を使う場合、不要な文字を除去するために以下の正規表現を使う
