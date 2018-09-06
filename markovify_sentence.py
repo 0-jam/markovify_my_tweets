@@ -32,10 +32,10 @@ with open(args.output, 'w') as out:
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
 
-    # 計測結果表示
-    print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
-        count,
-        args.number,
-        ((count - args.number) / count) * 100
-    ))
-    print("It takes {:.3f} seconds".format(elapsed_time))
+# 計測結果表示
+print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
+    count,
+    args.number,
+    ((count - args.number) / count) * 100
+))
+print("It takes {:.3f} seconds ({:.3f} sentences / second)".format(elapsed_time, args.number / elapsed_time))
