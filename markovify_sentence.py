@@ -10,13 +10,8 @@ parser.add_argument("-n", "--number", type=int, default=1, help="the number of s
 args = parser.parse_args()
 
 ## ファイル読んでマルコフ連鎖モデル作成
-def marcovify_text(file):
-    with open(file) as str:
-        text = str.read()
-
-    return markovify.Text(text)
-
-model = marcovify_text(args.input)
+with open(args.input) as input:
+    model = markovify.Text(input.read())
 
 with open(args.output, 'w') as out:
     # 生成処理をした回数

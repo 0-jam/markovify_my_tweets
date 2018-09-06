@@ -10,6 +10,7 @@
 1. [インストール](#インストール)
 1. [使用法](#使用法)
 1. [Note](#note)
+    1. [前処理](#前処理)
 
 ---
 
@@ -57,19 +58,27 @@ $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa
 ## Note
 
 - 実行するときは単語が半角スペースで区切られている必要がある
-- 文字コード問題
-    - Windows環境ではファイルをShift-JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`
-- 半角記号は全角にしないとエラー
-    - > KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')
-- 学習対象データに青空文庫を使う場合、不要な文字を除去するために以下の正規表現を使う
-    - 段落などを示す全角スペース
-    - 獰悪《どうあく》のようなふりがな
-    - ［＃ここから2字下げ］のような注釈
-    - ふりがなの付く文字列の始まりを示す｜（全角縦棒）
-    - 空行
+- Windows環境ではファイルをShift-JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`
+- 半角記号が文書内にあると`KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')`
+
+### 前処理
+
+学習対象データに青空文庫を使う場合、不要な文字を除去するために以下の正規表現を使う
 
 ```
 　|《.+?》|［.+?］|｜|^\n
+```
+
+- 段落などを示す全角スペース
+- 獰悪《どうあく》のようなふりがな
+- ［＃ここから2字下げ］のような注釈
+- ふりがなの付く文字列の始まりを示す｜（全角縦棒）
+- 空行
+
+欧文の始まりを示す以下のかっこは半角スペースに置き換える
+
+```
+〔|〕
 ```
 
 [markovify]: https://github.com/jsvine/markovify
