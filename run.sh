@@ -49,11 +49,9 @@ if [ ! -d $outdir ]; then
   mkdir -p ${outdir}
 fi
 
-echo "find ${indir} -maxdepth 1 -type f -name *.txt"
-
 while read -r f; do
   # $ findで抽出したファイル名からディレクトリ名と拡張子を除去
   # その後ろに"_markovified.txt"を追加して出力ファイル名とする
   echo "markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -p ${processes}"
   python markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -p ${processes}
-done < <(find ${indir} -maxdepth 1 -type f -name *.txt)
+done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")

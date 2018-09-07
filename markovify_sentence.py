@@ -5,11 +5,8 @@ import multiprocessing as mp
 
 ## モデルから文章生成（処理の本体）
 def generate(queue, model):
-    count = 0
-
     while True:
         text = model.make_sentence()
-        count += 1
 
         if text is not None:
             # 生成した文章をqueueに挿入
@@ -52,7 +49,6 @@ def main():
 
     start_time = time.time()
 
-    # map()の返り値は使われない
     pool.map(generate_sentence, [(queue, model) for _ in range(args.number)])
 
     # 処理にかかった時間を記録
@@ -62,7 +58,6 @@ def main():
         out.write("\n".join(dump_queue(queue)))
 
     # 計測結果表示
-    # 生成数カウントはできなくなった
     print("It takes {:.3f} seconds ({:.3f} sentences / second)".format(elapsed_time, args.number / elapsed_time))
 
 if __name__ == '__main__':
