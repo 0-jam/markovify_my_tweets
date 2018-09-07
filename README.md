@@ -17,7 +17,7 @@
 ## 環境
 
 - Python 3.6.6 on Miniconda 4.5.4
-    - インストールするタイミングによっては、Pythonのバージョンが3.7になっている場合もある
+    - インストールするタイミングによっては，Pythonのバージョンが3.7になっている場合もある
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 
 ## Todo
@@ -26,7 +26,8 @@
 - [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
     - 半角記号を全角にする
     - 注釈記号などの除去
-- [ ] マルチスレッドにできないかな？
+- [x] マルチプロセス化
+    - 4プロセスで平均2.5倍くらい速くなった
 
 ## インストール
 
@@ -42,9 +43,9 @@ $ pip install janome
 ## 使用法
 
 ```bash
-## すべてのスクリプトは、-hオプションでヘルプが表示される
+## すべてのスクリプトは，-hオプションでヘルプが表示される
 # 前処理スクリプト
-# デフォルト値は存在せず、入力・出力両方のファイル名を指定しないとエラー
+# デフォルト値は存在せず，入力・出力両方のファイル名を指定しないとエラー
 $ python wakachi.py
 usage: wakachi.py [-h] input output
 wakachi.py: error: the following arguments are required: input, output
@@ -58,7 +59,7 @@ markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
 # 一括実行スクリプト
-# デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し、その結果を./text/generated_(YYYYMMDD)に保存する
+# デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し，その結果を./text/generated_(YYYYMMDD)に保存する
 $ bash run.sh
 ```
 
@@ -70,16 +71,18 @@ $ bash run.sh
 
 ### 前処理
 
-学習対象データに青空文庫を使う場合、不要な文字を除去するために以下の正規表現を使う
+学習対象データに青空文庫を使う場合，不要な文字を除去するために以下の正規表現を使う
 
 ```
 　|《.+?》|［.+?］|｜|^\n
 ```
 
-- 段落などを示す全角スペース
-- 獰悪《どうあく》のようなふりがな
-- ［＃ここから2字下げ］のような注釈
-- ふりがなの付く文字列の始まりを示す｜（全角縦棒）
+- 全角スペース
+    - > 　吾輩は猫である。名前はまだ無い。
+- ふりがなとそれが付く文字列の始まりを示す｜（全角縦棒）
+    - > しかもあとで聞くとそれは書生という人間中で一番 **｜** 獰悪 **《どうあく》** な種族であったそうだ。
+- 注釈
+    - > **［＃８字下げ］** 一 **［＃「一」は中見出し］**
 - 空行
 
 欧文の始まりを示す以下のかっこは半角スペースに置き換える
