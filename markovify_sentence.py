@@ -4,9 +4,10 @@ import time
 import multiprocessing as mp
 
 ## モデルから文章生成（処理の本体）
-def generate(queue, model):
+def generate(queue, model, count):
     while True:
         text = model.make_sentence()
+        count.value += 1
 
         if text is not None:
             # 生成した文章をqueueに挿入
@@ -36,12 +37,17 @@ def main():
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("-o", "--output", type=str, default="out.txt", help="output file path (default: 'out.txt')")
     parser.add_argument("-n", "--number", type=int, default=1, help="the number of sentence you want to generate (default: 1)")
-    parser.add_argument("-p", "--processes", type=int, default=cores, help="the number of processes run at once (default: number of your CPU cores)")
+    parser.add_argument("-j", "--jobs", type=int, default=cores, help="the number of processes (default: the number of your CPU cores)")
     args = parser.parse_args()
 
-    queue = mp.Manager().Queue()
-    print("Processes:", args.processes)
-    pool = mp.Pool(args.processes)
+    mgr = mp.Manager()
+    # 生成された文章
+    queue = mgr.Queue()
+    # 生成処理が実行された回数
+    count = mgr.Value('i', 0)
+
+    print("Processes:", args.jobs)
+    pool = mp.Pool(args.jobs)
 
     ## ファイル読んでマルコフ連鎖モデル作成
     with open(args.input) as input:
@@ -49,7 +55,7 @@ def main():
 
     start_time = time.time()
 
-    pool.map(generate_sentence, [(queue, model) for _ in range(args.number)])
+    pool.map(generate_sentence, [(queue, model, count) for _ in range(args.number)])
 
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
@@ -58,6 +64,11 @@ def main():
         out.write("\n".join(dump_queue(queue)))
 
     # 計測結果表示
+    print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
+        count.value,
+        args.number,
+        ((count.value - args.number) / count.value) * 100
+    ))
     print("It takes {:.3f} seconds ({:.3f} sentences / second)".format(elapsed_time, args.number / elapsed_time))
 
 if __name__ == '__main__':

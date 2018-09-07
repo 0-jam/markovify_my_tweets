@@ -28,7 +28,6 @@
     - 注釈記号などの除去
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
-    - 代わりに実際に文章生成処理が走った回数を記録できなくなった（復活させたい）
 
 ## インストール
 
@@ -55,7 +54,7 @@ $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_waka
 # 本体
 # 出力ファイルのデフォルトはout.txt
 $ python markovify_sentence.py
-usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-p PROCESSES] input
+usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS] input
 markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
