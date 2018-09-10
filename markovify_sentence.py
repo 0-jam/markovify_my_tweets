@@ -46,10 +46,11 @@ def main():
     # 生成処理が実行された回数
     count = mgr.Value('i', 0)
 
-    print("Processes:", args.jobs)
-    pool = mp.Pool(args.jobs)
+    jobs = min([args.jobs, args.number])
+    print("Processes:", jobs)
+    pool = mp.Pool(jobs)
 
-    ## ファイル読んでマルコフ連鎖モデル作成
+    # ファイル読んでマルコフ連鎖モデル作成
     with open(args.input) as input:
         model = markovify.Text(input.read())
 
