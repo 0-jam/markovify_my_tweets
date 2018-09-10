@@ -11,6 +11,8 @@
 1. [Todo](#todo)
 1. [インストール](#インストール)
 1. [使用法](#使用法)
+    1. [markovify_sentence.py](#markovify_sentencepy)
+    1. [rnn_sentence.py](#rnn_sentencepy)
 1. [Note](#note)
     1. [前処理](#前処理)
 
@@ -34,6 +36,7 @@
 
 ## Todo
 
+- [ ] RNN版の分かち書き対応
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ、5-10世代程度ではロクな精度が出ない
@@ -60,8 +63,11 @@ $ conda install tensorflow numpy unidecode
 
 ## 使用法
 
+すべてのスクリプトは，-hオプションでヘルプが表示される
+
+### markovify_sentence.py
+
 ```bash
-## すべてのスクリプトは，-hオプションでヘルプが表示される
 # 前処理スクリプト
 # デフォルト値は存在せず，入力・出力両方のファイル名を指定しないとエラー
 $ python wakachi.py
@@ -79,6 +85,18 @@ $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa
 # 一括実行スクリプト
 # デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し，その結果を./text/generated_(YYYYMMDD)に保存する
 $ bash run.sh
+```
+
+### rnn_sentence.py
+
+```bash
+$ python rnn_sentence.py
+usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
+                       input start_string
+rnn_sentence.py: error: the following arguments are required: input, start_string
+# 入力ファイル・開始文字列の順に指定
+# テキストに特に前処理は必要ない（分かち書き対応させてもいいかも）
+$ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 ```
 
 ## Note

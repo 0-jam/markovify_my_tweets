@@ -7,7 +7,7 @@ outdir="text/generated"
 # 文章を生成する回数
 number=1
 # 一度に生成するプロセス数
-processes=1
+jobs=1
 
 ### スクリプトの使い方を表示し，スクリプトを終了する
 usage(){
@@ -24,7 +24,7 @@ EOS
 }
 
 ### オプションの処理
-while getopts "hi:n:o:p:" opts; do
+while getopts "hi:n:o:j:" opts; do
   case $opts in
     h|\?)
       usage
@@ -35,8 +35,8 @@ while getopts "hi:n:o:p:" opts; do
     o)
       outdir=$OPTARG
       ;;
-    p)
-      processes=$OPTARG
+    j)
+      jobs=$OPTARG
       ;;
     n)
       number=$OPTARG
@@ -52,6 +52,6 @@ fi
 while read -r f; do
   # $ findで抽出したファイル名からディレクトリ名と拡張子を除去
   # その後ろに"_markovified.txt"を追加して出力ファイル名とする
-  echo "markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${processes}"
-  python markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${processes}
+  echo "markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}"
+  python markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}
 done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")
