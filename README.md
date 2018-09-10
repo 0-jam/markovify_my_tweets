@@ -6,6 +6,8 @@
 ---
 
 1. [環境](#環境)
+    1. [ソフトウェア](#ソフトウェア)
+    1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
 1. [インストール](#インストール)
 1. [使用法](#使用法)
@@ -16,13 +18,26 @@
 
 ## 環境
 
+### ソフトウェア
+
 - Python 3.6.6 on Miniconda 4.5.4
     - インストールするタイミングによっては，Pythonのバージョンが3.7になっている場合もある
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 
+### ハードウェア
+
+- CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
+- RAM: 8GB
+- こっちでも試したい
+    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+    - RAM: 16GB
+
 ## Todo
 
-- [ ] Recurrent Neural Networkに対応
+- [x] Recurrent Neural Networkに対応
+    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
+    - 実行にはかなり時間かかるうえ、5-10世代程度ではロクな精度が出ない
+        - たぶんデータも足りていないが、これ以上増やすと学習時間どうなるんだ
 - [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
     - 半角記号を全角にする
     - 注釈記号などの除去
@@ -32,12 +47,15 @@
 ## インストール
 
 ```bash
+## markovify_sentence.py
 # pipを使う場合
 # Anaconda (Miniconda)環境でもこっちでいいかも
 $ pip install janome markovify
 # condaを使う場合
 $ conda install -c conda-forge markovify
 $ pip install janome
+## rnn_sentence.py
+$ conda install tensorflow numpy unidecode
 ```
 
 ## 使用法
