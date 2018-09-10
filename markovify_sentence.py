@@ -40,23 +40,25 @@ def main():
     parser.add_argument("-j", "--jobs", type=int, default=cores, help="the number of processes (default: the number of your CPU cores)")
     args = parser.parse_args()
 
-    mgr = mp.Manager()
-    # 生成された文章
-    queue = mgr.Queue()
-    # 生成処理が実行された回数
-    count = mgr.Value('i', 0)
-
-    jobs = min([args.jobs, args.number])
-    print("Processes:", jobs)
-    pool = mp.Pool(jobs)
-
     # ファイル読んでマルコフ連鎖モデル作成
     with open(args.input) as input:
-        model = markovify.Text(input.read())
+        model = markovify.NewlineText(input.read())
+        # model = markovify.Text(input.read())
 
     start_time = time.time()
 
-    pool.map(generate_sentence, [(queue, model, count) for _ in range(args.number)])
+    # プロセス数を指定
+    # 例えば1文を4プロセスで生成するように指定しても、1プロセスしか作られない
+    jobs = min([args.jobs, args.number])
+    mgr = mp.Manager()
+    # 生成した文章
+    queue = mgr.Queue()
+    # 生成処理が実行された回数
+    count = mgr.Value('i', 0)
+    # 指定された数のプロセスを起動
+    print("Processes:", jobs)
+    with mp.Pool(jobs) as pool:
+        pool.map(generate_sentence, [(queue, model, count) for _ in range(args.number)])
 
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
