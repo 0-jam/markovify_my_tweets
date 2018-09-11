@@ -72,7 +72,10 @@ def main():
         args.number,
         ((count.value - args.number) / count.value) * 100
     ))
-    print("It takes {:.3f} seconds ({:.3f} sentences / second)".format(elapsed_time, args.number / elapsed_time))
+    print("Times taken for generation {:.3f} seconds ({:.3f} sentences / second)".format(
+        elapsed_time,
+        args.number / elapsed_time)
+    )
 
 if __name__ == '__main__':
     main()

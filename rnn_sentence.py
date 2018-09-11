@@ -1,5 +1,4 @@
 ### 実行に時間かかる
-# embedded_dim = 256, units = 1024のとき、epochごとに30分くらいかかる
 ## ライブラリをロード
 import tensorflow as tf
 tf.enable_eager_execution()
@@ -33,9 +32,9 @@ idx2char = {index:char for index, char in enumerate(unique)}
 # 文の長さを指定
 max_length = 100
 vocab_size = len(unique)
-embedding_dim = 128
+embedding_dim = 256
 # RNN (Recursive Neural Network) ノード数
-units = 512
+units = 1024
 batch_size = 64
 # シャッフル用バッファサイズ
 buffer_size = 10000
@@ -112,8 +111,10 @@ def loss_function(real, preds):
 ## モデルを訓練させる
 epochs = args.epochs
 
+start = time.time()
+
 for epoch in range(epochs):
-    start = time.time()
+    epoch_start = time.time()
 
     # epochごとに隠れ状態(hidden state)を初期化
     hidden = model.reset_states()
@@ -133,10 +134,13 @@ for epoch in range(epochs):
 
         print("Epoch: {} / {}, Batch: {}, Loss: {:.4f}".format(epoch + 1, epochs, batch + 1, loss))
 
-    print("Time taken for 1 epoch {} sec \n".format(time.time() - start))
+    print("Time taken for 1 epoch: {:.3f} sec \n".format(time.time() - epoch_start))
+
+elapsed_time = time.time() - start
+print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
 
 ## 訓練済みモデルで予測
-gen_size = 10000
+gen_size = args.gen_size
 generated_text = ''
 start_string = args.start_string
 # start_stringを番号にする
