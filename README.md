@@ -1,7 +1,8 @@
 # Regenerate Sentences
 
-- マルコフ連鎖で文章生成
+- マルコフ連鎖やRecurrent Neural Networkで文章生成
 - [markovify][markovify]使用
+- RNN版は[TensorFlow](https://www.tensorflow.org/)使用
 
 ---
 
@@ -78,7 +79,9 @@ $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_waka
 # 本体
 # 出力ファイルのデフォルトはout.txt
 $ python markovify_sentence.py
-usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS] input
+usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
+                             [-s STATES]
+                             input
 markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
@@ -110,7 +113,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 学習対象データに青空文庫を使う場合，不要な文字を除去するために以下の正規表現を使う
 
 ```
-　|《.+?》|［.+?］|｜|^\n
+　|《.+?》|［.+?］|｜|^\n+
 ```
 
 - 全角スペース
@@ -119,7 +122,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
     - > しかもあとで聞くとそれは書生という人間中で一番 **｜** 獰悪 **《どうあく》** な種族であったそうだ。
 - 注釈
     - > **［＃８字下げ］** 一 **［＃「一」は中見出し］**
-- 空行
+- 1つ以上連続する空行
 
 欧文の始まりを示す以下のかっこは半角スペースに置き換える
 

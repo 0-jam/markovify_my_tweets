@@ -37,12 +37,15 @@ def main():
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("-o", "--output", type=str, default="out.txt", help="output file path (default: 'out.txt')")
     parser.add_argument("-n", "--number", type=int, default=1, help="the number of sentence you want to generate (default: 1)")
-    parser.add_argument("-j", "--jobs", type=int, default=cores, help="the number of processes (default: the number of your CPU cores)")
+    parser.add_argument("-j", "--jobs", type=int, default=int(cores / 2), help="the number of processes (default: half of the number of your CPU cores)")
+    parser.add_argument("-s", "--states", type=int, default=2, help="the size of states (default: 2)")
     args = parser.parse_args()
 
     # ファイル読んでマルコフ連鎖モデル作成
     with open(args.input) as input:
-        model = markovify.NewlineText(input.read())
+        # state_sizeは2か3がちょうどよさそう
+        # 4以上になると生成失敗が多くなりはじめる
+        model = markovify.NewlineText(input.read(), state_size=args.states)
         # model = markovify.Text(input.read())
 
     start_time = time.time()
