@@ -25,7 +25,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.input) as input:
-        text = replace_text(text)
+        text = replace_text(input.readlines())
 
     if args.wakachi:
         from wakachi import divide_text
