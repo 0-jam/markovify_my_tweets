@@ -42,13 +42,13 @@
 ## Todo
 
 - [ ] RNN版の分かち書き対応
+- [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
+    - 半角記号を全角にする
+    - 注釈記号などの除去
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
-- [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
-    - 半角記号を全角にする
-    - 注釈記号などの除去
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 
@@ -74,6 +74,7 @@ $ conda install tensorflow numpy unidecode
 
 - 前処理スクリプト（青空文庫用）
 - `-w`オプションを指定すると単語の分かち書きもする
+    - 一括実行スクリプト`run_pp_aozora.sh`も同様
 
 ```bash
 $ python pp_aozora.py
@@ -81,6 +82,9 @@ usage: pp_aozora.py [-h] [-w] input output
 pp_aozora.py: error: the following arguments are required: input, output
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
 $ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -w
+
+# 一括実行スクリプト
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```
 
 ### wakachi.py
@@ -108,7 +112,7 @@ markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
 # 一括実行スクリプト
-# デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し，その結果を./text/generated_(YYYYMMDD)に保存する
+# デフォルトでは./text内のすべての.txtファイルについて1回ずつ文章生成し，その結果を./text/generatedに保存する
 $ bash run.sh
 ```
 

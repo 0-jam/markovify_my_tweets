@@ -11,9 +11,9 @@ def replace_sentence(sentence):
     return sentence
 
 def replace_text(text):
-    # BUG: 入力テキストから空行を削除…できない
-    text = list(filter(lambda line: line != "\n", text))
-    return [replace_sentence(line) for line in text]
+    text = [replace_sentence(line) for line in text]
+    # 空行（もともと空行だったものと処理の結果空行になったもの）を削除して返す
+    return list(filter(lambda line: line != "", text))
 
 def main():
     # オプション設定・取得
