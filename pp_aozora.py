@@ -34,7 +34,7 @@ def main():
 
     # 改行区切りでファイルに書き込む
     with open(args.output, 'w') as out:
-        out.write("\n".join(text))
+        out.write("\n".join(text) + "\n")
 
 if __name__ == '__main__':
     main()

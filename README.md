@@ -43,8 +43,8 @@
 
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
-    - 半角記号を全角にする
-    - 注釈記号などの除去
+    - [ ] 半角記号を全角にする
+    - [x] 注釈記号などの除去
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない

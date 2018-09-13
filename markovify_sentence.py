@@ -67,7 +67,7 @@ def main():
     elapsed_time = time.time() - start_time
 
     with open(args.output, 'w') as out:
-        out.write("\n".join(dump_queue(queue)))
+        out.write("\n".join(dump_queue(queue)) + "\n")
 
     # 計測結果表示
     print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
