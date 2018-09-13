@@ -45,6 +45,9 @@
 - [ ] [青空文庫](https://www.aozora.gr.jp/)テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
     - [x] 注釈記号などの除去
+- [ ] 分かち書きスクリプトをいろいろなエンジンに対応
+    - [ ] [MeCab](http://taku910.github.io/mecab/)
+    - [ ] [Juman++](http://nlp.ist.i.kyoto-u.ac.jp/index.php?JUMAN++)
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
@@ -55,15 +58,24 @@
 ## インストール
 
 ```bash
+## wakachi_mecab.py
+# 必要パッケージ (Ubuntu)
+$ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
+$ pip install mecab-python3
+# (Optional) Mecab追加辞書をインストール
+$ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
+$ cd ~/mecab-ipadic-neologd
+$ ./bin/install-mecab-ipadic-neologd -n -a
+# 途中こう訊かれるので、"yes"と入力
+[install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
+yes
+
 ## markovify_sentence.py
-# pipを使う場合
-# Anaconda (Miniconda)環境でもこっちでいいかも
+# pipを使う場合（Anacondaでも同じ）
 $ pip install janome markovify
-# condaを使う場合
-$ conda install -c conda-forge markovify
-$ pip install janome
+
 ## rnn_sentence.py
-$ conda install tensorflow numpy unidecode
+$ conda install tensorflow numpy
 ```
 
 ## 使用法

@@ -8,7 +8,6 @@ import random
 import re
 import time
 import argparse
-import unidecode
 
 # オプション設定・取得
 parser = argparse.ArgumentParser(description="Generate sentence with RNN.")
@@ -20,7 +19,6 @@ parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size o
 args = parser.parse_args()
 
 with open(args.input) as file:
-    # text = unidecode.unidecode(file.read())
     text = file.read()
 
 # テキスト中に現れる文字を取得
