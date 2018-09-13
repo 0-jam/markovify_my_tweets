@@ -1,29 +1,39 @@
 from janome.tokenizer import Tokenizer
 import argparse
 
-parser = argparse.ArgumentParser(description="<WIP> Preprocessing script for Japanese text.")
-parser.add_argument("input", type=str, help="input file path")
-parser.add_argument("output", type=str, help="output file path")
-
-args = parser.parse_args()
-
 # 分かち書き用トークナイザ
 t = Tokenizer(wakati=True)
 
-## 読み込んだ文章を分かち書き
-def word_divide(text):
-    arr = []
+## 文sentenceを分かち書き
+# delimiter（デフォルトは半角スペース）で単語どうしをつなぐ
+def divide_word(sentence, delimiter=" "):
+    return delimiter.join(
+        list(filter(
+            lambda line: line != " ", t.tokenize(sentence.strip())
+        ))
+    )
 
-    for token in t.tokenize(text):
-        arr.append(str(token))
+## 複数行の（iterableな）テキストtextを分かち書き
+# 戻り値は行単位で要素に別れたlist
+def divide_text(text, delimiter=" "):
+    # 入力テキストから空行を削除
+    # divide_word()内で消そうとするとうまくいかない
+    text = list(filter(lambda line: line != "\n", text))
+    return [divide_word(line, delimiter=delimiter) for line in text]
 
-    # 半角スペースを除去して返す
-    return filter(lambda str:str != " ", arr)
+def main():
+    parser = argparse.ArgumentParser(description="<WIP> Preprocessing script for Japanese text.")
+    parser.add_argument("input", type=str, help="input file path")
+    parser.add_argument("output", type=str, help="output file path")
 
-with open(args.input) as input:
-    text = word_divide(input.read())
+    args = parser.parse_args()
 
-# 半角スペース区切りでファイルに書き込む
-# 行の頭にもスペースが入ってしまう
-with open(args.output, 'w') as out:
-    out.write(" ".join(text))
+    with open(args.input) as input:
+        text = divide_text(input.readlines())
+
+    # 改行区切りでファイルに書き込む
+    with open(args.output, 'w') as out:
+        out.write("\n".join(text))
+
+if __name__ == '__main__':
+    main()

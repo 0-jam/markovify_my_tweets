@@ -13,6 +13,7 @@ jobs=1
 usage(){
   cat <<EOS
 使用法：bash run.sh [オプション]
+markovify_sentence.pyを複数ファイルに対して一括で実行する
 
   -i [NAME]    学習対象のファイルが存在するディレクトリ名を指定（デフォルト：text）
   -o [NAME]    結果ファイルの出力先ディレクトリ名を指定（デフォルト：text/generated）
@@ -52,6 +53,6 @@ fi
 while read -r f; do
   # $ findで抽出したファイル名からディレクトリ名と拡張子を除去
   # その後ろに"_markovified.txt"を追加して出力ファイル名とする
-  echo "markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}"
-  python markovify_sentence.py $f -o ${outdir}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}
+  echo "markovify_sentence.py $f -o ${outdir%/}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}"
+  python markovify_sentence.py $f -o ${outdir%/}/$(basename ${f%.*})_markovified.txt -n ${number} -j ${jobs}
 done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")
