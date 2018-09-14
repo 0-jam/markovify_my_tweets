@@ -17,7 +17,6 @@ def main():
     with open(args.input) as input:
         text = divide_text(input.readlines())
 
-    # 改行区切りでファイルに書き込む
     with open(args.output, 'w') as out:
         out.write("\n".join(text) + "\n")
 

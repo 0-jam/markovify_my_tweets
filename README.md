@@ -46,12 +46,14 @@
     - [ ] 半角記号を全角にする
     - [x] 注釈記号などの除去
 - [ ] 分かち書きスクリプトをいろいろなエンジンに対応
-    - [ ] [MeCab](http://taku910.github.io/mecab/)
     - [ ] [Juman++](http://nlp.ist.i.kyoto-u.ac.jp/index.php?JUMAN++)
+        - WSLでビルドできず
+    - [x] [MeCab](http://taku910.github.io/mecab/)
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
+        - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 

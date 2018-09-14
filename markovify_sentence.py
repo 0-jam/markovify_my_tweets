@@ -10,7 +10,6 @@ def generate(queue, model, count):
         count.value += 1
 
         if text is not None:
-            # 生成した文章をqueueに挿入
             queue.put(text)
             break
 
@@ -29,10 +28,8 @@ def dump_queue(queue):
     return ret
 
 def main():
-    # CPUコア数取得
     cores = mp.cpu_count()
 
-    # オプション設定・取得
     parser = argparse.ArgumentParser(description="Generate sentence with Markov chain.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("-o", "--output", type=str, default="out.txt", help="output file path (default: 'out.txt')")
@@ -41,33 +38,29 @@ def main():
     parser.add_argument("-s", "--states", type=int, default=2, help="the size of states (default: 2)")
     args = parser.parse_args()
 
-    # ファイル読んでマルコフ連鎖モデル作成
     with open(args.input) as input:
+        # マルコフ連鎖モデル作成
         # state_sizeは2か3がちょうどよさそう
         # 4以上になると生成失敗が多くなりはじめる
         model = markovify.NewlineText(input.read(), state_size=args.states)
-        # model = markovify.Text(input.read())
 
-    start_time = time.time()
-
-    # プロセス数を指定
-    # 例えば1文を4プロセスで生成するように指定しても、1プロセスしか作られない
+    # 生成したい文数と指定されたプロセス数のうち少ないほうをプロセス数に指定（余分なプロセスができないようにするため）
     jobs = min([args.jobs, args.number])
     mgr = mp.Manager()
-    # 生成した文章
-    queue = mgr.Queue()
-    # 生成処理が実行された回数
+    generated_sentences = mgr.Queue()
+    # 生成処理が実行された回数…だが、複数プロセスの場合不正確
     count = mgr.Value('i', 0)
-    # 指定された数のプロセスを起動
+
     print("Processes:", jobs)
+    start_time = time.time()
     with mp.Pool(jobs) as pool:
-        pool.map(generate_sentence, [(queue, model, count) for _ in range(args.number)])
+        pool.map(generate_sentence, [(generated_sentences, model, count) for _ in range(args.number)])
 
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
 
     with open(args.output, 'w') as out:
-        out.write("\n".join(dump_queue(queue)) + "\n")
+        out.write("\n".join(dump_queue(generated_sentences)) + "\n")
 
     # 計測結果表示
     print("{} times generation to generate {} sentences (failed {:.2f}%)".format(

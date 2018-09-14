@@ -28,7 +28,8 @@ def main():
         text = replace_text(input.readlines())
 
     if args.wakachi:
-        from wakachi import divide_text
+        # エンジンはMeCab固定（暫定）
+        from wakachi_mecab import divide_text
 
         text = divide_text(text)
 
