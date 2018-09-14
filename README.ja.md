@@ -1,100 +1,99 @@
 # Regenerate Sentences
 
-- Text generation using Markov chain / Recurrent Neural Network (selectable)
-- Using [markovify][markovify] to apply Markov chain
-- Using [TensorFlow][tensorflow] to apply RNN
+- マルコフ連鎖やRecurrent Neural Networkで文章生成
+- [markovify][markovify]使用
+- RNN版は[TensorFlow][tensorflow]使用
 
 ---
 
-1. [Environment](#environment)
-    1. [Software](#software)
-    1. [Hardware](#hardware)
+1. [環境](#環境)
+    1. [ソフトウェア](#ソフトウェア)
+    1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
-1. [Installation](#installation)
-1. [Usage](#usage)
+1. [インストール](#インストール)
+1. [使用法](#使用法)
     1. [pp_aozora.py](#pp_aozorapy)
     1. [wakachi.py](#wakachipy)
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy)
-1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
-    1. [Aozora Bunko](#aozora-bunko)
-        1. [Remove manually](#remove-manually)
-        1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
-        1. [Replace with whitespace](#replace-with-whitespace)
+1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
+    1. [青空文庫](#青空文庫)
+        1. [手動で削除](#手動で削除)
+        1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
+        1. [半角スペースに置き換える](#半角スペースに置き換える)
 
 ---
 
-## Environment
+## 環境
 
-### Software
+### ソフトウェア
 
 - Python 3.6.6 or 3.7.0 on Miniconda 4.5.4
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 
-### Hardware
+### ハードウェア
 
 - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
 - RAM: 8GB
-- Try them later:
+- こっちでも試したい
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
 
 ## Todo
 
-- [ ] Enable function to use word as a token for RNN-based generation
-- [ ] Text formatter for [Aozora bunko][aozora]
-    - [ ] Convert all hankaku symbols to zenkaku
-    - [x] Remove annotation symbols
-- [ ] Enable using various engine for word dividing
+- [ ] RNN版の分かち書き対応
+- [ ] [青空文庫][aozora]テキスト整形用スクリプト
+    - [ ] 半角記号を全角にする
+    - [x] 注釈記号などの除去
+- [ ] 分かち書きスクリプトをいろいろなエンジンに対応
     - [ ] [Juman++][jumanpp]
-        - Juman++ cannot build on WSL
+        - WSLでビルドできず
     - [x] [MeCab][mecab]
-- [x] Recurrent Neural Network
-    - Based on script that [I wrote in the past](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
-        - Enabled command-line options
-    - It takes very long time for execution ...
-        - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
-            - `$ mecab -O yomi`
-- [x] Multiprocessing
-    - The script gets about 2.5x faster when it spawns 4 processes
+- [x] Recurrent Neural Networkに対応
+    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
+    - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
+        - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
+        - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
+- [x] マルチプロセス化
+    - 4プロセスで平均2.5倍くらい速くなった
 
-## Installation
+## インストール
 
 ```bash
 ## wakachi_janome.py
 $ pip install janome
 
 ## wakachi_mecab.py
-# Required packages (Ubuntu)
+# 必要パッケージ (Ubuntu)
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
 $ pip install mecab-python3
-# (Optional) Install additional dictionary for Mecab
+# (Optional) Mecab追加辞書をインストール
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
-# When you are asked about the installation of mecab-ipadic-NEologd, answer "yes"
+# 途中こう訊かれるので、"yes"と入力
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
 ## markovify_sentence.py
-# Using pip (recommended)
+# pipを使う場合（推奨）
 $ pip install markovify
-# Using Conda
+# Condaを使う場合
 $ conda install -c conda-forge markovify
 
 ## rnn_sentence.py
 $ conda install tensorflow numpy
 ```
 
-## Usage
+## 使用法
 
-Execute with `-h` option when you want to see the help.
+すべてのスクリプトは，-hオプションでヘルプが表示される
 
 ### pp_aozora.py
 
-- Preprocessing script for Aozora Bunko
-- Enable word dividing with `-w` option
-    - This function is also available in `run_pp_aozora.sh`
+- 前処理スクリプト（青空文庫用）
+- `-w`オプションを指定すると単語の分かち書きもする
+    - 一括実行スクリプト`run_pp_aozora.sh`も同様
 
 ```bash
 $ python pp_aozora.py
@@ -103,13 +102,13 @@ pp_aozora.py: error: the following arguments are required: input, output
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
 $ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -w
 
-# Execute pp_aozora.py for specific directory
+# 指定されたディレクトリに対して実行
 $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```
 
 ### wakachi.py
 
-- Preprocessing script for Japanese text
+- 前処理スクリプト（日本語文書用）
 
 ```bash
 $ python wakachi.py
@@ -117,7 +116,7 @@ usage: wakachi.py [-h] input output
 wakachi.py: error: the following arguments are required: input, output
 $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
 
-# Execute wakachi.py for specific directory
+# 指定されたディレクトリに対して実行
 $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ```
 
@@ -131,8 +130,8 @@ usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
 markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
-# Execute markovify_sentence.py for specific directory
-$ bash run_markovify.sh
+# 指定されたディレクトリに対して実行
+$ bash run.sh
 ```
 
 ### rnn_sentence.py
@@ -142,48 +141,49 @@ $ python rnn_sentence.py
 usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
                        input start_string
 rnn_sentence.py: error: the following arguments are required: input, start_string
-# No preprocessing needed for input file
+# テキストに特に前処理は必要ない
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 ```
 
-## Preprocessing (markovify_sentence.py)
+## 前処理 (markovify_sentence.py)
 
-- Make sure each words is separated by whitespaces before executing
-- In Windows, you will get `UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx` unless input file encoding is not Shift-JIS
-- You will get `KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')` if there is hankaku symbols in the input file
+- 実行するときは単語が半角スペースで区切られている必要がある
+- Windows環境ではファイルをShift-JISにしないと`UnicodeDecodeError: 'cp932' codec can't decode byte 0x99 in position xxxx`
+- 半角記号が文書内にあると`KeyError: ('\_\_\_BEGIN\_\_', '\_\_\_BEGIN\_\_')`
 
-### Aozora Bunko
+### 青空文庫
 
-#### Remove manually
+#### 手動で削除
 
-- Title and author
-- _【テキスト中に現れる記号について】_ (About symbols in the text)
-    - surronded by `-`
-- Below _底本：_
-- Convert text encoding into UTF-8 by using such as `$ nkf -w` (Text encoding of downloaded file is Shift-JIS)
+- タイトル
+- 作者
+- _【テキスト中に現れる記号について】_
+    - ハイフンで囲まれた部分と
+- _底本：_ から下の部分
+- ダウンロード時点での文字コードはShift-JISなので、必要に応じて`$ nkf -w`などでUTF-8などに変換する
 
-#### Remove using pp_aozora.py
+#### pp_aozora.pyで削除
 
 ```
 　|^\n+|《.+?》|［.+?］|｜
 ```
 
-- Removed by using `strip()`
-    - Zenkaku whitespace
+- 行を読んで`strip()`すると消えるもの
+    - 全角スペース
         - > 　吾輩は猫である。名前はまだ無い。
-    - Sequential blank line
-- Furigana and ｜ (Zenkaku vertical bar) indicates the beginning of the string which is placed furigana
+    - 1つ以上連続する空行
+- ふりがなとそれが付く文字列の始まりを示す｜（全角縦棒）
     - > しかもあとで聞くとそれは書生という人間中で一番 **｜** 獰悪 **《どうあく》** な種族であったそうだ。
-- Annotation
+- 注釈
     - > **［＃８字下げ］** 一 **［＃「一」は中見出し］**
 
-#### Replace with whitespace
+#### 半角スペースに置き換える
 
 ```
 〔|〕
 ```
 
-- Start of the sentence written in Latin character
+- 欧文の始まり
     - > 〔Quid aliud est mulier nisi amicitiae& inimica〕
 
 [markovify]: https://github.com/jsvine/markovify
