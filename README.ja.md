@@ -41,6 +41,7 @@
 
 ## Todo
 
+- [ ] RNN版でモデルを保存できるようにする
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
@@ -50,7 +51,7 @@
         - WSLでビルドできず
     - [x] [MeCab][mecab]
 - [x] Recurrent Neural Networkに対応
-    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに、コマンドラインオプションに対応
+    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
         - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
@@ -71,7 +72,7 @@ $ pip install mecab-python3
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
-# 途中こう訊かれるので、"yes"と入力
+# 途中こう訊かれるので，"yes"と入力
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
@@ -92,18 +93,15 @@ $ conda install tensorflow numpy
 ### pp_aozora.py
 
 - 前処理スクリプト（青空文庫用）
-- `-w`オプションを指定すると単語の分かち書きもする
+- `-e`オプションにエンジン名を指定すると単語の分かち書きもする
     - 一括実行スクリプト`run_pp_aozora.sh`も同様
 
 ```bash
-$ python pp_aozora.py
-usage: pp_aozora.py [-h] [-w] input output
-pp_aozora.py: error: the following arguments are required: input, output
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -w
+$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -e mecab
 
 # 指定されたディレクトリに対して実行
-$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e mecab
 ```
 
 ### wakachi.py
@@ -111,9 +109,6 @@ $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 - 前処理スクリプト（日本語文書用）
 
 ```bash
-$ python wakachi.py
-usage: wakachi.py [-h] input output
-wakachi.py: error: the following arguments are required: input, output
 $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
 
 # 指定されたディレクトリに対して実行
@@ -123,11 +118,6 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py
-usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
-                             [-s STATES]
-                             input
-markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
 
 # 指定されたディレクトリに対して実行
@@ -137,10 +127,6 @@ $ bash run.sh
 ### rnn_sentence.py
 
 ```bash
-$ python rnn_sentence.py
-usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
-                       input start_string
-rnn_sentence.py: error: the following arguments are required: input, start_string
 # テキストに特に前処理は必要ない
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 ```
@@ -160,7 +146,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 - _【テキスト中に現れる記号について】_
     - ハイフンで囲まれた部分と
 - _底本：_ から下の部分
-- ダウンロード時点での文字コードはShift-JISなので、必要に応じて`$ nkf -w`などでUTF-8などに変換する
+- ダウンロード時点での文字コードはShift-JISなので，必要に応じて`$ nkf -w`などでUTF-8などに変換する
 
 #### pp_aozora.pyで削除
 

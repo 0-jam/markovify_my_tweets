@@ -14,7 +14,7 @@ def generate(queue, model, count):
             break
 
 ## ラッパーメソッド
-# Pool.map()は指定できる引数の数に制限があるので、ここの引数にtuple型の値を入れて、
+# Pool.map()は指定できる引数の数に制限があるので，ここの引数にtuple型の値を入れて，
 # このメソッド内で展開して本体メソッドで処理をする
 def generate_sentence(args):
     generate(*args)
@@ -48,7 +48,7 @@ def main():
     jobs = min([args.jobs, args.number])
     mgr = mp.Manager()
     generated_sentences = mgr.Queue()
-    # 生成処理が実行された回数…だが、複数プロセスの場合不正確
+    # 生成処理が実行された回数…だが，複数プロセスの場合不正確
     count = mgr.Value('i', 0)
 
     print("Processes:", jobs)

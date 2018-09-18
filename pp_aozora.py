@@ -20,21 +20,19 @@ def main():
     parser = argparse.ArgumentParser(description="Preprocessing for Aozora Bunko.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("output", type=str, help="output file path")
-    parser.add_argument("-w", "--wakachi", action="store_true", help="enable word dividing")
+    parser.add_argument("-e", "--engine", type=str, default="", choices=["", "janome", "mecab"], help="specify tokenize engine (default: none)")
 
     args = parser.parse_args()
 
-    with open(args.input) as input:
+    with open(args.input) as input, open(args.output, 'w') as out:
         text = replace_text(input.readlines())
 
-    if args.wakachi:
-        # エンジンはMeCab固定（暫定）
-        from wakachi_mecab import divide_text
+        if args.engine != "":
+            from wakachi import divide
 
-        text = divide_text(text)
+            text = divide(args.engine, text)
 
-    # 改行区切りでファイルに書き込む
-    with open(args.output, 'w') as out:
+        # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
 
 if __name__ == '__main__':

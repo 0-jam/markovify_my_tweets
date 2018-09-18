@@ -15,14 +15,14 @@ pp_aozora.pyを複数ファイルに対して一括で実行する
 
   -i [NAME]    学習対象のファイルが存在するディレクトリ名を指定（デフォルト：text/novel_orig）
   -o [NAME]    結果ファイルの出力先ディレクトリ名を指定（デフォルト：text/novel）
-  -w           分かち書きを有効にする
+  -e [NAME]    指定したエンジン名で分かち書きを有効にする
   -h           このヘルプを表示して終了
 EOS
   exit 1
 }
 
 ### オプションの処理
-while getopts "hwi:o:" opts; do
+while getopts "he:i:o:" opts; do
   case $opts in
     h|\?)
       usage
@@ -33,8 +33,8 @@ while getopts "hwi:o:" opts; do
     o)
       outdir=$OPTARG
       ;;
-    w)
-      wakachi=" -w"
+    e)
+      wakachi=" -e ${OPTARG}"
       postfix="wakachi"
       ;;
   esac

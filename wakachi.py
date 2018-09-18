@@ -1,5 +1,17 @@
 import argparse
 
+## 入力されたtextをengineで分かち書き
+def divide(engine, text):
+    if engine in {"janome"}:
+        from wakachi_janome import divide_text
+    elif engine in {"mecab"}:
+        from wakachi_mecab import divide_text
+    else
+        # 無効なエンジンが指定された場合，入力されたテキストをそのまま返す（暫定）
+        return text
+
+    return divide_text(text)
+
 def main():
     parser = argparse.ArgumentParser(description="<WIP> Preprocessing script for Japanese text.")
     parser.add_argument("input", type=str, help="input file path")
@@ -8,17 +20,8 @@ def main():
 
     args = parser.parse_args()
 
-    engine = args.engine
-    if engine in {"janome"}:
-        from wakachi_janome import divide_text
-    elif engine in {"mecab"}:
-        from wakachi_mecab import divide_text
-
-    with open(args.input) as input:
-        text = divide_text(input.readlines())
-
-    with open(args.output, 'w') as out:
-        out.write("\n".join(text) + "\n")
+    with open(args.input) as input, open(args.output, 'w') as out:
+        out.write("\n".join(divide(args.engine, input.readlines())) + "\n")
 
 if __name__ == '__main__':
     main()

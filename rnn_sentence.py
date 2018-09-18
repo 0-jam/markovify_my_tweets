@@ -10,11 +10,11 @@ def main():
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("start_string", type=str, help="generation start with this string")
     parser.add_argument("-o", "--output", type=str, default="out_rnn.txt", help="output file path (default: 'out_rnn.txt')")
-    parser.add_argument("-e", "--epochs", type=int, default=5, help="the number of epochs (default: 5)")
+    parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
     args = parser.parse_args()
 
-    # TensorFlowはロードに時間がかかるので、コマンドラインオプションをすべて通してから呼んでいる
+    # TensorFlowはロードに時間がかかるので，コマンドラインオプションをすべて通してから呼んでいる
     import tensorflow as tf
     tf.enable_eager_execution()
 
@@ -24,6 +24,7 @@ def main():
     # テキスト中に現れる文字を取得
     unique = sorted(set(text))
     # 各文字に数字を割り当てる
+    # テキストにない文字は記録されないので，開始文字列に未知の文字を与えるとエラー
     char2idx = {char:index for index, char in enumerate(unique)}
     idx2char = {index:char for index, char in enumerate(unique)}
 
@@ -31,8 +32,10 @@ def main():
     max_length = 100
     vocab_size = len(unique)
     embedding_dim = 256
+    # embedding_dim = 16
     # RNN (Recursive Neural Network) ノード数
     units = 1024
+    # units = 64
     batch_size = 64
     # シャッフル用バッファサイズ
     buffer_size = 10000

@@ -41,6 +41,7 @@
 
 ## Todo
 
+- [ ] Enable saving model for RNN-based generation
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -93,18 +94,15 @@ Execute with `-h` option when you want to see the help.
 ### pp_aozora.py
 
 - Preprocessing script for Aozora Bunko
-- Enable word dividing with `-w` option
+- Enable word dividing with `-e` option
     - This function is also available in `run_pp_aozora.sh`
 
 ```bash
-$ python pp_aozora.py
-usage: pp_aozora.py [-h] [-w] input output
-pp_aozora.py: error: the following arguments are required: input, output
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -w
+$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -e mecab
 
 # Execute pp_aozora.py for specific directory
-$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e mecab
 ```
 
 ### wakachi.py
