@@ -31,11 +31,12 @@ def main():
     # 文の長さを指定
     max_length = 100
     vocab_size = len(unique)
-    embedding_dim = 256
-    # embedding_dim = 16
+    # テスト用に学習用パラメータ（組み込み次元数・RNNノード数）を16分の1にしている
+    # embedding_dim = 256
+    embedding_dim = 16
     # RNN (Recursive Neural Network) ノード数
-    units = 1024
-    # units = 64
+    # units = 1024
+    units = 64
     batch_size = 64
     # シャッフル用バッファサイズ
     buffer_size = 10000
