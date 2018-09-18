@@ -30,7 +30,7 @@ def main():
         if args.engine != "":
             from wakachi import divide
 
-            text = divide(args.engine, text)
+            text = divide(text, args.engine)
 
         # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
