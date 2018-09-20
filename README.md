@@ -28,7 +28,7 @@
 
 ### Software
 
-- Python 3.6.6 or 3.7.0 on Miniconda 4.5.4
+- Python 3.6.6 on Miniconda 4.5.4
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 
 ### Hardware

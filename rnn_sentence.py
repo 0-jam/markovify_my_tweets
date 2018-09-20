@@ -4,6 +4,62 @@ import numpy as np
 import random
 import re
 import time
+import tensorflow as tf
+tf.enable_eager_execution()
+from tensorflow import keras
+
+class Model(tf.keras.Model):
+    def __init__(self, vocab_size, embedding_dim, units, batch_size):
+        super(Model, self).__init__()
+        self.units = units
+        self.batch_sz = batch_size
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
+
+        # CUDAが使えるか確認
+        if tf.test.is_gpu_available():
+            self.gru = tf.keras.layers.CuDNNGRU(
+                self.units,
+                return_sequences=True,
+                return_state=True,
+                recurrent_initializer='glorot_uniform'
+            )
+        else:
+            self.gru = tf.keras.layers.GRU(
+                self.units,
+                return_sequences=True,
+                return_state=True,
+                recurrent_activation='sigmoid',
+                recurrent_initializer='glorot_uniform'
+            )
+
+        self.fc = tf.keras.layers.Dense(vocab_size)
+
+    def call(self, x, hidden):
+        x = self.embedding(x)
+
+        # output_shape = (batch_size, max_length, hidden_size)
+        # states_shape = (batch_size, hidden_size)
+
+        # statesにモデルの状態を格納
+        # 訓練中に毎回渡される
+        output, states = self.gru(x, initial_state=hidden)
+
+        # Densely-connected層に渡せる形にデータを整形
+        # 整形後：(batch_size * max_length, hidden)
+        output = tf.reshape(output, (-1, output.shape[2]))
+
+        # output shape after the dense layer is (batch_size * max_length, vocab_size)
+        x = self.fc(output)
+
+        return x, states
+
+    # def get_config(self):
+    #     config = {vocab_size, embedding_dim, units, batch_size}
+    def get_config(self):
+        config = super().get_config()
+        config['localization_net'] = # say self. _localization_net  if you store the argument in __init__
+        config['output_size'] = # say self. _output_size  if you store the argument in __init__
+        return config
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN.")
@@ -13,10 +69,6 @@ def main():
     parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
     args = parser.parse_args()
-
-    # TensorFlowはロードに時間がかかるので，コマンドラインオプションをすべて通してから呼んでいる
-    import tensorflow as tf
-    tf.enable_eager_execution()
 
     with open(args.input) as file:
         text = file.read()
@@ -55,51 +107,6 @@ def main():
     ## バッチを作ってシャッフルする
     dataset = tf.data.Dataset.from_tensor_slices((input_text, target_text)).shuffle(buffer_size)
     dataset = dataset.batch(batch_size, drop_remainder=True)
-
-    class Model(tf.keras.Model):
-        def __init__(self, vocab_size, embedding_dim, units, batch_size):
-            super(Model, self).__init__()
-            self.units = units
-            self.batch_sz = batch_size
-            self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
-
-            # CUDAが使えるか確認
-            if tf.test.is_gpu_available():
-                self.gru = tf.keras.layers.CuDNNGRU(
-                    self.units,
-                    return_sequences=True,
-                    return_state=True,
-                    recurrent_initializer='glorot_uniform'
-                )
-            else:
-                self.gru = tf.keras.layers.GRU(
-                    self.units,
-                    return_sequences=True,
-                    return_state=True,
-                    recurrent_activation='sigmoid',
-                    recurrent_initializer='glorot_uniform'
-                )
-
-            self.fc = tf.keras.layers.Dense(vocab_size)
-
-        def call(self, x, hidden):
-            x = self.embedding(x)
-
-            # output_shape = (batch_size, max_length, hidden_size)
-            # states_shape = (batch_size, hidden_size)
-
-            # statesにモデルの状態を格納
-            # 訓練中に毎回渡される
-            output, states = self.gru(x, initial_state=hidden)
-
-            # Densely-connected層に渡せる形にデータを整形
-            # 整形後：(batch_size * max_length, hidden)
-            output = tf.reshape(output, (-1, output.shape[2]))
-
-            # output shape after the dense layer is (batch_size * max_length, vocab_size)
-            x = self.fc(output)
-
-            return x, states
 
     ## モデル作成
     model = Model(vocab_size, embedding_dim, units, batch_size)
