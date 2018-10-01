@@ -28,20 +28,18 @@
 
 ### Software
 
-- Python 3.6.6 or 3.7.0 on Miniconda 4.5.4
+- Python 3.6.6 on Miniconda 4.5.4
 - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 
 ### Hardware
 
 - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
 - RAM: 8GB
-- Try them later:
-    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-    - RAM: 16GB
+- CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+- RAM: 16GB
 
 ## Todo
 
-- [ ] Enable saving model for RNN-based generation
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -50,12 +48,14 @@
     - [ ] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
+- [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
     - Based on script that [I wrote in the past](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
         - Enabled command-line options
     - It takes very long time for execution ...
         - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
             - `$ mecab -O yomi`
+        - It should be executed on GPU
 - [x] Multiprocessing
     - The script gets about 2.5x faster when it spawns 4 processes
 
@@ -142,6 +142,13 @@ usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
 rnn_sentence.py: error: the following arguments are required: input, start_string
 # No preprocessing needed for input file
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
+
+# Specifying learned model
+# Example: Learned model exists in directory "./learned_models/Latin-Lipsum.txt"
+$ ls learned_models/Latin-Lipsum.txt/
+Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+# Specify the directory name
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model learned_models/Latin-Lipsum.txt
 ```
 
 ## Preprocessing (markovify_sentence.py)
