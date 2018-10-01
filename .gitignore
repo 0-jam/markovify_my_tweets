@@ -107,4 +107,4 @@ ENV/
 *.csv
 *.txt
 !text/Latin-Lipsum.txt
-model_checkpoint/*
+learned_models/*

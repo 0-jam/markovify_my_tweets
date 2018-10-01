@@ -35,13 +35,11 @@
 
 - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
 - RAM: 8GB
-- こっちでも試したい
-    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-    - RAM: 16GB
+- CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+- RAM: 16GB
 
 ## Todo
 
-- [ ] RNN版でモデルを保存できるようにする
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
@@ -50,11 +48,13 @@
     - [ ] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
+- [x] RNN版でモデルを保存できるようにする
 - [x] Recurrent Neural Networkに対応
     - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
         - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
+        - GPU使わないとダメか
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 
@@ -127,8 +127,19 @@ $ bash run.sh
 ### rnn_sentence.py
 
 ```bash
-# テキストに特に前処理は必要ない
+$ python rnn_sentence.py
+usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
+                       input start_string
+rnn_sentence.py: error: the following arguments are required: input, start_string
+# 特に前処理は必要ない
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
+
+# 学習済みモデルを指定
+# 例：ディレクトリ"./learned_models/Latin-Lipsum.txt"内にモデルがあるとする
+$ ls learned_models/Latin-Lipsum.txt/
+Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+# ディレクトリ名を指定
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
 ```
 
 ## 前処理 (markovify_sentence.py)

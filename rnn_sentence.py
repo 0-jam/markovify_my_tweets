@@ -4,6 +4,7 @@ import numpy as np
 import random
 import re
 import time
+from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from tensorflow import keras
@@ -53,17 +54,15 @@ class Model(tf.keras.Model):
 
         return x, states
 
-    # def get_config(self):
-    #     config = {embedding, units, batch_sz} + super().get_config()
-    #     return config
-
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN.")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN. README.md contains further information.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("start_string", type=str, help="generation start with this string")
     parser.add_argument("-o", "--output", type=str, default="out_rnn.txt", help="output file path (default: 'out_rnn.txt')")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
+    parser.add_argument("-m", "--model", type=str, help="the learned model ('<model>.index' file) (default: empty (create a new model))")
+    parser.add_argument("-s", "--save_to", type=str, default="", help="location to save the model (default: './learned_models/<input_file_name>', overwrite if checkpoints exists)")
     args = parser.parse_args()
 
     with open(args.input) as file:
@@ -79,12 +78,11 @@ def main():
     # 文の長さを指定
     max_length = 100
     vocab_size = len(unique)
-    # テスト用に学習用パラメータ（組み込み次元数・RNNノード数）を16分の1にしている
-    # embedding_dim = 256
-    embedding_dim = 16
+    embedding_dim = 256
+    # embedding_dim = 16
     # RNN (Recursive Neural Network) ノード数
-    # units = 1024
-    units = 64
+    units = 1024
+    # units = 64
     batch_size = 64
     # シャッフル用バッファサイズ
     buffer_size = 10000
@@ -113,38 +111,50 @@ def main():
         # one-hotベクトルを生成しなくていいようにsparse_softmax_cross_entropyを使う
         return tf.losses.sparse_softmax_cross_entropy(labels=real, logits=preds)
 
-    ## モデルを訓練させる
-    epochs = args.epochs
+    filename = args.input.split("/")[-1]
+    if args.model:
+        # 訓練済みモデルを読み込む
+        model.load_weights(args.model.strip("/") + "/" + filename)
+    else:
+        ## モデルを訓練させる
+        epochs = args.epochs
+        # モデル保存先ディレクトリを指定
+        if args.save_to:
+            path = Path(args.save_to)
+        else:
+            path = Path("./learned_models/" + filename)
 
-    start = time.time()
+        if Path.is_dir(path) is not True:
+            Path.mkdir(path, parents=True)
 
-    for epoch in range(epochs):
-        epoch_start = time.time()
+        start = time.time()
+        for epoch in range(epochs):
+            epoch_start = time.time()
 
-        # epochごとに隠れ状態(hidden state)を初期化
-        hidden = model.reset_states()
+            # epochごとに隠れ状態(hidden state)を初期化
+            hidden = model.reset_states()
 
-        for (batch, (input, target)) in enumerate(dataset):
-            with tf.GradientTape() as tape:
-                # モデルに隠れ状態を与える
-                predictions, hidden = model(input, hidden)
+            for (batch, (input, target)) in enumerate(dataset):
+                with tf.GradientTape() as tape:
+                    # モデルに隠れ状態を与える
+                    predictions, hidden = model(input, hidden)
 
-                # 損失関数に対象を予期させる？ように対象を整形する
-                # (reshape target to make loss function expect the target)
-                target = tf.reshape(target, (-1,))
-                loss = loss_function(target, predictions)
+                    # 損失関数に対象を予期させる？ように対象を整形する
+                    # (reshape target to make loss function expect the target)
+                    target = tf.reshape(target, (-1,))
+                    loss = loss_function(target, predictions)
 
-            gradients = tape.gradient(loss, model.variables)
-            optimizer.apply_gradients(zip(gradients, model.variables), global_step = tf.train.get_or_create_global_step())
+                gradients = tape.gradient(loss, model.variables)
+                optimizer.apply_gradients(zip(gradients, model.variables), global_step = tf.train.get_or_create_global_step())
 
-            print("Epoch: {} / {}, Batch: {}, Loss: {:.4f}".format(epoch + 1, epochs, batch + 1, loss))
+                print("Epoch: {} / {}, Batch: {}, Loss: {:.4f}".format(epoch + 1, epochs, batch + 1, loss))
 
-        print("Time taken for 1 epoch: {:.3f} sec \n".format(time.time() - epoch_start))
+            print("Time taken for 1 epoch: {:.3f} sec \n".format(time.time() - epoch_start))
 
-    elapsed_time = time.time() - start
-    print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
+        elapsed_time = time.time() - start
+        print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
 
-    model.save_weights("./model_checkpoint/my_checkpoint")
+        model.save_weights(str(path) + "/" + filename)
 
     ## 訓練済みモデルで予測
     gen_size = args.gen_size
