@@ -56,9 +56,7 @@ class Model(tf.keras.Model):
     # def get_config(self):
     #     config = {vocab_size, embedding_dim, units, batch_size}
     def get_config(self):
-        config = super().get_config()
-        config['localization_net'] = # say self. _localization_net  if you store the argument in __init__
-        config['output_size'] = # say self. _output_size  if you store the argument in __init__
+        config = {vocab_size, embedding_dim, units, batch_size} + super().get_config()
         return config
 
 def main():
