@@ -54,10 +54,8 @@ class Model(tf.keras.Model):
         return x, states
 
     # def get_config(self):
-    #     config = {vocab_size, embedding_dim, units, batch_size}
-    def get_config(self):
-        config = {vocab_size, embedding_dim, units, batch_size} + super().get_config()
-        return config
+    #     config = {embedding, units, batch_sz} + super().get_config()
+    #     return config
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN.")
@@ -145,6 +143,8 @@ def main():
 
     elapsed_time = time.time() - start
     print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
+
+    model.save_weights("./model_checkpoint/my_checkpoint")
 
     ## 訓練済みモデルで予測
     gen_size = args.gen_size
