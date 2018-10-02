@@ -40,6 +40,7 @@
 
 ## Todo
 
+- [ ] Try on pure Windows
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -50,7 +51,7 @@
     - [x] [MeCab][mecab]
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
-    - Based on script that [I wrote in the past](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
+    - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
         - Enabled command-line options
     - It takes very long time for execution ...
         - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
@@ -127,7 +128,7 @@ usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
                              [-s STATES]
                              input
 markovify_sentence.py: error: the following arguments are required: input
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
 
 # Execute markovify_sentence.py for specific directory
 $ bash run_markovify.sh

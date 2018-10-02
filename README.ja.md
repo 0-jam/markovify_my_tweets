@@ -40,6 +40,7 @@
 
 ## Todo
 
+- [ ] 素のWindowsで試す
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
@@ -50,7 +51,7 @@
     - [x] [MeCab][mecab]
 - [x] RNN版でモデルを保存できるようにする
 - [x] Recurrent Neural Networkに対応
-    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
+    - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
         - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
@@ -72,9 +73,10 @@ $ pip install mecab-python3
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
-# 途中こう訊かれるので，"yes"と入力
+# 途中こう訊かれたら"yes"と入力
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
+$ ./install-mecab-ipadic-neologd.sh
 
 ## markovify_sentence.py
 # pipを使う場合（推奨）
@@ -118,7 +120,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
 
 # 指定されたディレクトリに対して実行
 $ bash run.sh

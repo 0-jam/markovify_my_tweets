@@ -2,6 +2,7 @@ import markovify
 import argparse
 import time
 import multiprocessing as mp
+from pathlib import Path
 
 ## モデルから文章生成（処理の本体）
 def generate(queue, model, count):
@@ -38,7 +39,7 @@ def main():
     parser.add_argument("-s", "--states", type=int, default=2, help="the size of states (default: 2)")
     args = parser.parse_args()
 
-    with open(args.input) as input:
+    with Path(args.input).open() as input:
         # マルコフ連鎖モデル作成
         # state_sizeは2か3がちょうどよさそう
         # 4以上になると生成失敗が多くなりはじめる
@@ -59,7 +60,7 @@ def main():
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
 
-    with open(args.output, 'w') as out:
+    with Path(args.output).open('w') as out:
         out.write("\n".join(dump_queue(generated_sentences)) + "\n")
 
     # 計測結果表示
@@ -70,8 +71,8 @@ def main():
     ))
     print("Times taken for generation {:.3f} seconds ({:.3f} sentences / second)".format(
         elapsed_time,
-        args.number / elapsed_time)
-    )
+        args.number / elapsed_time
+    ))
 
 if __name__ == '__main__':
     main()

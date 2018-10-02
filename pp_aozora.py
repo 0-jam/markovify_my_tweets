@@ -1,5 +1,6 @@
 import argparse
 import re
+from pathlib import Path
 
 ## 引数sentenceを整形
 def replace_sentence(sentence):
@@ -24,7 +25,7 @@ def main():
 
     args = parser.parse_args()
 
-    with open(args.input) as input, open(args.output, 'w') as out:
+    with Path(args.input).open() as input, Path(args.output).open('w') as out:
         text = replace_text(input.readlines())
 
         if args.engine != "":
