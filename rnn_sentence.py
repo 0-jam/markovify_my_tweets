@@ -8,6 +8,7 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from tensorflow import keras
+import sys
 
 class Model(tf.keras.Model):
     def __init__(self, vocab_size, embedding_dim, units, batch_size):
@@ -69,11 +70,11 @@ def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN. README.md contains further information.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("start_string", type=str, help="generation start with this string")
-    parser.add_argument("-o", "--output", type=str, default="out_rnn.txt", help="output file path (default: 'out_rnn.txt')")
+    parser.add_argument("-o", "--output", type=str, help="output file path (default: stdout)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
     parser.add_argument("-m", "--model_dir", type=str, help="path to the learned model directory (default: empty (create a new model))")
-    parser.add_argument("-s", "--save_to", type=str, default="", help="location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
+    parser.add_argument("-s", "--save_to", type=str, help="location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     args = parser.parse_args()
 
     with Path(args.input).open() as file:
@@ -135,9 +136,6 @@ def main():
         else:
             path = Path("./learned_models").joinpath(filename)
 
-        if Path.is_dir(path) is not True:
-            Path.mkdir(path, parents=True)
-
         start = time.time()
         for epoch in range(epochs):
             epoch_start = time.time()
@@ -164,6 +162,9 @@ def main():
 
         elapsed_time = time.time() - start
         print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
+
+        if Path.is_dir(path) is not True:
+            Path.mkdir(path, parents=True)
 
         model.save_weights(str(path.joinpath(filename)))
 
@@ -192,8 +193,12 @@ def main():
 
         generated_text += idx2char[predicted_id]
 
-    with Path(args.output).open('w') as out:
-        out.write(start_string + generated_text)
+    generated_text = start_string + generated_text + "\n"
+    if args.output:
+        with Path(args.output).open('w') as out:
+            out.write(generated_text)
+    else:
+        sys.stdout.write(generated_text)
 
 if __name__ == '__main__':
     main()

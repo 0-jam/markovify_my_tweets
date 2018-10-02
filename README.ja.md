@@ -28,15 +28,22 @@
 
 ### ソフトウェア
 
-- Python 3.6.6 on Miniconda 4.5.4
-- Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
+- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.6 on Ubuntu 18.04.1
+- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
 
 ### ハードウェア
 
-- CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
-- RAM: 8GB
-- CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-- RAM: 16GB
+- PC 1
+    - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
+    - RAM: 8GB
+- PC 2
+    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+    - RAM: 16GB
+    - [ ] GPU: AMD Radeon RX 580
+        - Polaris 10 (GFX 8), 2304 cores (64 CUs), 8GB VRAM
+        - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
 
 ## Todo
 
@@ -76,7 +83,6 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 # 途中こう訊かれたら"yes"と入力
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
-$ ./install-mecab-ipadic-neologd.sh
 
 ## markovify_sentence.py
 # pipを使う場合（推奨）
@@ -141,7 +147,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # ディレクトリ名を指定
-$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
 ```
 
 ## 前処理 (markovify_sentence.py)

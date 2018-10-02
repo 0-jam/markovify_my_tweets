@@ -25,14 +25,15 @@ def main():
 
     args = parser.parse_args()
 
-    with Path(args.input).open() as input, Path(args.output).open('w') as out:
+    with Path(args.input).open() as input:
         text = replace_text(input.readlines())
 
-        if args.engine != "":
-            from wakachi import divide
+    if args.engine != "":
+        from wakachi import divide
 
-            text = divide(text, args.engine)
+        text = divide(text, args.engine)
 
+    with Path(args.output).open('w') as out:
         # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
 
