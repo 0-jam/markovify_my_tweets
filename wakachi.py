@@ -4,9 +4,9 @@ from pathlib import Path
 ## 入力されたtextをengineで分かち書き
 def divide(text, engine="janome"):
     if engine in {"janome"}:
-        from wakachi_janome import divide_text
+        from modules.wakachi_janome import divide_text
     elif engine in {"mecab"}:
-        from wakachi_mecab import divide_text
+        from modules.wakachi_mecab import divide_text
     else:
         # 無効なエンジンが指定された場合，入力されたテキストをそのまま返す（暫定）
         return text
