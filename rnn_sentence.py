@@ -8,6 +8,7 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from tensorflow import keras
+import sys
 
 class Model(tf.keras.Model):
     def __init__(self, vocab_size, embedding_dim, units, batch_size):
@@ -54,18 +55,29 @@ class Model(tf.keras.Model):
 
         return x, states
 
+## <ckpt_dir>/checkpointの内容を読み込んでモデルファイルのパスを返す
+def model_path(ckpt_dir):
+    ckpt_dir = Path(ckpt_dir)
+    with ckpt_dir.joinpath("checkpoint").open() as file:
+        ckpt = file.readlines()
+
+    ckpt = dict(map(lambda line: line.strip().split(":"), ckpt))
+
+    # model.load_weights()はPathオブジェクトを受け取れないのでstrに変換
+    return str(ckpt_dir.joinpath(ckpt['model_checkpoint_path'].strip(' "')))
+
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN. README.md contains further information.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("start_string", type=str, help="generation start with this string")
-    parser.add_argument("-o", "--output", type=str, default="out_rnn.txt", help="output file path (default: 'out_rnn.txt')")
+    parser.add_argument("-o", "--output", type=str, help="output file path (default: stdout)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
-    parser.add_argument("-m", "--model", type=str, help="the learned model ('<model>.index' file) (default: empty (create a new model))")
-    parser.add_argument("-s", "--save_to", type=str, default="", help="location to save the model (default: './learned_models/<input_file_name>', overwrite if checkpoints exists)")
+    parser.add_argument("-m", "--model_dir", type=str, help="path to the learned model directory (default: empty (create a new model))")
+    parser.add_argument("-s", "--save_to", type=str, help="location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     args = parser.parse_args()
 
-    with open(args.input) as file:
+    with Path(args.input).open() as file:
         text = file.read()
 
     # テキスト中に現れる文字を取得
@@ -111,21 +123,18 @@ def main():
         # one-hotベクトルを生成しなくていいようにsparse_softmax_cross_entropyを使う
         return tf.losses.sparse_softmax_cross_entropy(labels=real, logits=preds)
 
-    filename = args.input.split("/")[-1]
-    if args.model:
+    if args.model_dir:
         # 訓練済みモデルを読み込む
-        model.load_weights(args.model.strip("/") + "/" + filename)
+        model.load_weights(model_path(args.model_dir))
     else:
+        filename = args.input.split("/")[-1]
         ## モデルを訓練させる
         epochs = args.epochs
         # モデル保存先ディレクトリを指定
         if args.save_to:
             path = Path(args.save_to)
         else:
-            path = Path("./learned_models/" + filename)
-
-        if Path.is_dir(path) is not True:
-            Path.mkdir(path, parents=True)
+            path = Path("./learned_models").joinpath(filename)
 
         start = time.time()
         for epoch in range(epochs):
@@ -139,7 +148,7 @@ def main():
                     # モデルに隠れ状態を与える
                     predictions, hidden = model(input, hidden)
 
-                    # 損失関数に対象を予期させる？ように対象を整形する
+                    # 損失関数に渡せる形に対象を整形する
                     # (reshape target to make loss function expect the target)
                     target = tf.reshape(target, (-1,))
                     loss = loss_function(target, predictions)
@@ -154,7 +163,10 @@ def main():
         elapsed_time = time.time() - start
         print("Time taken for whole learning: {:.3f} sec ({:.3f} seconds / epoch) \n".format(elapsed_time, elapsed_time / epochs))
 
-        model.save_weights(str(path) + "/" + filename)
+        if Path.is_dir(path) is not True:
+            Path.mkdir(path, parents=True)
+
+        model.save_weights(str(path.joinpath(filename)))
 
     ## 訓練済みモデルで予測
     gen_size = args.gen_size
@@ -162,7 +174,7 @@ def main():
     start_string = args.start_string
     # start_stringを番号にする
     input_eval = tf.expand_dims([char2idx[s] for s in start_string], 0)
-    # temperaturesが大きいほど予測しにくい(surprising)テキストが生成される
+    # temperaturesが大きいほど予想？しにくい(surprising)テキストが生成される
     temperature = 1.0
 
     # 隠れ状態の形：(batch_size, units)
@@ -181,8 +193,12 @@ def main():
 
         generated_text += idx2char[predicted_id]
 
-    with open(args.output, 'w') as out:
-        out.write(start_string + generated_text)
+    generated_text = start_string + generated_text + "\n"
+    if args.output:
+        with Path(args.output).open('w') as out:
+            out.write(generated_text)
+    else:
+        sys.stdout.write(generated_text)
 
 if __name__ == '__main__':
     main()

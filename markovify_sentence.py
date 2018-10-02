@@ -2,6 +2,8 @@ import markovify
 import argparse
 import time
 import multiprocessing as mp
+from pathlib import Path
+import sys
 
 ## モデルから文章生成（処理の本体）
 def generate(queue, model, count):
@@ -32,13 +34,13 @@ def main():
 
     parser = argparse.ArgumentParser(description="Generate sentence with Markov chain.")
     parser.add_argument("input", type=str, help="input file path")
-    parser.add_argument("-o", "--output", type=str, default="out.txt", help="output file path (default: 'out.txt')")
+    parser.add_argument("-o", "--output", type=str, help="output file path (default: stdout)")
     parser.add_argument("-n", "--number", type=int, default=1, help="the number of sentence you want to generate (default: 1)")
     parser.add_argument("-j", "--jobs", type=int, default=int(cores / 2), help="the number of processes (default: half of the number of your CPU cores)")
     parser.add_argument("-s", "--states", type=int, default=2, help="the size of states (default: 2)")
     args = parser.parse_args()
 
-    with open(args.input) as input:
+    with Path(args.input).open() as input:
         # マルコフ連鎖モデル作成
         # state_sizeは2か3がちょうどよさそう
         # 4以上になると生成失敗が多くなりはじめる
@@ -59,8 +61,12 @@ def main():
     # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
 
-    with open(args.output, 'w') as out:
-        out.write("\n".join(dump_queue(generated_sentences)) + "\n")
+    generated_sentences = "\n".join(dump_queue(generated_sentences)) + "\n"
+    if args.output:
+        with Path(args.output).open('w') as out:
+            out.write(generated_sentences)
+    else:
+        sys.stdout.write(generated_sentences)
 
     # 計測結果表示
     print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
@@ -70,8 +76,8 @@ def main():
     ))
     print("Times taken for generation {:.3f} seconds ({:.3f} sentences / second)".format(
         elapsed_time,
-        args.number / elapsed_time)
-    )
+        args.number / elapsed_time
+    ))
 
 if __name__ == '__main__':
     main()

@@ -28,18 +28,26 @@
 
 ### ソフトウェア
 
-- Python 3.6.6 on Miniconda 4.5.4
-- Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
+- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.6 on Ubuntu 18.04.1
+- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
 
 ### ハードウェア
 
-- CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
-- RAM: 8GB
-- CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-- RAM: 16GB
+- PC 1
+    - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
+    - RAM: 8GB
+- PC 2
+    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+    - RAM: 16GB
+    - [ ] GPU: AMD Radeon RX 580
+        - Polaris 10 (GFX 8), 2304 cores (64 CUs), 8GB VRAM
+        - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
 
 ## Todo
 
+- [ ] 素のWindowsで試す
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
@@ -50,7 +58,7 @@
     - [x] [MeCab][mecab]
 - [x] RNN版でモデルを保存できるようにする
 - [x] Recurrent Neural Networkに対応
-    - [以前書いたもの](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
+    - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
     - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
         - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
         - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
@@ -72,7 +80,7 @@ $ pip install mecab-python3
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
-# 途中こう訊かれるので，"yes"と入力
+# 途中こう訊かれたら"yes"と入力
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
@@ -118,7 +126,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
 
 # 指定されたディレクトリに対して実行
 $ bash run.sh
@@ -139,7 +147,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # ディレクトリ名を指定
-$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
 ```
 
 ## 前処理 (markovify_sentence.py)

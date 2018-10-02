@@ -28,18 +28,26 @@
 
 ### Software
 
-- Python 3.6.6 on Miniconda 4.5.4
-- Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
+- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.6 on Ubuntu 18.04.1
+- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
 
 ### Hardware
 
-- CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
-- RAM: 8GB
-- CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-- RAM: 16GB
+- PC 1
+    - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
+    - RAM: 8GB
+- PC 2
+    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
+    - RAM: 16GB
+    - [ ] GPU: AMD Radeon RX 580
+        - Polaris 10 (GFX 8), 2304 cores (64 CUs), 8GB VRAM
+        - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
 
 ## Todo
 
+- [ ] Try on pure Windows
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -50,7 +58,7 @@
     - [x] [MeCab][mecab]
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
-    - Based on script that [I wrote in the past](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
+    - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
         - Enabled command-line options
     - It takes very long time for execution ...
         - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
@@ -127,7 +135,7 @@ usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
                              [-s STATES]
                              input
 markovify_sentence.py: error: the following arguments are required: input
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 1000
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
 
 # Execute markovify_sentence.py for specific directory
 $ bash run_markovify.sh
@@ -148,7 +156,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # Specify the directory name
-$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
 ```
 
 ## Preprocessing (markovify_sentence.py)
