@@ -42,11 +42,13 @@
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
     - [ ] GPU: AMD Radeon RX 580
-        - Polaris 10 (GFX 8), 2304 cores (64 CUs), 8GB VRAM
+        - 2304 cores (64 CUs), 8GB VRAM
         - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
+        - [公式Dockerイメージ](https://hub.docker.com/r/rocm/tensorflow/)で動作確認済み
 
 ## Todo
 
+- [ ] ROCmインストール手順書いておこう
 - [ ] 素のWindowsで試す
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
@@ -69,11 +71,10 @@
 ## インストール
 
 ```bash
-## wakachi_janome.py
+# wakachi_janome.py
 $ pip install janome
 
-## wakachi_mecab.py
-# 必要パッケージ (Ubuntu)
+# wakachi_mecab.py
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
 $ pip install mecab-python3
 # (Optional) Mecab追加辞書をインストール
@@ -84,13 +85,13 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
-## markovify_sentence.py
+# markovify_sentence.py
 # pipを使う場合（推奨）
 $ pip install markovify
 # Condaを使う場合
 $ conda install -c conda-forge markovify
 
-## rnn_sentence.py
+# rnn_sentence.py
 $ conda install tensorflow numpy
 ```
 

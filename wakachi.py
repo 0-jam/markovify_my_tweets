@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description="Preprocessing script for Japanese text.")
     parser.add_argument("input", type=str, help="input file path")
     parser.add_argument("output", type=str, help="output file path")
-    parser.add_argument("-e", "--engine", type=str, default="janome", choices=["janome", "mecab"], help="specify tokenize engine (default: janome)")
+    parser.add_argument("-e", "--engine", type=str, default="mecab", choices=["janome", "mecab"], help="specify tokenize engine (default: mecab)")
 
     args = parser.parse_args()
 
