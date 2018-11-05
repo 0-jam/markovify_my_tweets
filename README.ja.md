@@ -29,9 +29,9 @@
 ### ソフトウェア
 
 - [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
-- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- [ ] Python 3.6.6 on Ubuntu 18.04.1
-- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
+- [x] Python 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.7 on Ubuntu 18.04.1
+- [ ] Python 3.6.7 on Windows 10 Home 1803 (April 2018)
 
 ### ハードウェア
 
@@ -49,7 +49,9 @@
 ## Todo
 
 - [ ] ROCmインストール手順書いておこう
-- [ ] 素のWindowsで試す
+- [ ] Windows対応
+    - [ ] 文字コード
+    - [ ] 学習済みモデルディレクトリ作成
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする

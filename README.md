@@ -29,9 +29,9 @@
 ### Software
 
 - [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
-- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- [ ] Python 3.6.6 on Ubuntu 18.04.1
-- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
+- [x] Python 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.7 on Ubuntu 18.04.1
+- [ ] Python 3.6.7 on Windows 10 Home 1803 (April 2018)
 
 ### Hardware
 
@@ -49,7 +49,9 @@
 ## Todo
 
 - [ ] Add ROCm instruction in this README
-- [ ] Try on pure Windows
+- [ ] Windows port
+    - [ ] Text encoding
+    - [ ] Create directory to save learned model
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
