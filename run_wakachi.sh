@@ -4,7 +4,7 @@
 # ディレクトリ名
 indir="text/novel_orig"
 outdir="text/novel"
-engine="janome"
+engine="mecab"
 
 ### スクリプトの使い方を表示し，スクリプトを終了する
 usage(){
@@ -14,14 +14,14 @@ pp_aozora.pyを複数ファイルに対して一括で実行する
 
   -i [NAME]    学習対象のファイルが存在するディレクトリ名を指定（デフォルト：text/novel_orig）
   -o [NAME]    結果ファイルの出力先ディレクトリ名を指定（デフォルト：text/novel）
-  -m           分かち書きエンジンにMeCabを指定（デフォルト：Janome）
+  -j           分かち書きエンジンにJanomeを指定（デフォルト：MeCab）
   -h           このヘルプを表示して終了
 EOS
   exit 1
 }
 
 ### オプションの処理
-while getopts "hmi:o:" opts; do
+while getopts "hji:o:" opts; do
   case $opts in
     h|\?)
       usage
@@ -32,8 +32,8 @@ while getopts "hmi:o:" opts; do
     o)
       outdir=$OPTARG
       ;;
-    m)
-      engine="mecab"
+    j)
+      engine="janome"
       ;;
   esac
 done
