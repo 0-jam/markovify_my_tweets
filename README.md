@@ -29,9 +29,9 @@
 ### Software
 
 - [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
-- [x] Python 3.6.6 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- [ ] Python 3.6.6 on Ubuntu 18.04.1
-- [ ] Miniconda 4.5.4 (Python 3.6.6) on Windows 10 Home 1803 (April 2018)
+- [x] Python 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- [ ] Python 3.6.7 on Ubuntu 18.04.1
+- [ ] Python 3.6.7 on Windows 10 Home 1803 (April 2018)
 
 ### Hardware
 
@@ -42,12 +42,16 @@
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
     - [ ] GPU: AMD Radeon RX 580
-        - Polaris 10 (GFX 8), 2304 cores (64 CUs), 8GB VRAM
+        - 2304 cores (64 CUs), 8GB VRAM
         - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
+        - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
 
 ## Todo
 
-- [ ] Try on pure Windows
+- [ ] Add ROCm instruction in this README
+- [ ] Windows port
+    - [ ] Text encoding
+    - [ ] Create directory to save learned model
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -70,11 +74,10 @@
 ## Installation
 
 ```bash
-## wakachi_janome.py
+# wakachi_janome.py
 $ pip install janome
 
-## wakachi_mecab.py
-# Required packages (Ubuntu)
+# wakachi_mecab.py
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
 $ pip install mecab-python3
 # (Optional) Install additional dictionary for Mecab
@@ -85,13 +88,13 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
-## markovify_sentence.py
+# markovify_sentence.py
 # Using pip (recommended)
 $ pip install markovify
 # Using Conda
 $ conda install -c conda-forge markovify
 
-## rnn_sentence.py
+# rnn_sentence.py
 $ conda install tensorflow numpy
 ```
 
