@@ -105,7 +105,8 @@ def main():
                 print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
 
             print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
-                epoch + 1, epochs,
+                epoch + 1,
+                epochs,
                 time.time() - epoch_start,
                 loss.numpy()
             ))

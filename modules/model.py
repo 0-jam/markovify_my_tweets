@@ -2,13 +2,13 @@ import tensorflow as tf
 from tensorflow import keras
 
 class Model(keras.Model):
-    def __init__(self, vocab_size, embedding_dim, units):
+    def __init__(self, vocab_size, embedding_dim, units, force_cpu=False):
         super(Model, self).__init__()
         self.units = units
         self.embedding = keras.layers.Embedding(vocab_size, embedding_dim)
 
         # Enable CUDA if GPU is available
-        if tf.test.is_gpu_available():
+        if tf.test.is_gpu_available() and not force_cpu:
             self.gru = keras.layers.CuDNNGRU(
                 self.units,
                 return_sequences=True,
