@@ -31,6 +31,7 @@ def main():
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
     parser.add_argument("-m", "--model_dir", type=str, help="path to the learned model directory (default: empty (create a new model))")
     parser.add_argument("-s", "--save_to", type=str, help="location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
+    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
     args = parser.parse_args()
 
     with Path(args.input).open() as file:
@@ -67,7 +68,7 @@ def main():
     units = 1024
     # units = 64
 
-    model = Model(vocab_size, embedding_dim, units)
+    model = Model(vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
     optimizer = tf.train.AdamOptimizer()
 
     if args.model_dir:
@@ -135,7 +136,7 @@ def main():
     # hidden layer shape: (batch_size, units)
     hidden = [tf.zeros((1, units))]
 
-    for i in tqdm(range(gen_size)):
+    for i in tqdm(range(gen_size), desc="Generating..."):
         predictions, hidden = model(input_eval, hidden)
 
         # Using the multinomial distribution to predict the word returned by the model
