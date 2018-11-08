@@ -29,6 +29,7 @@ def main():
     dataset = TextDataset(text)
 
     ## Create the model
+    # The embedding dimensions
     embedding_dim = 256
     # embedding_dim = 4
     # RNN (Recursive Neural Network) nodes
