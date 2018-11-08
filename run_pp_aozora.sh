@@ -1,27 +1,28 @@
 #!/bin/bash
 
-### 初期設定
-# ディレクトリ名
+### Initialize
+# Input / output file location
 indir="text/novel_orig"
 outdir="text/novel"
+# Enable word divider
 wakachi=""
+# Postfix of the file name
 postfix="noruby"
 
-### スクリプトの使い方を表示し，スクリプトを終了する
 usage(){
   cat <<EOS
-使用法：bash run.sh [オプション]
-pp_aozora.pyを複数ファイルに対して一括で実行する
+Usage: bash run_pp_aozora.sh [OPTIONS]
+Execute pp_aozora.py to multiple files at once
 
-  -i [NAME]    学習対象のファイルが存在するディレクトリ名を指定（デフォルト：text/novel_orig）
-  -o [NAME]    結果ファイルの出力先ディレクトリ名を指定（デフォルト：text/novel）
-  -e [NAME]    指定したエンジン名で分かち書きを有効にする
-  -h           このヘルプを表示して終了
+  -i [NAME]    Path to file to convert (directory) (default: ./text/novel_orig)
+  -o [NAME]    Path to output file (directory) (default: ./text/novel)
+  -e [NAME]    Enable word divider using specified engine
+  -h           Print this help
 EOS
   exit 1
 }
 
-### オプションの処理
+### Parse options
 while getopts "he:i:o:" opts; do
   case $opts in
     h|\?)

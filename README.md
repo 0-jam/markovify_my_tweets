@@ -16,11 +16,17 @@
     1. [wakachi.py](#wakachipy)
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy)
+    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
     1. [Aozora Bunko](#aozora-bunko)
         1. [Remove manually](#remove-manually)
         1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
         1. [Replace with whitespace](#replace-with-whitespace)
+1. [Benchmarking](#benchmarking)
+    1. [About Dataset](#about-dataset)
+    1. [Rule](#rule)
+    1. [Evaluation](#evaluation)
+    1. [Records](#records)
 
 ---
 
@@ -28,13 +34,13 @@
 
 ### Software
 
-- [x] Miniconda 4.5.4 (Python 3.6.6) on Ubuntu 18.04.1
-- [x] Python 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- [ ] Python 3.6.7 on Ubuntu 18.04.1
-- [ ] Python 3.6.7 on Windows 10 Home 1803 (April 2018)
+- Python = 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+- Python = 3.6.7 on Windows 10 Home 1803 (April 2018)
+- TensorFlow >= 1.11.0
 
 ### Hardware
 
+- It seems TensorFlow uses CPU as many as possible
 - PC 1
     - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
     - RAM: 8GB
@@ -60,6 +66,11 @@
     - [ ] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
+- [x] Merge [Benchmarking script](https://github.com/0-jam/regen_sentence_bm) into here
+    - [x] Script
+    - [x] Dataset
+        - Automatically download from my Google Drive
+    - [x] README
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
     - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
@@ -77,7 +88,7 @@
 # wakachi_janome.py
 $ pip install janome
 
-# wakachi_mecab.py
+## wakachi_mecab.py
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
 $ pip install mecab-python3
 # (Optional) Install additional dictionary for Mecab
@@ -88,14 +99,17 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
-# markovify_sentence.py
-# Using pip (recommended)
+## markovify_sentence.py
 $ pip install markovify
-# Using Conda
-$ conda install -c conda-forge markovify
 
-# rnn_sentence.py
-$ conda install tensorflow numpy
+## rnn_sentence.py
+$ pip install tensorflow numpy
+
+## bm_rnn_sentence.py
+# If you use pyenv, install liblzma header before building Python
+$ sudo apt install liblzma-dev
+$ pyenv install 3.6.7
+$ pip install tensorflow numpy tqdm
 ```
 
 ## Usage
@@ -121,9 +135,6 @@ $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e meca
 - Preprocessing script for Japanese text
 
 ```bash
-$ python wakachi.py
-usage: wakachi.py [-h] input output
-wakachi.py: error: the following arguments are required: input, output
 $ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
 
 # Execute wakachi.py for specific directory
@@ -133,11 +144,6 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py
-usage: markovify_sentence.py [-h] [-o OUTPUT] [-n NUMBER] [-j JOBS]
-                             [-s STATES]
-                             input
-markovify_sentence.py: error: the following arguments are required: input
 $ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
 
 # Execute markovify_sentence.py for specific directory
@@ -147,10 +153,6 @@ $ bash run_markovify.sh
 ### rnn_sentence.py
 
 ```bash
-$ python rnn_sentence.py
-usage: rnn_sentence.py [-h] [-o OUTPUT] [-e EPOCHS] [-g GEN_SIZE]
-                       input start_string
-rnn_sentence.py: error: the following arguments are required: input, start_string
 # No preprocessing needed for input file
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
@@ -160,6 +162,15 @@ $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # Specify the directory name
 $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
+```
+
+### bm_rnn_sentence.py
+
+```bash
+# Simply execute this to use:
+$ python bm_rnn_sentence.py
+# If you want to force to use CPU, give "-c" option
+$ python bm_rnn_sentence.py -c
 ```
 
 ## Preprocessing (markovify_sentence.py)
@@ -201,6 +212,52 @@ $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_mode
 
 - Start of the sentence written in Latin character
     - > 〔Quid aliud est mulier nisi amicitiae& inimica〕
+
+## Benchmarking
+
+- bm_rnn_sentence.py: Benchmarking script based on rnn_sentence.py
+    - Almost all functions have been removed from the original script
+- Learn specified dataset _in 1 hours(TBD)_, and compare the performance
+
+### About Dataset
+
+- 7 novels written by Souseki Natsume（夏目漱石）
+    1. 坊っちゃん (Bocchan)
+    1. こころ (Kokoro)
+    1. 草枕 (Kusamakura)
+    1. 思い出す事など (Omoidasu koto nado)
+    1. 三四郎 (Sanshiro)
+    1. それから (Sorekara)
+    1. 吾輩は猫である (Wagahai wa neko de aru)
+- Based on [Aozora Bunko](https://www.aozora.gr.jp/index_pages/person148.html)
+    - Already preprocessed by [this](#aozora-bunko) method
+- Dataset is XZ-compressed
+    - Extract automatically when execute
+    - About 3.01MiB after decompressing
+    - Compress: `$ xz -9 -e -T 0 souseki_utf8.txt`
+    - Extract: `$ xz -d souseki_utf8.txt -k`
+
+### Rule
+
+1. Time measurement begins when training of the model is started
+1. Keep training for an hour (default)
+1. If it exceeded the time limit, finish training at the current epoch
+1. Print results
+    - Elapsed time
+    - Trained epochs
+    - Epochs per minute
+    - The value of loss function
+
+### Evaluation
+
+- How many epochs did the system learned?
+- Is readable 1000 generated characters (TBD) from the learned model?
+- What loss function's value?
+    - The smaller loss function's value, the more readable sentence can be generated ...probably
+
+### Records
+
+- Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

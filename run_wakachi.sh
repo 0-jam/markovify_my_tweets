@@ -1,26 +1,26 @@
 #!/bin/bash
 
-### 初期設定
-# ディレクトリ名
+### Initialize
+# Input / output file location
 indir="text/novel_orig"
 outdir="text/novel"
+# Engine of word divider
 engine="mecab"
 
-### スクリプトの使い方を表示し，スクリプトを終了する
 usage(){
   cat <<EOS
-使用法：bash run.sh [オプション]
-pp_aozora.pyを複数ファイルに対して一括で実行する
+Usage: bash run_wakachi.sh [OPTIONS]
+Execute wakachi.py to multiple files at once
 
-  -i [NAME]    学習対象のファイルが存在するディレクトリ名を指定（デフォルト：text/novel_orig）
-  -o [NAME]    結果ファイルの出力先ディレクトリ名を指定（デフォルト：text/novel）
-  -j           分かち書きエンジンにJanomeを指定（デフォルト：MeCab）
-  -h           このヘルプを表示して終了
+  -i [NAME]    Path to file to convert (directory) (default: ./text/novel_orig)
+  -o [NAME]    Path to output file (directory) (default: ./text/novel)
+  -j           Specify Janome as the engine of word divider (default: MeCab)
+  -h           Print this help
 EOS
   exit 1
 }
 
-### オプションの処理
+### Parse options
 while getopts "hji:o:" opts; do
   case $opts in
     h|\?)
