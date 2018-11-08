@@ -48,6 +48,7 @@
 
 ## Todo
 
+- [ ] [ベンチマークスクリプト](https://github.com/0-jam/regen_sentence_bm)をこちらに統合
 - [ ] ROCmインストール手順書いておこう
 - [ ] Windows対応
     - [ ] 文字コード

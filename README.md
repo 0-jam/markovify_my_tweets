@@ -48,6 +48,7 @@
 
 ## Todo
 
+- [ ] Merge [Benchmarking script](https://github.com/0-jam/regen_sentence_bm) into here
 - [ ] Add ROCm instruction in this README
 - [ ] Windows port
     - [ ] Text encoding

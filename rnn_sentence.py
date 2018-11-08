@@ -1,26 +1,14 @@
 import argparse
-import numpy as np
 import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
-from tqdm import tqdm
 from modules.model import Model
+from modules.dataset import TextDataset
 
 ## Return the path to <ckpt_dir>/checkpoint
 def model_path(ckpt_dir):
     return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
-
-## Create input and target texts from the text
-def split_into_target(chunk):
-    input_text = chunk[:-1]
-    target_text = chunk[1:]
-
-    return input_text, target_text
-
-## Using sparse_softmax_cross_entropy so that we don't have to create one-hot vectors
-def loss_function(real, preds):
-    return tf.losses.sparse_softmax_cross_entropy(labels=real, logits=preds)
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN. README.md contains further information.")
@@ -37,39 +25,17 @@ def main():
     with Path(args.input).open() as file:
         text = file.read()
 
-    ## Vectorize the text
-    text_size = len(text)
-    # unique character in text
-    vocab = sorted(set(text))
-    vocab_size = len(vocab)
-    print("Text has {} characters ({} unique characters)".format(text_size, vocab_size))
-    # Creating a mapping from unique characters to indices
-    # This list doesn't have character that is not contained in the text
-    char2idx = {char:index for index, char in enumerate(vocab)}
-    idx2char = np.array(vocab)
-    text_as_int = np.array([char2idx[c] for c in text])
-
-    # The maximum length sentence we want for single input in characters
-    seq_length = 100
-    chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(seq_length + 1, drop_remainder=True)
-
-    batch_size = 64
-    # Buffer size to shuffle the dataset
-    buffer_size = 10000
-
-    ## Creating batches and shuffling them
-    dataset = chunks.map(split_into_target)
-    dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
+    ## Create the dataset from the text
+    dataset = TextDataset(text)
 
     ## Create the model
     embedding_dim = 256
-    # embedding_dim = 16
+    # embedding_dim = 4
     # RNN (Recursive Neural Network) nodes
     units = 1024
-    # units = 64
+    # units = 16
 
-    model = Model(vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
-    optimizer = tf.train.AdamOptimizer()
+    model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
 
     if args.model_dir:
         # Load learned model
@@ -88,28 +54,13 @@ def main():
             print("Epoch: {} / {}:".format(epoch + 1, epochs))
             epoch_start = time.time()
 
-            # initializing the hidden state at the start of every epoch
-            hidden = model.reset_states()
-
-            for (batch, (input, target)) in enumerate(dataset):
-                with tf.GradientTape() as tape:
-                    # feeding the hidden state back into the model
-                    predictions, hidden = model(input, hidden)
-
-                    # reshape target to make loss function expect the target
-                    target = tf.reshape(target, (-1,))
-                    loss = loss_function(target, predictions)
-
-                gradients = tape.gradient(loss, model.variables)
-                optimizer.apply_gradients(zip(gradients, model.variables))
-
-                print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
+            loss = model.train(dataset.dataset)
 
             print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
                 epoch + 1,
                 epochs,
                 time.time() - epoch_start,
-                loss.numpy()
+                loss
             ))
 
         elapsed_time = time.time() - start
@@ -117,7 +68,7 @@ def main():
             epochs,
             elapsed_time,
             elapsed_time / epochs,
-            loss.numpy()
+            loss
         ))
 
         if Path.is_dir(path) is not True:
@@ -126,29 +77,7 @@ def main():
         model.save_weights(str(path.joinpath(filename)))
 
     ## Evaluation
-    gen_size = args.gen_size
-    generated_text = ''
-    start_string = args.start_string
-    # Vectorize start_string
-    input_eval = tf.expand_dims([char2idx[s] for s in start_string], 0)
-    temperature = 1.0
-
-    # hidden layer shape: (batch_size, units)
-    hidden = [tf.zeros((1, units))]
-
-    for i in tqdm(range(gen_size), desc="Generating..."):
-        predictions, hidden = model(input_eval, hidden)
-
-        # Using the multinomial distribution to predict the word returned by the model
-        predictions = predictions / temperature
-        predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
-
-        # Pass the predicted word as the next input to the model along with the previous hidden state
-        input_eval = tf.expand_dims([predicted_id], 0)
-
-        generated_text += idx2char[predicted_id]
-
-    generated_text = start_string + generated_text + "\n"
+    generated_text = model.generate_text(dataset, args.start_string, args.gen_size)
     if args.output:
         with Path(args.output).open('w') as out:
             out.write(generated_text)
