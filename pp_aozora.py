@@ -19,9 +19,9 @@ def replace_text(text):
 def main():
     # オプション設定・取得
     parser = argparse.ArgumentParser(description="Preprocessing for Aozora Bunko.")
-    parser.add_argument("input", type=str, help="input file path")
-    parser.add_argument("output", type=str, help="output file path")
-    parser.add_argument("-e", "--engine", type=str, default="", choices=["", "janome", "mecab"], help="specify tokenize engine (default: none)")
+    parser.add_argument("input", type=str, help="Input file path")
+    parser.add_argument("output", type=str, help="Output file path")
+    parser.add_argument("-e", "--engine", type=str, default="", choices=["", "janome", "mecab"], help="Tokenize engine (default: none)")
 
     args = parser.parse_args()
 

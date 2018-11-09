@@ -1,23 +1,23 @@
 import argparse
 from pathlib import Path
 
-## 入力されたtextをengineで分かち書き
+## Divide text by word using specified engine
 def divide(text, engine="janome"):
     if engine in {"janome"}:
         from modules.wakachi_janome import divide_text
     elif engine in {"mecab"}:
         from modules.wakachi_mecab import divide_text
     else:
-        # 無効なエンジンが指定された場合，入力されたテキストをそのまま返す（暫定）
+        # If specified invalid engine, just return input text
         return text
 
     return divide_text(text)
 
 def main():
     parser = argparse.ArgumentParser(description="Preprocessing script for Japanese text.")
-    parser.add_argument("input", type=str, help="input file path")
-    parser.add_argument("output", type=str, help="output file path")
-    parser.add_argument("-e", "--engine", type=str, default="mecab", choices=["janome", "mecab"], help="specify tokenize engine (default: mecab)")
+    parser.add_argument("input", type=str, help="Input file path")
+    parser.add_argument("output", type=str, help="Output file path")
+    parser.add_argument("-e", "--engine", type=str, default="mecab", choices=["janome", "mecab"], help="Tokenize engine (default: mecab)")
 
     args = parser.parse_args()
 

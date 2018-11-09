@@ -5,7 +5,7 @@ import multiprocessing as mp
 from pathlib import Path
 import sys
 
-## モデルから文章生成（処理の本体）
+## Generate text from the model
 def generate(queue, model, count):
     while True:
         text = model.make_sentence()
@@ -15,13 +15,12 @@ def generate(queue, model, count):
             queue.put(text)
             break
 
-## ラッパーメソッド
-# Pool.map()は指定できる引数の数に制限があるので，ここの引数にtuple型の値を入れて，
-# このメソッド内で展開して本体メソッドで処理をする
+## Wrapper method of generate()
+# Because Pool.map() can give only one argument, give this method tuple value and extract it before giving extract()
 def generate_sentence(args):
     generate(*args)
 
-## queueの中身を抽出してlistで返す
+## Extract values in queue
 def dump_queue(queue):
     ret = []
     while queue.empty() is False:
@@ -33,24 +32,23 @@ def main():
     cores = mp.cpu_count()
 
     parser = argparse.ArgumentParser(description="Generate sentence with Markov chain.")
-    parser.add_argument("input", type=str, help="input file path")
-    parser.add_argument("-o", "--output", type=str, help="output file path (default: stdout)")
-    parser.add_argument("-n", "--number", type=int, default=1, help="the number of sentence you want to generate (default: 1)")
-    parser.add_argument("-j", "--jobs", type=int, default=int(cores / 2), help="the number of processes (default: half of the number of your CPU cores)")
-    parser.add_argument("-s", "--states", type=int, default=2, help="the size of states (default: 2)")
+    parser.add_argument("input", type=str, help="Input file path")
+    parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
+    parser.add_argument("-n", "--number", type=int, default=1, help="The number of sentence you want to generate (default: 1)")
+    parser.add_argument("-j", "--jobs", type=int, default=int(cores / 2), help="The number of processes (default: half of the number of your CPU cores)")
+    parser.add_argument("-s", "--states", type=int, default=2, help="The size of states (default: 2)")
+    parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
 
-    with Path(args.input).open() as input:
-        # マルコフ連鎖モデル作成
-        # state_sizeは2か3がちょうどよさそう
-        # 4以上になると生成失敗が多くなりはじめる
-        model = markovify.NewlineText(input.read(), state_size=args.states)
+    with Path(args.input).open(encoding=args.encoding) as file:
+        # Create markov chain model
+        model = markovify.NewlineText(file.read(), state_size=args.states)
 
-    # 生成したい文数と指定されたプロセス数のうち少ないほうをプロセス数に指定（余分なプロセスができないようにするため）
+    # Prevent maximum number of processes be larger than number of sentences to generate
     jobs = min([args.jobs, args.number])
     mgr = mp.Manager()
     generated_sentences = mgr.Queue()
-    # 生成処理が実行された回数…だが，複数プロセスの場合不正確
+    # BUG: Count is incorrect if multiprocessing is enabled
     count = mgr.Value('i', 0)
 
     print("Processes:", jobs)
@@ -58,7 +56,6 @@ def main():
     with mp.Pool(jobs) as pool:
         pool.map(generate_sentence, [(generated_sentences, model, count) for _ in range(args.number)])
 
-    # 処理にかかった時間を記録
     elapsed_time = time.time() - start_time
 
     generated_sentences = "\n".join(dump_queue(generated_sentences)) + "\n"
@@ -68,7 +65,7 @@ def main():
     else:
         sys.stdout.write(generated_sentences)
 
-    # 計測結果表示
+    # Print result
     print("{} times generation to generate {} sentences (failed {:.2f}%)".format(
         count.value,
         args.number,

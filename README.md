@@ -55,9 +55,6 @@
 ## Todo
 
 - [ ] Add ROCm instruction in this README
-- [ ] Windows port
-    - [ ] Text encoding
-    - [ ] Create directory to save learned model
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Text formatter for [Aozora bunko][aozora]
     - [ ] Convert all hankaku symbols to zenkaku
@@ -66,6 +63,9 @@
     - [ ] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
+- [x] Windows port
+    - [x] Text encoding
+    - [x] Create directory to save learned model
 - [x] Merge [Benchmarking script](https://github.com/0-jam/regen_sentence_bm) into here
     - [x] Script
     - [x] Dataset
@@ -247,11 +247,12 @@ $ python bm_rnn_sentence.py -c
     - Trained epochs
     - Epochs per minute
     - The value of loss function
+    - Generated text
+        - The number of characters: _1000(TBD)_
 
 ### Evaluation
 
 - How many epochs did the system learned?
-- Is readable 1000 generated characters (TBD) from the learned model?
 - What loss function's value?
     - The smaller loss function's value, the more readable sentence can be generated ...probably
 

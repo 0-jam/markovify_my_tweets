@@ -5,24 +5,27 @@ import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import TextDataset
+from modules.plot_result import save_result
 
 ## Return the path to <ckpt_dir>/checkpoint
 def model_path(ckpt_dir):
     return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN. README.md contains further information.")
-    parser.add_argument("input", type=str, help="input file path")
-    parser.add_argument("start_string", type=str, help="generation start with this string")
-    parser.add_argument("-o", "--output", type=str, help="output file path (default: stdout)")
-    parser.add_argument("-e", "--epochs", type=int, default=10, help="the number of epochs (default: 10)")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="the size of text that you want to generate (default: 1000)")
-    parser.add_argument("-m", "--model_dir", type=str, help="path to the learned model directory (default: empty (create a new model))")
-    parser.add_argument("-s", "--save_to", type=str, help="location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN")
+    parser.add_argument("input", type=str, help="Input file path")
+    parser.add_argument("start_string", type=str, help="Generation start with this string")
+    parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
+    parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
+    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The size of text that you want to generate (default: 1000)")
+    parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
+    parser.add_argument("-s", "--save_to", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
+    parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
 
-    with Path(args.input).open() as file:
+    input_path = Path(args.input)
+    with input_path.open(encoding=args.encoding) as file:
         text = file.read()
 
     ## Create the dataset from the text
@@ -31,10 +34,10 @@ def main():
     ## Create the model
     # The embedding dimensions
     embedding_dim = 256
-    # embedding_dim = 4
     # RNN (Recursive Neural Network) nodes
     units = 1024
-    # units = 16
+    embedding_dim = 4
+    units = 16
 
     model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
 
@@ -42,7 +45,7 @@ def main():
         # Load learned model
         model.load_weights(model_path(args.model_dir))
     else:
-        filename = args.input.split("/")[-1]
+        filename = input_path.name
         epochs = args.epochs
         # Specify directory to save model
         if args.save_to:
@@ -50,12 +53,14 @@ def main():
         else:
             path = Path("./learned_models").joinpath(filename)
 
+        losses = []
         start = time.time()
         for epoch in range(epochs):
             print("Epoch: {} / {}:".format(epoch + 1, epochs))
             epoch_start = time.time()
 
             loss = model.train(dataset.dataset)
+            losses.append(loss)
 
             print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
                 epoch + 1,
@@ -72,10 +77,12 @@ def main():
             loss
         ))
 
+        save_result(losses)
+
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 
-        model.save_weights(str(path.joinpath(filename)))
+        model.save_weights(str(path.joinpath(filename).resolve()))
 
     ## Evaluation
     generated_text = model.generate_text(dataset, args.start_string, args.gen_size)
