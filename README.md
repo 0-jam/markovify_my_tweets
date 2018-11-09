@@ -107,7 +107,8 @@ $ pip install tensorflow numpy
 
 ## bm_rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
-$ sudo apt install liblzma-dev
+# tk-dev for displaying graph
+$ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
 $ pip install tensorflow numpy tqdm
 ```

@@ -19,26 +19,42 @@ def main():
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The size of text that you want to generate (default: 1000)")
     parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
-    parser.add_argument("-s", "--save_to", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
+    parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
+    parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
     args = parser.parse_args()
 
+    ## Parse options and initialize some parameters
+    if args.test_mode:
+        # input_path = Path("text/Latin-Lipsum.txt")
+        # encoding = 'utf-8'
+
+        embedding_dim = 4
+        units = 16
+        epochs = 2
+
+        # start_string = "Lorem "
+        gen_size = 100
+    else:
+        # The embedding dimensions
+        embedding_dim = 256
+        # RNN (Recursive Neural Network) nodes
+        units = 1024
+        epochs = args.epochs
+
+        gen_size = args.gen_size
+
     input_path = Path(args.input)
-    with input_path.open(encoding=args.encoding) as file:
+    encoding = args.encoding
+
+    with input_path.open(encoding=encoding) as file:
         text = file.read()
 
     ## Create the dataset from the text
     dataset = TextDataset(text)
 
     ## Create the model
-    # The embedding dimensions
-    embedding_dim = 256
-    # RNN (Recursive Neural Network) nodes
-    units = 1024
-    embedding_dim = 4
-    units = 16
-
     model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
 
     if args.model_dir:
@@ -46,10 +62,9 @@ def main():
         model.load_weights(model_path(args.model_dir))
     else:
         filename = input_path.name
-        epochs = args.epochs
         # Specify directory to save model
-        if args.save_to:
-            path = Path(args.save_to)
+        if args.save_dir:
+            path = Path(args.save_dir)
         else:
             path = Path("./learned_models").joinpath(filename)
 
@@ -85,7 +100,8 @@ def main():
         model.save_weights(str(path.joinpath(filename).resolve()))
 
     ## Evaluation
-    generated_text = model.generate_text(dataset, args.start_string, args.gen_size)
+    start_string = args.start_string
+    generated_text = model.generate_text(dataset, start_string, gen_size)
     if args.output:
         with Path(args.output).open('w') as out:
             out.write(generated_text)

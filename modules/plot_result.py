@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import tkinter as tki
 
 def plot_result(losses):
     fig = plt.figure()
@@ -14,3 +15,4 @@ def save_result(losses, save_to="result.png"):
 
 def show_result(losses):
     plot_result(losses).show()
+    tki.mainloop()

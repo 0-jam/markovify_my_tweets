@@ -107,7 +107,8 @@ $ pip install tensorflow numpy
 
 ## bm_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
-$ sudo apt install liblzma-dev
+# 結果グラフ表示用にtkinterを使っている
+$ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
 $ pip install tensorflow numpy tqdm
 ```
