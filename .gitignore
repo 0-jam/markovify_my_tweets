@@ -107,5 +107,6 @@ ENV/
 *.csv
 *.txt
 *.xz
+*.png
 !text/Latin-Lipsum.txt
 learned_models/*

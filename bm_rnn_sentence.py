@@ -6,40 +6,58 @@ tf.enable_eager_execution()
 import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
+from modules.plot_result import show_result, save_result
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
+    parser.add_argument("-s", "--save_to_file", action='store_true', help="Save loss function graph and generated_text (default: False)")
+    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to run in short-time for debugging (default: false)")
     args = parser.parse_args()
 
-    # テキスト読み込み
+    ## Create the dataset from the XZ-compressed text
     path = tf.keras.utils.get_file("souseki.txt.xz", "https://drive.google.com/uc?export=download&id=1RnvBPi0GSg07-FhiuHpkwZahGwl4sMb5")
     with lzma.open(path) as file:
         text = file.read().decode()
 
-    # テキストからデータセット作成
     dataset = TextDataset(text)
 
-    ## モデル作成
-    # The embedding dimensions
-    embedding_dim = 256
-    # RNN (Recursive Neural Network) nodes
-    units = 1024
+    if args.test_mode:
+        # The embedding dimensions
+        embedding_dim = 4
+        # RNN (Recursive Neural Network) nodes
+        units = 16
 
+        # Time limit (min)
+        time_limit = 5
+
+        gen_size = 100
+    else:
+        # The embedding dimensions
+        embedding_dim = 256
+        # RNN (Recursive Neural Network) nodes
+        units = 1024
+
+        # Time limit (min)
+        time_limit = 60
+
+        gen_size = 1000
+
+    ## Create the model
     model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
 
     epoch = 0
     elapsed_time = 0
-    # 制限時間
-    minutes = 60
+    losses = []
     start = time.time()
-    # この時間を経過したら…ではなく、時間切れになった時のepochの学習を終えたら学習終了
-    while elapsed_time < (60 * minutes):
+    # Finish training in current epoch when time limit exceeded
+    while elapsed_time < (60 * time_limit):
         epoch += 1
         print("Epoch:", epoch)
         epoch_start = time.time()
 
         loss = model.train(dataset.dataset)
+        losses.append(loss)
 
         elapsed_time = time.time() - start
         print("Time taken for epoch {}: {:.3f} sec, Loss: {:.3f}\n".format(
@@ -51,13 +69,23 @@ def main():
     print("Time!")
     elapsed_time = elapsed_time / 60
 
-    # モデルから文章生成
-    generated_text = model.generate_text(dataset, "吾輩は", 1000)
-    print("Generated text:")
-    print(generated_text)
+    # Generate sentence from the model
+    generated_text = model.generate_text(dataset, "吾輩は", gen_size)
 
+    # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
     print("Loss:", loss)
+    if args.save_to_file:
+        print("Saving generated text...")
+        with open("generated_text_" + time.strftime("%Y%m%d") + ".txt", 'w', encoding='utf-8') as out:
+            out.write(generated_text)
+
+        save_result(losses, save_to="losses_" + time.strftime("%Y%m%d") + ".png")
+    else:
+        print("Generated text:")
+        print(generated_text)
+
+        show_result(losses)
 
 if __name__ == '__main__':
     main()

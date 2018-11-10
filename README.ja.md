@@ -55,9 +55,6 @@
 ## Todo
 
 - [ ] ROCmインストール手順書いておこう
-- [ ] Windows対応
-    - [ ] 文字コード
-    - [ ] 学習済みモデルディレクトリ作成
 - [ ] RNN版の分かち書き対応
 - [ ] [青空文庫][aozora]テキスト整形用スクリプト
     - [ ] 半角記号を全角にする
@@ -66,6 +63,10 @@
     - [ ] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
+- [x] Windows対応
+    - [x] 文字コード
+    - [x] 学習済みモデルディレクトリ作成
+        - >ValueError: Parent directory of C:\path\of\repo\regen_my_sentences\learned_models\Latin-Lipsum.txt\Latin-Lipsum.txt doesn't exist, can't save.
 - [x] [ベンチマークスクリプト](https://github.com/0-jam/regen_sentence_bm)をこちらに統合
     - [x] スクリプト
     - [x] データセット
@@ -106,7 +107,8 @@ $ pip install tensorflow numpy
 
 ## bm_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
-$ sudo apt install liblzma-dev
+# 結果グラフ表示用にtkinterを使っている
+$ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
 $ pip install tensorflow numpy tqdm
 ```
