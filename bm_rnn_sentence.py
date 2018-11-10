@@ -6,12 +6,13 @@ tf.enable_eager_execution()
 import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
-from modules.plot_result import show_result
+from modules.plot_result import show_result, save_result
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
-    parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging (default: false)")
+    parser.add_argument("-s", "--save_to_file", action='store_true', help="Save loss function graph and generated_text (default: False)")
+    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to run in short-time for debugging (default: false)")
     args = parser.parse_args()
 
     ## Create the dataset from the XZ-compressed text
@@ -70,12 +71,21 @@ def main():
 
     # Generate sentence from the model
     generated_text = model.generate_text(dataset, "吾輩は", gen_size)
-    print("Generated text:")
-    print(generated_text)
 
+    # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
     print("Loss:", loss)
-    show_result(losses)
+    if args.save_to_file:
+        print("Saving generated text...")
+        with open("generated_text_" + time.strftime("%Y%m%d") + ".txt", 'w', encoding='utf-8') as out:
+            out.write(generated_text)
+
+        save_result(losses, save_to="losses_" + time.strftime("%Y%m%d") + ".png")
+    else:
+        print("Generated text:")
+        print(generated_text)
+
+        show_result(losses)
 
 if __name__ == '__main__':
     main()
