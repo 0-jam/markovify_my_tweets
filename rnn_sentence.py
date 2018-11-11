@@ -5,7 +5,7 @@ import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import TextDataset
-from modules.plot_result import save_result
+from modules.plot_result import save_result, show_result
 
 ## Return the path to <ckpt_dir>/checkpoint
 def model_path(ckpt_dir):
@@ -92,8 +92,6 @@ def main():
             loss
         ))
 
-        save_result(losses)
-
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 
@@ -103,10 +101,21 @@ def main():
     start_string = args.start_string
     generated_text = model.generate_text(dataset, start_string, gen_size)
     if args.output:
-        with Path(args.output).open('w') as out:
+        print("Saving generated text...")
+        with Path(args.output).open('w', encoding='utf-8') as out:
             out.write(generated_text)
+
+        try:
+            save_result(losses)
+        except NameError:
+            print("Skipped drawing losses graph")
     else:
         print(generated_text)
+
+        try:
+            show_result(losses)
+        except NameError:
+            print("Skipped drawing losses graph")
 
 if __name__ == '__main__':
     main()

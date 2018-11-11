@@ -36,6 +36,7 @@
 
 - Python = 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
 - Python = 3.6.7 on Windows 10 Home 1803 (April 2018)
+- Python = 3.6.7 on Ubuntu 18.04.1 + ROCm Module
 - TensorFlow >= 1.11.0
 
 ### ハードウェア
@@ -102,15 +103,13 @@ yes
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py
-$ pip install tensorflow numpy
-
-## bm_rnn_sentence.py
+## rnn_sentence.py & bm_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 # 結果グラフ表示用にtkinterを使っている
 $ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
-$ pip install tensorflow numpy tqdm
+# NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
+$ pip install tensorflow numpy matplotlib tqdm
 ```
 
 ## 使用法
