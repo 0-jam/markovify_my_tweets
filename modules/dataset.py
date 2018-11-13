@@ -6,7 +6,8 @@ class TextDataset():
     def __init__(self, text):
         ## Vectorize the text
         # unique character in text
-        vocab = sorted(set(text + self.dict()))
+        vocab = sorted(set(text))
+        # vocab = sorted(set(text + self.dict()))
         self.vocab_size = len(vocab)
         print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size))
         # Creating a mapping from unique characters to indices
