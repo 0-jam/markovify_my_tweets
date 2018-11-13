@@ -34,8 +34,11 @@
 
 ### Software
 
-- Python = 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- Python = 3.6.7 on Windows 10 Home 1803 (April 2018)
+- Python < 3.7.0
+- Tested OSs
+    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+    - Windows 10 Home 1803 (April 2018)
+    - Ubuntu 18.04.1 + ROCm Module
 - TensorFlow >= 1.11.0
 
 ### Hardware
@@ -56,13 +59,13 @@
 
 - [ ] Add ROCm instruction in this README
 - [ ] Enable function to use word as a token for RNN-based generation
-- [ ] Text formatter for [Aozora bunko][aozora]
-    - [ ] Convert all hankaku symbols to zenkaku
-    - [x] Remove annotation symbols
 - [ ] Enable using various engine for word dividing
     - [ ] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
+- [x] Text formatter for [Aozora bunko][aozora]
+    - [x] Remove title, author and footnotes
+    - [x] Remove annotation symbols
 - [x] Windows port
     - [x] Text encoding
     - [x] Create directory to save learned model
@@ -102,15 +105,13 @@ yes
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py
-$ pip install tensorflow numpy
-
-## bm_rnn_sentence.py
+## rnn_sentence.py & bm_rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 # tk-dev for displaying graph
 $ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
-$ pip install tensorflow numpy tqdm
+# If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
+$ pip install tensorflow numpy matplotlib tqdm
 ```
 
 ## Usage
@@ -125,10 +126,10 @@ Execute with `-h` option when you want to see the help.
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -e mecab
+$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # Execute pp_aozora.py for specific directory
-$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e mecab
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```
 
 ### wakachi.py
@@ -145,10 +146,8 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
-
-# Execute markovify_sentence.py for specific directory
-$ bash run_markovify.sh
+# Give filename to "-o" option if you want to save generated text
+$ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
 ### rnn_sentence.py
@@ -184,18 +183,20 @@ $ python bm_rnn_sentence.py -c
 
 #### Remove manually
 
-- Title and author
-- _【テキスト中に現れる記号について】_ (About symbols in the text)
-    - surronded by `-`
-- Below _底本：_
 - Convert text encoding into UTF-8 by using such as `$ nkf -w` (Text encoding of downloaded file is Shift-JIS)
 
 #### Remove using pp_aozora.py
 
-```
-　|^\n+|《.+?》|［.+?］|｜
+```python
+# Apply on entire text
+regex1 = "---.*---\n|底本：.*"
+# Apply on every line in text
+regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ```
 
+- Title and author
+- _【テキスト中に現れる記号について】_ (About symbols in the text)
+- Footnote（_底本：_）
 - Removed by using `strip()`
     - Zenkaku whitespace
         - > 　吾輩は猫である。名前はまだ無い。

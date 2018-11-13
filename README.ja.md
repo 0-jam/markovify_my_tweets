@@ -34,8 +34,11 @@
 
 ### ソフトウェア
 
-- Python = 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- Python = 3.6.7 on Windows 10 Home 1803 (April 2018)
+- Python < 3.7.0
+- Tested OSs
+    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+    - Windows 10 Home 1803 (April 2018)
+    - Ubuntu 18.04.1 + ROCm Module
 - TensorFlow >= 1.11.0
 
 ### ハードウェア
@@ -56,13 +59,13 @@
 
 - [ ] ROCmインストール手順書いておこう
 - [ ] RNN版の分かち書き対応
-- [ ] [青空文庫][aozora]テキスト整形用スクリプト
-    - [ ] 半角記号を全角にする
-    - [x] 注釈記号などの除去
 - [ ] 分かち書きスクリプトをいろいろなエンジンに対応
     - [ ] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
+- [x] [青空文庫][aozora]テキスト整形用スクリプト
+    - [x] タイトル、作者名、底本除去
+    - [x] 注釈記号などの除去
 - [x] Windows対応
     - [x] 文字コード
     - [x] 学習済みモデルディレクトリ作成
@@ -102,15 +105,13 @@ yes
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py
-$ pip install tensorflow numpy
-
-## bm_rnn_sentence.py
+## rnn_sentence.py & bm_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 # 結果グラフ表示用にtkinterを使っている
 $ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
-$ pip install tensorflow numpy tqdm
+# NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
+$ pip install tensorflow numpy matplotlib tqdm
 ```
 
 ## 使用法
@@ -125,10 +126,10 @@ $ pip install tensorflow numpy tqdm
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -e mecab
+$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # 指定されたディレクトリに対して実行
-$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e mecab
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```
 
 ### wakachi.py
@@ -145,10 +146,8 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
-
-# 指定されたディレクトリに対して実行
-$ bash run_markovify.sh
+# "-o"オプションにファイル名を指定すると生成された文章が保存される
+$ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
 ### rnn_sentence.py
@@ -162,7 +161,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # ディレクトリ名を指定
-$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
 ```
 
 ### bm_rnn_sentence.py
@@ -184,23 +183,25 @@ $ python bm_rnn_sentence.py -c
 
 #### 手動で削除
 
-- タイトル
-- 作者
-- _【テキスト中に現れる記号について】_
-    - ハイフンで囲まれた部分と
-- _底本：_ から下の部分
 - ダウンロード時点での文字コードはShift-JISなので，必要に応じて`$ nkf -w`などでUTF-8などに変換する
 
 #### pp_aozora.pyで削除
 
-```
-　|^\n+|《.+?》|［.+?］|｜
+```python
+# テキスト全体に適用
+regex1 = "---.*---\n|底本：.*"
+# 1行ずつ読んだものに適用
+regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ```
 
-- 行を読んで`strip()`すると消えるもの
+- タイトル
+- 作者
+- _【テキスト中に現れる記号について】_
+- _底本：_ の部分
+- テキストを読んで`split()`すると消えるもの
     - 全角スペース
         - > 　吾輩は猫である。名前はまだ無い。
-    - 1つ以上連続する空行
+    - すべての改行コード
 - ふりがなとそれが付く文字列の始まりを示す｜（全角縦棒）
     - > しかもあとで聞くとそれは書生という人間中で一番 **｜** 獰悪 **《どうあく》** な種族であったそうだ。
 - 注釈
