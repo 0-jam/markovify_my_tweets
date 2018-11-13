@@ -27,8 +27,8 @@ class TextDataset():
         dataset = chunks.map(self.split_into_target)
         self.dataset = dataset.shuffle(buffer_size).batch(batch_size, drop_remainder=True)
 
-    @staticmethod
     ## Create input and target texts from the text
+    @staticmethod
     def split_into_target(chunk):
         input_text = chunk[:-1]
         target_text = chunk[1:]
