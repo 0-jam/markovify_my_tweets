@@ -34,9 +34,11 @@
 
 ### Software
 
-- Python = 3.6.7 on Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-- Python = 3.6.7 on Windows 10 Home 1803 (April 2018)
-- Python = 3.6.7 on Ubuntu 18.04.1 + ROCm Module
+- Python = 3.6.7
+- Tested OSs
+    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
+    - Windows 10 Home 1803 (April 2018)
+    - Ubuntu 18.04.1 + ROCm Module
 - TensorFlow >= 1.11.0
 
 ### Hardware
@@ -124,10 +126,10 @@ Execute with `-h` option when you want to see the help.
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt -e mecab
+$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # Execute pp_aozora.py for specific directory
-$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki -e mecab
+$ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```
 
 ### wakachi.py
@@ -144,10 +146,8 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ### markovify_sentence.py
 
 ```bash
-$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -o wagahaiwa_nekodearu_markovified_1000.txt -n 100
-
-# Execute markovify_sentence.py for specific directory
-$ bash run_markovify.sh
+# Specify -o option if you want to save generated text
+$ python markovify_sentence.py wagahaiwa_nekodearu_wakachi_utf8.txt -n 100
 ```
 
 ### rnn_sentence.py

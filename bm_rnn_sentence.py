@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
     parser.add_argument("-s", "--save_to_file", action='store_true', help="Save loss function graph and generated_text (default: False)")
-    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to run in short-time for debugging (default: false)")
+    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging (default: false)")
     args = parser.parse_args()
 
     ## Create the dataset from the XZ-compressed text
