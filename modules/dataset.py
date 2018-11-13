@@ -1,11 +1,12 @@
 import tensorflow as tf
 import numpy as np
+from pathlib import Path
 
 class TextDataset():
     def __init__(self, text):
         ## Vectorize the text
         # unique character in text
-        vocab = sorted(set(text))
+        vocab = sorted(set(text + self.dict()))
         self.vocab_size = len(vocab)
         print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size))
         # Creating a mapping from unique characters to indices
@@ -41,3 +42,12 @@ class TextDataset():
     ## Convert numbers to string
     def indices_to_str(self, indices):
         return [self.idx2char[id] for id in indices]
+
+    ## Load dictionary data
+    @staticmethod
+    def dict():
+        dicts = ''
+        for dic in Path("dict").iterdir():
+            dicts += dic.open(encoding='utf-8').read()
+
+        return dicts
