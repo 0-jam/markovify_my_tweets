@@ -13,8 +13,9 @@ def replace_sentence(sentence):
 
 def replace_text(text):
     text = re.sub("---.*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))
-    text = [replace_sentence(line) for line in text.split()]
-    return text
+    text = [replace_sentence(line) for line in text.split("\n")]
+    # 空行（もともと空行だったものと処理の結果空行になったもの）を削除して返す
+    return list(filter(lambda line: line != "", text))
 
 def main():
     # オプション設定・取得
@@ -26,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     with Path(args.input).open(encoding='utf-8') as input:
-        # タイトル・作者名がそれぞれ1行目・2行目にあるのでそれを削除
+        # ほとんどの場合タイトル・作者名がそれぞれ1行目・2行目にあるのでそれを削除
         text = replace_text(input.read())[2:]
 
     if args.engine != "":
