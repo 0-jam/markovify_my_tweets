@@ -92,6 +92,8 @@ def main():
             loss
         ))
 
+        save_result(losses)
+
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 

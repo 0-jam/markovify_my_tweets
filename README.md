@@ -88,7 +88,7 @@
 ## Installation
 
 ```bash
-## wakachi_janome.py
+# wakachi_janome.py
 $ pip install janome
 
 ## wakachi_mecab.py
