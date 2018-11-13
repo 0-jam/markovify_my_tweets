@@ -183,6 +183,8 @@ $ python bm_rnn_sentence.py -c
 
 #### Remove manually
 
+- Title
+- Author
 - Convert text encoding into UTF-8 by using such as `$ nkf -w` (Text encoding of downloaded file is Shift-JIS)
 
 #### Remove using pp_aozora.py
@@ -194,7 +196,6 @@ regex1 = "---.*---\n|底本：.*"
 regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ```
 
-- Title and author
 - _【テキスト中に現れる記号について】_ (About symbols in the text)
 - Footnote（_底本：_）
 - Removed by using `strip()`
