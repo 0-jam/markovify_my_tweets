@@ -88,13 +88,14 @@
 ## インストール
 
 ```bash
-# wakachi_janome.py
+## wakachi_janome.py
+# Windowsではこちらを推奨
 $ pip install janome
 
 ## wakachi_mecab.py
-$ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
+$ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# (Optional) Mecab追加辞書をインストール
+# （任意、Linuxのみ）Mecab追加辞書をインストール
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
