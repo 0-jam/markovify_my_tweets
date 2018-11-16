@@ -17,6 +17,7 @@
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy)
     1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
+    1. [utanet_scraper.py](#utanet_scraperpy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
     1. [Aozora Bunko](#aozora-bunko)
         1. [Remove manually](#remove-manually)
@@ -50,7 +51,7 @@
 - PC 2
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
-    - [ ] GPU: AMD Radeon RX 580
+    - GPU: AMD Radeon RX 580
         - 2304 cores (64 CUs), 8GB VRAM
         - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
         - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
@@ -88,13 +89,14 @@
 ## Installation
 
 ```bash
-# wakachi_janome.py
+## wakachi_janome.py
+# Recommended on Windows
 $ pip install janome
 
 ## wakachi_mecab.py
-$ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev
+$ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# (Optional) Install additional dictionary for Mecab
+# (Optional, only works on Linux) Install additional dictionary for Mecab
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
@@ -112,6 +114,9 @@ $ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 $ pip install tensorflow numpy matplotlib tqdm
+
+## utanet_scraper.py
+$ pip install beautifulscraper
 ```
 
 ## Usage
@@ -171,6 +176,15 @@ $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_mode
 $ python bm_rnn_sentence.py
 # If you want to force to use CPU, give "-c" option
 $ python bm_rnn_sentence.py -c
+```
+
+### utanet_scraper.py
+
+- Do scraping and extract lyrics by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
+
+```bash
+# Extracted lyrics is saved as "lyrics.txt" by default
+$ python utanet_scraper.py "秋元康"
 ```
 
 ## Preprocessing (markovify_sentence.py)
