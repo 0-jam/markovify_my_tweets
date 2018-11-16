@@ -17,6 +17,7 @@
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy)
     1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
+    1. [utanet_scraper.py](#utanet_scraperpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
     1. [青空文庫](#青空文庫)
         1. [手動で削除](#手動で削除)
@@ -50,7 +51,7 @@
 - PC 2
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
-    - [ ] GPU: AMD Radeon RX 580
+    - GPU: AMD Radeon RX 580
         - 2304 cores (64 CUs), 8GB VRAM
         - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
         - [公式Dockerイメージ](https://hub.docker.com/r/rocm/tensorflow/)で動作確認済み
@@ -113,6 +114,9 @@ $ sudo apt install liblzma-dev tk-dev
 $ pyenv install 3.6.7
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib tqdm
+
+## utanet_scraper.py
+$ pip install beautifulscraper
 ```
 
 ## 使用法
@@ -172,6 +176,15 @@ $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_mode
 $ python bm_rnn_sentence.py
 # "-c"オプションをつけると強制的にCPUを使った学習になる
 $ python bm_rnn_sentence.py -c
+```
+
+### utanet_scraper.py
+
+- [歌ネット](https://www.uta-net.com/)で作詞家を検索して歌詞を抽出
+
+```bash
+# 抽出されたテキストはデフォルトで"lyrics.txt"に保存される
+$ python utanet_scraper.py "秋元康"
 ```
 
 ## 前処理 (markovify_sentence.py)

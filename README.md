@@ -51,7 +51,7 @@
 - PC 2
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
-    - [ ] GPU: AMD Radeon RX 580
+    - GPU: AMD Radeon RX 580
         - 2304 cores (64 CUs), 8GB VRAM
         - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
         - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
