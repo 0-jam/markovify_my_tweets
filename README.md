@@ -58,6 +58,11 @@
 
 ## Todo
 
+- [ ] Add search options to Utanet scraper
+    - Example:
+        - Artist name
+        - Enable multiple search options
+        - Number of songs to extract
 - [ ] Add ROCm instruction in this README
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Enable using various engine for word dividing
