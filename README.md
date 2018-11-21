@@ -114,8 +114,7 @@ $ pip install markovify
 
 ## rnn_sentence.py & bm_rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
-# tk-dev for displaying graph
-$ sudo apt install liblzma-dev tk-dev
+$ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 $ pip install tensorflow numpy matplotlib tqdm
