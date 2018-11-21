@@ -14,36 +14,10 @@ def search(query):
     # クエリが日本語だと正しく処理されないのでエンコード
     search_url = domain + "/search/?Aselect=3&Keyword=" + urllib.parse.quote(query) + "&Bselect=4&sort="
 
-    body = scraper.go(search_url)
+    bodies = [scraper.go(search_url)]
 
-    song_ids = []
-    titles = []
-    artists = []
-    lyricists = []
-    composers = []
-
-    # 1ページ目
-    # 曲名と歌詞ページのURLを抽出
-    for td in body.select(".td1"):
-        # "/song/21496/"の形で抽出される
-        song_ids.append(td.find_all("a")[0].get("href"))
-        titles.append(td.get_text())
-
-    # 歌手名を抽出
-    for td in body.select(".td2"):
-        artists.append(td.get_text())
-
-    # 作詞者名を抽出
-    for td in body.select(".td3"):
-        lyricists.append(td.get_text())
-
-    # 作曲者名を抽出
-    for td in body.select(".td4"):
-        composers.append(td.get_text())
-
-    # 2ページ目以降（あれば）
     try:
-        pages = body.select("#page_list")[0]
+        pages = bodies[0].select("#page_list")[0]
         last_page = urllib.parse.urlparse(pages.find_all("a")[-1].get("href"))
         lpq = urllib.parse.parse_qs(last_page.query)
         last_page_num = int(lpq["pnum"][0])
@@ -61,26 +35,32 @@ def search(query):
             )
             page_url = urllib.parse.urlunparse(page)
 
-            body = scraper.go(page_url)
-
-            # 曲名と歌詞ページのURLを抽出
-            for td in body.select(".td1"):
-                song_ids.append(td.find_all("a")[0].get("href"))
-                titles.append(td.get_text())
-
-            # 歌手名を抽出
-            for td in body.select(".td2"):
-                artists.append(td.get_text())
-
-            # 作詞者名を抽出
-            for td in body.select(".td3"):
-                lyricists.append(td.get_text())
-
-            # 作曲者名を抽出
-            for td in body.select(".td4"):
-                composers.append(td.get_text())
+            bodies.append(scraper.go(page_url))
     except IndexError:
         pass
+
+    song_ids = []
+    titles = []
+    artists = []
+    lyricists = []
+    composers = []
+    for body in bodies:
+        # 曲名と歌詞ページのURLを抽出
+        for td in body.select(".td1"):
+            song_ids.append(td.find_all("a")[0].get("href"))
+            titles.append(td.get_text())
+
+        # 歌手名を抽出
+        for td in body.select(".td2"):
+            artists.append(td.get_text())
+
+        # 作詞者名を抽出
+        for td in body.select(".td3"):
+            lyricists.append(td.get_text())
+
+        # 作曲者名を抽出
+        for td in body.select(".td4"):
+            composers.append(td.get_text())
 
     return (song_ids, titles, artists, lyricists, composers)
 
@@ -103,7 +83,7 @@ def extract_lyrics(song_ids):
 
 ## queryで作詞家を検索して情報を抽出
 # 戻り値はdict
-def search_lyrics(query):
+def search_songs(query):
     (song_ids, titles, artists, lyricists, composers) = search(query)
 
     lyrics = extract_lyrics(song_ids)
@@ -123,10 +103,10 @@ def search_lyrics(query):
 def main():
     parser = argparse.ArgumentParser(description="引数に指定した名前で作詞家を検索して曲情報を抽出")
     parser.add_argument("query", type=str, help="検索したい名前")
-    parser.add_argument("-o", "--output", type=str, default="lyrics.json", help="出力ファイル名（デフォルト：'./lyrics.json'）")
+    parser.add_argument("-o", "--output", type=str, default="songs.json", help="出力ファイル名（デフォルト：'./songs.json'）")
     args = parser.parse_args()
 
-    results = search_lyrics(args.query)
+    results = search_songs(args.query)
 
     with open(args.output, "w", encoding='utf-8') as out:
         # json.dumps(results, out)だと最後の波括弧が閉じられない
