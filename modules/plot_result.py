@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
-import tkinter as tki
 
 def plot_result(losses):
-    fig = plt.figure()
-    ax = fig.subplots()
+    fig, ax = plt.subplots()
 
     ax.set(xlabel="epoch", ylabel="loss", xticks=range(len(losses)))
     ax.plot(losses)
@@ -14,5 +12,5 @@ def save_result(losses, save_to="result.png"):
     plot_result(losses).savefig(save_to)
 
 def show_result(losses):
-    plot_result(losses).show()
-    tki.mainloop()
+    plot_result(losses)
+    plt.show()

@@ -58,6 +58,11 @@
 
 ## Todo
 
+- [ ] 歌ネットスクレイパーの検索条件
+    - 例：
+        - アーティスト名
+        - 複数条件対応
+        - 抽出件数
 - [ ] ROCmインストール手順書いておこう
 - [ ] RNN版の分かち書き対応
 - [ ] 分かち書きスクリプトをいろいろなエンジンに対応
@@ -109,8 +114,7 @@ $ pip install markovify
 
 ## rnn_sentence.py & bm_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
-# 結果グラフ表示用にtkinterを使っている
-$ sudo apt install liblzma-dev tk-dev
+$ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib tqdm

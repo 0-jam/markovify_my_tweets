@@ -27,14 +27,10 @@ def main():
 
     ## Parse options and initialize some parameters
     if args.test_mode:
-        # input_path = Path("text/Latin-Lipsum.txt")
-        # encoding = 'utf-8'
-
         embedding_dim = 4
         units = 16
         epochs = 2
 
-        # start_string = "Lorem "
         gen_size = 100
     else:
         # The embedding dimensions
