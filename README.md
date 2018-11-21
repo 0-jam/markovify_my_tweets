@@ -18,6 +18,7 @@
     1. [rnn_sentence.py](#rnn_sentencepy)
     1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
     1. [utanet_scraper.py](#utanet_scraperpy)
+    1. [json_extractor.py](#json_extractorpy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
     1. [Aozora Bunko](#aozora-bunko)
         1. [Remove manually](#remove-manually)
@@ -39,7 +40,7 @@
 - Tested OSs
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
-    - Ubuntu 18.04.1 + ROCm Module
+    - Ubuntu 18.04.1 + ROCm 1.9
 - TensorFlow >= 1.11.0
 
 ### Hardware
@@ -163,6 +164,7 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 
 ```bash
 # No preprocessing needed for input file
+# If you want to force to use Non-CuDNN GRU layer, give "-c" option
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # Specifying learned model
@@ -176,19 +178,44 @@ $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_mode
 ### bm_rnn_sentence.py
 
 ```bash
-# Simply execute this to use:
+# Just execute:
 $ python bm_rnn_sentence.py
-# If you want to force to use CPU, give "-c" option
-$ python bm_rnn_sentence.py -c
 ```
 
 ### utanet_scraper.py
 
-- Do scraping and extract lyrics by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
+- Do scraping and extract song informations by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
+- Song information is saved as JSON
+    - key: song_id from original URL
+    - values:
+        - title
+        - artist
+        - lyricist
+        - composer
+        - lyric
 
 ```bash
-# Extracted lyrics is saved as "lyrics.txt" by default
+# Extracted song information is saved as "songs.json" by default
 $ python utanet_scraper.py "秋元康"
+```
+
+### json_extractor.py
+
+- Extract specified attributes from [utanet_scraper.py](#utanet_scraperpy)
+    - Specifing multiple attributes are **not** available
+- Extracted attributes are saved as plain text
+    - Each songs are delimited by line break
+- Available attributes
+    - 'id'
+    - 'title'
+    - 'artist'
+    - 'lyricist'
+    - 'composer'
+    - 'lyric'
+
+```bash
+# Default attribute: lyrics
+$ python json_extractor.py akimoto.json akimoto_lyrics.txt
 ```
 
 ## Preprocessing (markovify_sentence.py)
