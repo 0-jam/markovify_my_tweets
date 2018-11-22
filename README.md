@@ -218,15 +218,6 @@ $ python utanet_scraper.py "秋元康"
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
 ```
 
-### utanet_scraper.py
-
-- Do scraping and extract lyrics by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
-
-```bash
-# Extracted lyrics is saved as "lyrics.txt" by default
-$ python utanet_scraper.py "秋元康"
-```
-
 ## Preprocessing (markovify_sentence.py)
 
 - Make sure each words is separated by whitespaces before executing

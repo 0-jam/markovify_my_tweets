@@ -223,15 +223,6 @@ $ python utanet_scraper.py "秋元康"
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
 ```
 
-### utanet_scraper.py
-
-- [歌ネット](https://www.uta-net.com/)で作詞家を検索して歌詞を抽出
-
-```bash
-# 抽出されたテキストはデフォルトで"lyrics.txt"に保存される
-$ python utanet_scraper.py "秋元康"
-```
-
 ## 前処理 (markovify_sentence.py)
 
 - 実行するときは単語が半角スペースで区切られている必要がある
