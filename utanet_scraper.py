@@ -4,6 +4,7 @@ import urllib
 import time
 from tqdm import tqdm
 from beautifulscraper import BeautifulScraper
+from modules.multi_sub import replace_str
 
 scraper = BeautifulScraper()
 domain = "https://www.uta-net.com"
@@ -69,8 +70,14 @@ def extract_lyric(song_id):
     song_url = domain + song_id
 
     body = scraper.go(song_url)
+    # 歌詞内の改行を全角スラッシュ／に置換して抽出
+    lyric = body.find(id="kashi_area").get_text("／")
+    # 丸括弧（）、全角スペース　、！、？をそれぞれ半角に置換
+    # 3つ以上続くピリオド...を三点リーダー…に置換
+    # 各要素：(置換したい文字, 置換先の文字)
+    patterns = [("\u3000", " "), ("（", "("), ("）", ")"), ("！", "!"), ("？", "?"), (r"\.{3,}", "…")]
 
-    return body.find(id="kashi_area").get_text("／")
+    return replace_str(lyric, patterns)
 
 def extract_lyrics(song_ids):
     lyrics = []
