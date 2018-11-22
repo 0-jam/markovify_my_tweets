@@ -18,6 +18,7 @@
     1. [rnn_sentence.py](#rnn_sentencepy)
     1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
     1. [utanet_scraper.py](#utanet_scraperpy)
+    1. [json_extractor.py](#json_extractorpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
     1. [青空文庫](#青空文庫)
         1. [手動で削除](#手動で削除)
@@ -36,10 +37,10 @@
 ### ソフトウェア
 
 - Python < 3.7.0
-- Tested OSs
+- テスト済みOS
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
-    - Ubuntu 18.04.1 + ROCm Module
+    - Ubuntu 18.04.1 + ROCm 1.9
 - TensorFlow >= 1.11.0
 
 ### ハードウェア
@@ -163,6 +164,7 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 
 ```bash
 # 特に前処理は必要ない
+# "-c"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる（bm_rnn_sentence.pyも同様）
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # 学習済みモデルを指定
@@ -178,8 +180,47 @@ $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_mode
 ```bash
 # これだけ
 $ python bm_rnn_sentence.py
-# "-c"オプションをつけると強制的にCPUを使った学習になる
-$ python bm_rnn_sentence.py -c
+```
+
+### utanet_scraper.py
+
+- [歌ネット](https://www.uta-net.com/)で作詞家を検索して曲情報を抽出
+- 抽出結果はJSONで保存される
+    - key: song_id（抽出元のURL）
+    - values:
+        - title
+            - 曲名
+        - artist
+            - 歌手名
+        - lyricist
+            - 作詞者名
+        - composer
+            - 作曲者名
+        - lyric
+            - 歌詞
+
+```bash
+# 抽出されたテキストはデフォルトで"songs.json"に保存される
+$ python utanet_scraper.py "秋元康"
+```
+
+### json_extractor.py
+
+- 指定した属性を[utanet_scraper.py](#utanet_scraperpy)で出力したJSONから抽出
+    - Specifing multiple attributes are **not** available
+- 抽出された属性はテキストで保存される
+    - 曲ごとに改行
+- 指定できる属性：
+    - 'id'
+    - 'title'
+    - 'artist'
+    - 'lyricist'
+    - 'composer'
+    - 'lyric'
+
+```bash
+# デフォルトの属性：lyrics
+$ python json_extractor.py akimoto.json akimoto_lyrics.txt
 ```
 
 ### utanet_scraper.py

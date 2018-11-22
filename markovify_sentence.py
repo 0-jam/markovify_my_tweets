@@ -60,7 +60,7 @@ def main():
 
     generated_sentences = "\n".join(dump_queue(generated_sentences)) + "\n"
     if args.output:
-        with Path(args.output).open('w') as out:
+        with Path(args.output).open('w', encoding='utf-8') as out:
             out.write(generated_sentences)
     else:
         sys.stdout.write(generated_sentences)
