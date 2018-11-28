@@ -17,7 +17,7 @@ def main():
     parser.add_argument("start_string", type=str, help="Generation start with this string")
     parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The size of text that you want to generate (default: 1000)")
+    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
@@ -42,6 +42,7 @@ def main():
         gen_size = args.gen_size
 
     input_path = Path(args.input)
+    filename = input_path.name
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:
@@ -51,19 +52,18 @@ def main():
     dataset = TextDataset(text)
 
     ## Create the model
-    model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=args.cpu_mode)
 
-    if args.model_dir:
+    # Specify directory to save model
+    if args.save_dir:
+        path = Path(args.save_dir)
+    elif args.model_dir:
         # Load learned model
-        model.load_weights(model_path(args.model_dir))
+        path = Path(args.model_dir)
     else:
-        filename = input_path.name
-        # Specify directory to save model
-        if args.save_dir:
-            path = Path(args.save_dir)
-        else:
-            path = Path("./learned_models").joinpath(filename)
+        path = Path("./learned_models").joinpath(filename)
 
+    if not args.model_dir:
         losses = []
         start = time.time()
         for epoch in range(epochs):
@@ -80,6 +80,14 @@ def main():
                 loss
             ))
 
+            # If ARC (Average Rate of Change) is under 0.01, stop learning
+            last_losses = losses[-2:]
+            try:
+                if ((last_losses[2] - last_losses[0]) / 2) < 0.01:
+                    break
+            except IndexError:
+                pass
+
         elapsed_time = time.time() - start
         print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
             epochs,
@@ -93,11 +101,15 @@ def main():
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 
-        model.save_weights(str(path.joinpath(filename).resolve()))
+        model.model.save_weights(str(path.joinpath(filename).resolve()))
 
     ## Evaluation
+    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
+    # Load learned model
+    generator.model.load_weights(model_path(path))
+
     start_string = args.start_string
-    generated_text = model.generate_text(dataset, start_string, gen_size)
+    generated_text = generator.generate_text(dataset, start_string, gen_size)
     if args.output:
         print("Saving generated text...")
         with Path(args.output).open('w', encoding='utf-8') as out:
