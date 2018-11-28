@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
+from pathlib import Path
 
 ## Keras Functional API implementation
 class Model():
@@ -84,3 +85,8 @@ class Model():
                     pbar.update(1)
 
         return start_string + "".join(generated_text) + "\n"
+
+    ## Return the path to <ckpt_dir>/checkpoint
+    @staticmethod
+    def path(ckpt_dir):
+        return tf.train.latest_checkpoint(str(Path(ckpt_dir)))

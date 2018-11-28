@@ -7,10 +7,6 @@ from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
 
-## Return the path to <ckpt_dir>/checkpoint
-def model_path(ckpt_dir):
-    return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
-
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
     parser.add_argument("input", type=str, help="Input file path")
@@ -31,7 +27,7 @@ def main():
         units = 16
         epochs = 2
 
-        gen_size = 100
+        gen_size = 1
     else:
         # The embedding dimensions
         embedding_dim = 256
@@ -106,7 +102,7 @@ def main():
     ## Evaluation
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
     # Load learned model
-    generator.model.load_weights(model_path(path))
+    generator.model.load_weights(model.path(path))
 
     start_string = args.start_string
     generated_text = generator.generate_text(dataset, start_string, gen_size)

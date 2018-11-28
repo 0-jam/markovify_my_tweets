@@ -112,3 +112,4 @@ ENV/
 !text/Latin-Lipsum.txt
 !dict/*
 learned_models/*
+benchmark*/*
