@@ -16,7 +16,7 @@ def main():
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
-    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
+    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
     args = parser.parse_args()
@@ -25,14 +25,14 @@ def main():
     if args.test_mode:
         embedding_dim = 4
         units = 16
-        epochs = 2
+        epochs = 3
 
         gen_size = 1
     else:
         # The embedding dimensions
         embedding_dim = 256
         # RNN (Recursive Neural Network) nodes
-        units = 1024
+        units = 4096
         epochs = args.epochs
 
         gen_size = args.gen_size
@@ -76,10 +76,12 @@ def main():
                 loss
             ))
 
-            # If ARC (Average Rate of Change) is under 0.01, stop learning
-            last_losses = losses[-2:]
+            # If ARC (Average Rate of Change) of last 3 epochs is under 0.01, stop learning
+            last_losses = losses[-3:]
             try:
-                if ((last_losses[2] - last_losses[0]) / 2) < 0.01:
+                arc = (last_losses[2] - last_losses[0]) / 2
+                print("ARC of last 3 epochs:", arc)
+                if arc < 0.01:
                     break
             except IndexError:
                 pass

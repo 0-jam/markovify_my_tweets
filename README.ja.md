@@ -56,9 +56,17 @@
         - 2304 cores (64 CUs), 8GB VRAM
         - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
         - [公式Dockerイメージ](https://hub.docker.com/r/rocm/tensorflow/)で動作確認済み
+- PC 3
+    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
+    - RAM: 16GB
+    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
+    - VRAM: 8GB
+    - OS: Ubuntu 18.04.1
+        - CUDA 9.0
 
 ## Todo
 
+- [ ] RNN版の訓練とテキスト生成を分離
 - [ ] 歌ネットスクレイパーの検索条件
     - 例：
         - アーティスト名
@@ -270,7 +278,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 - bm_rnn_sentence.py: rnn_sentence.pyベースのベンチマークスクリプト
     - 基本的にオリジナルの機能を大きく省いただけ
-- 1時間（仮）で何epoch学習できて，そのモデルから1000文字（仮）生成した時にどの程度読める文章ができるかを比較
+- 1時間（仮）で何epoch学習できて，そのモデルから20行生成した時にどの程度読める文章ができるかを比較
 
 ### データセット
 
@@ -303,6 +311,8 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
     - epoch数
     - 上二つから計算できる1分あたりのepoch数
     - loss（損失関数）の値
+    - モデルから生成されたテキスト
+        - 20行
 
 ### 評価基準
 
