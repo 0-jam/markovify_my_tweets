@@ -32,7 +32,7 @@ def main():
         # The embedding dimensions
         embedding_dim = 256
         # RNN (Recursive Neural Network) nodes
-        units = 4096
+        units = 1024
         epochs = args.epochs
 
         gen_size = args.gen_size
@@ -79,7 +79,7 @@ def main():
             # If ARC (Average Rate of Change) of last 3 epochs is under 0.01, stop learning
             last_losses = losses[-3:]
             try:
-                arc = (last_losses[2] - last_losses[0]) / 2
+                arc = abs((last_losses[2] - last_losses[0]) / 2)
                 print("ARC of last 3 epochs:", arc)
                 if arc < 0.01:
                     break

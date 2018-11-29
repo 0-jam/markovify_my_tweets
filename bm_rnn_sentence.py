@@ -88,7 +88,7 @@ def main():
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
     # Load learned model
     generator.model.load_weights(model.path(model_dir))
-    generated_text = generator.generate_text(dataset, "坾輩㝯", gen_size)
+    generated_text = generator.generate_text(dataset, "吾輩は", gen_size)
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
