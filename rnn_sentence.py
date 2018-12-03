@@ -7,20 +7,17 @@ from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
 
-## Return the path to <ckpt_dir>/checkpoint
-def model_path(ckpt_dir):
-    return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
-
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
     parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The size of text that you want to generate (default: 1000)")
+    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
-    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
+    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
     args = parser.parse_args()
@@ -29,41 +26,43 @@ def main():
     if args.test_mode:
         embedding_dim = 4
         units = 16
-        epochs = 2
+        epochs = 3
+        batch_size = 128
 
-        gen_size = 100
+        gen_size = 1
     else:
         # The embedding dimensions
         embedding_dim = 256
         # RNN (Recursive Neural Network) nodes
-        units = 1024
+        units = 2048
         epochs = args.epochs
+        batch_size = 64
 
         gen_size = args.gen_size
 
     input_path = Path(args.input)
+    filename = input_path.name
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:
         text = file.read()
 
     ## Create the dataset from the text
-    dataset = TextDataset(text)
+    dataset = TextDataset(text, batch_size)
 
     ## Create the model
-    model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=args.cpu_mode)
 
-    if args.model_dir:
+    # Specify directory to save model
+    if args.save_dir:
+        path = Path(args.save_dir)
+    elif args.model_dir:
         # Load learned model
-        model.load_weights(model_path(args.model_dir))
+        path = Path(args.model_dir)
     else:
-        filename = input_path.name
-        # Specify directory to save model
-        if args.save_dir:
-            path = Path(args.save_dir)
-        else:
-            path = Path("./learned_models").joinpath(filename)
+        path = Path("./learned_models").joinpath(input_path.name)
 
+    if not args.model_dir:
         losses = []
         start = time.time()
         for epoch in range(epochs):
@@ -80,6 +79,16 @@ def main():
                 loss
             ))
 
+            # If ARC (Average Rate of Change) of last 3 epochs is under 0.1%, stop learning
+            last_losses = losses[-3:]
+            try:
+                arc = (last_losses[2] - last_losses[0]) / (len(last_losses) - 1)
+                print("ARC of last {} epochs: {}".format(len(last_losses), arc))
+                if abs(arc) < 0.01:
+                    break
+            except IndexError:
+                pass
+
         elapsed_time = time.time() - start
         print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
             epochs,
@@ -93,11 +102,15 @@ def main():
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 
-        model.save_weights(str(path.joinpath(filename).resolve()))
+        model.model.save_weights(str(path.joinpath(filename).resolve()))
 
     ## Evaluation
+    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
+    # Load learned model
+    generator.model.load_weights(model.path(path))
+
     start_string = args.start_string
-    generated_text = model.generate_text(dataset, start_string, gen_size)
+    generated_text = generator.generate_text(dataset, start_string, gen_size, args.temperature)
     if args.output:
         print("Saving generated text...")
         with Path(args.output).open('w', encoding='utf-8') as out:

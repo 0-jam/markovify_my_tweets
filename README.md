@@ -56,9 +56,17 @@
         - 2304 cores (64 CUs), 8GB VRAM
         - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
         - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
+- PC 3
+    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
+    - RAM: 16GB
+    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
+    - VRAM: 8GB
+    - OS: Ubuntu 18.04.1
+        - CUDA 9.0
 
 ## Todo
 
+- [ ] Separate RNN trainer and generator
 - [ ] Add search options to Utanet scraper
     - Example:
         - Artist name
@@ -296,7 +304,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
     - Epochs per minute
     - The value of loss function
     - Generated text
-        - The number of characters: _1000(TBD)_
+        - The number of characters: 20 lines
 
 ### Evaluation
 
