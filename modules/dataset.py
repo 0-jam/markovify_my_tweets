@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 
 class TextDataset():
-    def __init__(self, text):
+    def __init__(self, text, batch_size):
         ## Vectorize the text
         # unique character in text
         vocab = sorted(set(text))
@@ -20,7 +20,7 @@ class TextDataset():
         seq_length = 100
         chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(seq_length + 1, drop_remainder=True)
 
-        self.batch_size = 64
+        self.batch_size = batch_size
         # Buffer size to shuffle the dataset
         buffer_size = 10000
 

@@ -19,7 +19,7 @@ def main():
     with lzma.open(path) as file:
         text = file.read().decode()
 
-    dataset = TextDataset(text)
+    dataset = TextDataset(text, 64)
 
     if args.test_mode:
         # The embedding dimensions

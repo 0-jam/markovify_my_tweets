@@ -32,6 +32,7 @@ class Model():
         self.model = keras.Sequential([
             keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
             gru,
+            keras.layers.Dropout(0.5),
             keras.layers.Dense(vocab_size)
         ])
 
@@ -56,11 +57,11 @@ class Model():
 
         return loss.numpy()
 
-    def generate_text(self, dataset, start_string, gen_size=1, delimiter="\n"):
+    def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
         generated_text = []
         # Vectorize start_string
         input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
-        temperature = 1.0
+        temperature = temp
 
         with tqdm(total=gen_size, desc="Generating...") as pbar:
             count = 0
