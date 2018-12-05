@@ -11,7 +11,7 @@ from rnn_sentence import load_test_settings
 import settings
 
 def load_settings():
-    return settings.BENCHMARK_PARAMETERS.values()
+    return settings.BENCHMARK_PARAMETERS
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
@@ -26,7 +26,7 @@ def main():
         text = file.read().decode()
 
     if args.test_mode:
-        embedding_dim, units, batch_size = load_test_settings()
+        parameters = load_test_settings()
 
         # Time limit (min)
         time_limit = 5
@@ -34,13 +34,15 @@ def main():
 
         gen_size = 1
     else:
-        embedding_dim, units, batch_size = load_settings()
+        parameters = load_settings()
 
         # Time limit (min)
         time_limit = 60
         max_epochs = args.max_epochs
 
         gen_size = 20
+
+    embedding_dim, units, batch_size = parameters.values()
 
     ## Create the dataset & the model
     dataset = TextDataset(text, batch_size)

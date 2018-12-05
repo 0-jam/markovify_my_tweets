@@ -1,7 +1,9 @@
-# RNN (Recursive Neural Network) nodes
 DEFAULT_PARAMETERS = {
+    # The embedding dimensions
     "embedding_dim": 256,
+    # RNN (Recursive Neural Network) nodes
     "units": 2048,
+    # Batch size of the dataset
     "batch_size": 64
 }
 

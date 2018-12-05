@@ -7,12 +7,13 @@ from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
 import settings
+import json
 
 def load_settings():
-    return settings.DEFAULT_PARAMETERS.values()
+    return settings.DEFAULT_PARAMETERS
 
 def load_test_settings():
-    return settings.TEST_MODE_PARAMETERS.values()
+    return settings.TEST_MODE_PARAMETERS
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
@@ -22,7 +23,6 @@ def main():
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
-    parser.add_argument("-m", "--model_dir", type=str, help="Path to the learned model directory (default: empty (create a new model))")
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
@@ -31,17 +31,17 @@ def main():
 
     ## Parse options and initialize some parameters
     if args.test_mode:
-        embedding_dim, units, batch_size = load_test_settings()
+        parameters = load_test_settings()
         epochs = 3
 
         gen_size = 1
     else:
-        # The embedding dimensions
-        embedding_dim, units, batch_size = load_settings()
+        parameters = load_settings()
         epochs = args.epochs
 
         gen_size = args.gen_size
 
+    embedding_dim, units, batch_size = parameters.values()
     input_path = Path(args.input)
     filename = input_path.name
     encoding = args.encoding
@@ -58,52 +58,52 @@ def main():
     # Specify directory to save model
     if args.save_dir:
         path = Path(args.save_dir)
-    elif args.model_dir:
-        # Load learned model
-        path = Path(args.model_dir)
     else:
         path = Path("./learned_models").joinpath(input_path.name)
 
-    if not args.model_dir:
-        losses = []
-        start = time.time()
-        for epoch in range(epochs):
-            print("Epoch: {} / {}:".format(epoch + 1, epochs))
-            epoch_start = time.time()
+    losses = []
+    start = time.time()
+    for epoch in range(epochs):
+        print("Epoch: {} / {}:".format(epoch + 1, epochs))
+        epoch_start = time.time()
 
-            loss = model.train(dataset.dataset)
-            losses.append(loss)
+        loss = model.train(dataset.dataset)
+        losses.append(loss)
 
-            print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
-                epoch + 1,
-                epochs,
-                time.time() - epoch_start,
-                loss
-            ))
-
-            # If ARC (Average Rate of Change) of last 3 epochs is under 0.1%, stop learning
-            last_losses = losses[-3:]
-            try:
-                arc = (last_losses[2] - last_losses[0]) / (len(last_losses) - 1)
-                print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-                if abs(arc) < 0.01:
-                    break
-            except IndexError:
-                pass
-
-        elapsed_time = time.time() - start
-        print("Training finished.")
-        print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
+        print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
+            epoch + 1,
             epochs,
-            elapsed_time,
-            elapsed_time / epochs,
+            time.time() - epoch_start,
             loss
         ))
 
-        if Path.is_dir(path) is not True:
-            Path.mkdir(path, parents=True)
+        # If ARC (Average Rate of Change) of last 3 epochs is under 0.1%, stop learning
+        last_losses = losses[-3:]
+        try:
+            arc = (last_losses[2] - last_losses[0]) / (len(last_losses) - 1)
+            print("ARC of last {} epochs: {}".format(len(last_losses), arc))
+            if abs(arc) < 0.01:
+                break
+        except IndexError:
+            pass
 
-        model.save(path.joinpath(filename))
+    elapsed_time = time.time() - start
+    print("Training finished.")
+    print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
+        epochs,
+        elapsed_time,
+        elapsed_time / epochs,
+        loss
+    ))
+
+    if Path.is_dir(path) is not True:
+        Path.mkdir(path, parents=True)
+
+    # Save models and hyper parameters
+    model.save(path.joinpath(filename))
+    with path.joinpath("parameters.json").open('w', encoding='utf-8') as params:
+        parameters["cpu_mode"] = args.cpu_mode
+        params.write(json.dumps(parameters))
 
     ## Evaluation
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
