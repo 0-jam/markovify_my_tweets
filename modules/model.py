@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
 from pathlib import Path
+import json
 
 ## Keras Functional API implementation
 class Model():
@@ -58,11 +59,17 @@ class Model():
 
         return loss.numpy()
 
-    def save(self, path):
-        self.model.save_weights(str(Path(path).resolve()))
+    def save(self, model_dir, parameters):
+        if Path.is_dir(model_dir) is not True:
+            Path.mkdir(model_dir, parents=True)
 
-    def load(self, path):
-        self.model.load_weights(self.path(Path(path)))
+        with model_dir.joinpath("parameters.json").open('w', encoding='utf-8') as params:
+            params.write(json.dumps(parameters))
+
+        self.model.save_weights(str(Path(model_dir.joinpath("weights")).resolve()))
+
+    def load(self, model_dir):
+        self.model.load_weights(self.path(Path(model_dir)))
 
     def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
         generated_text = []

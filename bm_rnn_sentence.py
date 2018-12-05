@@ -7,7 +7,7 @@ import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import show_result, save_result
-from rnn_sentence import load_test_settings
+from rnn_sentence import load_test_settings, generate_text
 import settings
 
 def load_settings():
@@ -42,11 +42,12 @@ def main():
 
         gen_size = 20
 
-    embedding_dim, units, batch_size = parameters.values()
+    parameters["cpu_mode"] = args.cpu_mode
+    embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
     ## Create the dataset & the model
     dataset = TextDataset(text, batch_size)
-    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=args.cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
 
     epoch = 0
     elapsed_time = 0
@@ -62,7 +63,7 @@ def main():
         losses.append(loss)
 
         elapsed_time = time.time() - start
-        print("Time taken for epoch {}: {:.3f} sec, Loss: {:.3f}\n".format(
+        print("Time taken for epoch {}: {:.3f} sec, Loss: {:.3f}".format(
             epoch,
             time.time() - epoch_start,
             loss
@@ -84,27 +85,22 @@ def main():
 
     print("Saving trained model...")
     today = time.strftime("%Y%m%d")
-    path = Path("benchmark_" + today)
-    model_dir = path.joinpath("model")
-    if Path.is_dir(path) is not True:
-        Path.mkdir(model_dir, parents=True)
+    result_dir = Path("benchmark_" + today)
+    model_dir = result_dir.joinpath("model")
 
-    model.save(model_dir.joinpath("model"))
+    model.save(model_dir, parameters)
 
     # Generate sentence from the model
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
-    # Load learned model
-    generator.load(model_dir)
-    generated_text = generator.generate_text(dataset, "吾輩は", gen_size)
+    generated_text = generate_text(dataset, model_dir, "吾輩は", gen_size)
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
     print("Loss:", loss)
     print("Saving generated text...")
-    with open(str(path) + "/generated_text.txt", 'w', encoding='utf-8') as out:
+    with open(str(result_dir) + "/generated_text.txt", 'w', encoding='utf-8') as out:
         out.write(generated_text)
 
-    save_result(losses, save_to=str(path) + "/losses_" + today + ".png")
+    save_result(losses, save_to=str(result_dir) + "/losses_" + today + ".png")
 
 if __name__ == '__main__':
     main()

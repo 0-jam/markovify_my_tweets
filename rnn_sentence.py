@@ -15,18 +15,35 @@ def load_settings():
 def load_test_settings():
     return settings.TEST_MODE_PARAMETERS
 
+## Evaluation
+def generate_text(dataset, model_dir, start_string, gen_size, temperature=1.0):
+    with Path(model_dir).joinpath("parameters.json").open(encoding='utf-8') as params:
+        parameters = json.load(params)
+        embedding_dim, units, batch_size, cpu_mode = parameters.values()
+
+    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
+    # Load learned model
+    generator.load(model_dir)
+
+    return generator.generate_text(dataset, start_string, gen_size, temperature)
+
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
+    ## Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
+    ## Common arguments
     parser.add_argument("-o", "--output", type=str, help="Path to save losses graph and the generated text (default: None (show without saving))")
-    parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
-    parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
+    parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of input text file (default: utf-8)")
+    parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
+    ## Arguments for training
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
-    parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
-    parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
+    parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
+    ## Arguments for generation
+    parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
+    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
     ## Parse options and initialize some parameters
@@ -41,7 +58,8 @@ def main():
 
         gen_size = args.gen_size
 
-    embedding_dim, units, batch_size = parameters.values()
+    parameters["cpu_mode"] = args.cpu_mode
+    embedding_dim, units, batch_size, cpu_mode = parameters.values()
     input_path = Path(args.input)
     filename = input_path.name
     encoding = args.encoding
@@ -53,65 +71,56 @@ def main():
     dataset = TextDataset(text, batch_size)
 
     ## Create the model
-    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=args.cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
 
     # Specify directory to save model
     if args.save_dir:
-        path = Path(args.save_dir)
+        model_dir = Path(args.save_dir)
+    elif args.model_dir:
+        model_dir = Path(args.model_dir)
     else:
-        path = Path("./learned_models").joinpath(input_path.name)
+        model_dir = Path("./learned_models").joinpath(filename)
 
-    losses = []
-    start = time.time()
-    for epoch in range(epochs):
-        print("Epoch: {} / {}:".format(epoch + 1, epochs))
-        epoch_start = time.time()
+    if not args.model_dir:
+        losses = []
+        start = time.time()
+        for epoch in range(epochs):
+            print("Epoch: {} / {}:".format(epoch + 1, epochs))
+            epoch_start = time.time()
 
-        loss = model.train(dataset.dataset)
-        losses.append(loss)
+            loss = model.train(dataset.dataset)
+            losses.append(loss)
 
-        print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}\n".format(
-            epoch + 1,
+            print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}".format(
+                epoch + 1,
+                epochs,
+                time.time() - epoch_start,
+                loss
+            ))
+
+            # If ARC (Average Rate of Change) of last 3 epochs is under 1%, stop learning
+            last_losses = losses[-5:]
+            try:
+                arc = (last_losses[4] - last_losses[0]) / (len(last_losses) - 1)
+                print("ARC of last {} epochs: {}".format(len(last_losses), arc))
+                if abs(arc) < 0.01:
+                    break
+            except IndexError:
+                pass
+
+        elapsed_time = time.time() - start
+        print("Training finished.")
+        print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
             epochs,
-            time.time() - epoch_start,
+            elapsed_time,
+            elapsed_time / epochs,
             loss
         ))
 
-        # If ARC (Average Rate of Change) of last 3 epochs is under 0.1%, stop learning
-        last_losses = losses[-3:]
-        try:
-            arc = (last_losses[2] - last_losses[0]) / (len(last_losses) - 1)
-            print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-            if abs(arc) < 0.01:
-                break
-        except IndexError:
-            pass
+        # Save models and hyper parameters
+        model.save(model_dir, filename, parameters)
 
-    elapsed_time = time.time() - start
-    print("Training finished.")
-    print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
-        epochs,
-        elapsed_time,
-        elapsed_time / epochs,
-        loss
-    ))
-
-    if Path.is_dir(path) is not True:
-        Path.mkdir(path, parents=True)
-
-    # Save models and hyper parameters
-    model.save(path.joinpath(filename))
-    with path.joinpath("parameters.json").open('w', encoding='utf-8') as params:
-        parameters["cpu_mode"] = args.cpu_mode
-        params.write(json.dumps(parameters))
-
-    ## Evaluation
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
-    # Load learned model
-    generator.load(path)
-
-    start_string = args.start_string
-    generated_text = generator.generate_text(dataset, start_string, gen_size, args.temperature)
+    generated_text = generate_text(dataset, model_dir, args.start_string, gen_size, temperature=args.temperature)
     if args.output:
         print("Saving generated text...")
         outpath = Path(args.output)
