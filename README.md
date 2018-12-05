@@ -41,6 +41,7 @@
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
+    - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
 - TensorFlow >= 1.11.0
 
 ### Hardware
@@ -56,6 +57,13 @@
         - 2304 cores (64 CUs), 8GB VRAM
         - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
         - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
+- PC 3
+    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
+    - RAM: 16GB
+    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
+    - VRAM: 8GB
+    - OS: Ubuntu 18.04.1
+        - CUDA 9.0
 
 ## Todo
 
@@ -65,11 +73,14 @@
         - Enable multiple search options
         - Number of songs to extract
 - [ ] Add ROCm instruction in this README
+- [ ] Add CUDA instruction in this README
 - [ ] Enable function to use word as a token for RNN-based generation
 - [ ] Enable using various engine for word dividing
     - [ ] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
+- [x] Separate RNN trainer and generator
+    - Adding "generation-only" option seems better...
 - [x] Text formatter for [Aozora bunko][aozora]
     - [x] Remove title, author and footnotes
     - [x] Remove annotation symbols
@@ -172,6 +183,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # Specify the directory name
+# Training model is automatically skipped
 $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
 ```
 
@@ -290,19 +302,23 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 1. Time measurement begins when training of the model is started
 1. Keep training for an hour (default)
 1. If it exceeded the time limit, finish training at the current epoch
+    - Example: time limit is 15 minutes
+        - If it elapsed 15 minutes while training epoch 3, abort training when finished training epoch 3
+    - If it learned 50 epochs within the time limit, stop learning regardless of elapsed time
 1. Print results
     - Elapsed time
     - Trained epochs
     - Epochs per minute
     - The value of loss function
     - Generated text
-        - The number of characters: _1000(TBD)_
+        - The number of characters: 20 lines
 
 ### Evaluation
 
 - How many epochs did the system learned?
+    - How many times per epoch?
 - What loss function's value?
-    - The smaller loss function's value, the more readable sentence can be generated ...probably
+    - The smaller loss function's value, the more _readable_ sentence can be generated ...probably
 
 ### Records
 

@@ -7,12 +7,17 @@ import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import show_result, save_result
+from rnn_sentence import load_test_settings, generate_text
+import settings
+
+def load_settings():
+    return settings.BENCHMARK_PARAMETERS
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
+    parser.add_argument("-e", "--max_epochs", type=int, default=50, help="Max number of epochs (default: 50)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
-    parser.add_argument("-s", "--save_to_file", action='store_true', help="Save loss function graph and generated_text (default: False)")
-    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging (default: false)")
+    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging, ignore -e option (default: false)")
     args = parser.parse_args()
 
     ## Create the dataset from the XZ-compressed text
@@ -20,31 +25,29 @@ def main():
     with lzma.open(path) as file:
         text = file.read().decode()
 
-    dataset = TextDataset(text)
-
     if args.test_mode:
-        # The embedding dimensions
-        embedding_dim = 4
-        # RNN (Recursive Neural Network) nodes
-        units = 16
+        parameters = load_test_settings()
 
         # Time limit (min)
         time_limit = 5
+        max_epochs = 2
 
-        gen_size = 100
+        gen_size = 1
     else:
-        # The embedding dimensions
-        embedding_dim = 256
-        # RNN (Recursive Neural Network) nodes
-        units = 1024
+        parameters = load_settings()
 
         # Time limit (min)
         time_limit = 60
+        max_epochs = args.max_epochs
 
-        gen_size = 1000
+        gen_size = 20
 
-    ## Create the model
-    model = Model(dataset.vocab_size, embedding_dim, units, force_cpu=args.cpu_mode)
+    parameters["cpu_mode"] = args.cpu_mode
+    embedding_dim, units, batch_size, cpu_mode = parameters.values()
+
+    ## Create the dataset & the model
+    dataset = TextDataset(text, batch_size)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
 
     epoch = 0
     elapsed_time = 0
@@ -60,32 +63,44 @@ def main():
         losses.append(loss)
 
         elapsed_time = time.time() - start
-        print("Time taken for epoch {}: {:.3f} sec, Loss: {:.3f}\n".format(
+        print("Time taken for epoch {}: {:.3f} sec, Loss: {:.3f}".format(
             epoch,
             time.time() - epoch_start,
             loss
         ))
 
+        last_losses = losses[-3:]
+        try:
+            arc = (last_losses[2] - last_losses[0]) / 2
+            print("ARC of last 3 epochs:", arc)
+        except IndexError:
+            pass
+
+        if epoch >= max_epochs:
+            print("You have learned enough epochs! Aborting...")
+            break
+
     print("Time!")
     elapsed_time = elapsed_time / 60
 
+    print("Saving trained model...")
+    today = time.strftime("%Y%m%d")
+    result_dir = Path("benchmark_" + today)
+    model_dir = result_dir.joinpath("model")
+
+    model.save(model_dir, parameters)
+
     # Generate sentence from the model
-    generated_text = model.generate_text(dataset, "吾輩は", gen_size)
+    generated_text = generate_text(dataset, model_dir, "吾輩は", gen_size)
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
     print("Loss:", loss)
-    if args.save_to_file:
-        print("Saving generated text...")
-        with open("generated_text_" + time.strftime("%Y%m%d") + ".txt", 'w', encoding='utf-8') as out:
-            out.write(generated_text)
+    print("Saving generated text...")
+    with open(str(result_dir) + "/generated_text.txt", 'w', encoding='utf-8') as out:
+        out.write(generated_text)
 
-        save_result(losses, save_to="losses_" + time.strftime("%Y%m%d") + ".png")
-    else:
-        print("Generated text:")
-        print(generated_text)
-
-        show_result(losses)
+    save_result(losses, save_to=str(result_dir) + "/losses_" + today + ".png")
 
 if __name__ == '__main__':
     main()

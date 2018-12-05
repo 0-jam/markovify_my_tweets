@@ -41,6 +41,7 @@
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
+    - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
 - TensorFlow >= 1.11.0
 
 ### ハードウェア
@@ -56,6 +57,13 @@
         - 2304 cores (64 CUs), 8GB VRAM
         - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
         - [公式Dockerイメージ](https://hub.docker.com/r/rocm/tensorflow/)で動作確認済み
+- PC 3
+    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
+    - RAM: 16GB
+    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
+    - VRAM: 8GB
+    - OS: Ubuntu 18.04.1
+        - CUDA 9.0
 
 ## Todo
 
@@ -65,11 +73,14 @@
         - 複数条件対応
         - 抽出件数
 - [ ] ROCmインストール手順書いておこう
+- [ ] CUDAインストール手順書いておこう
 - [ ] RNN版の分かち書き対応
 - [ ] 分かち書きスクリプトをいろいろなエンジンに対応
     - [ ] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
+- [x] RNN版の訓練とテキスト生成を分離
+    - "生成だけする"オプションを追加するほうがいいかも
 - [x] [青空文庫][aozora]テキスト整形用スクリプト
     - [x] タイトル、作者名、底本除去
     - [x] 注釈記号などの除去
@@ -172,6 +183,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # ディレクトリ名を指定
+# モデルの訓練はスキップされる
 $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
 ```
 
@@ -188,16 +200,11 @@ $ python bm_rnn_sentence.py
 - 抽出結果はJSONで保存される
     - key: song_id（抽出元のURL）
     - values:
-        - title
-            - 曲名
-        - artist
-            - 歌手名
-        - lyricist
-            - 作詞者名
-        - composer
-            - 作曲者名
-        - lyric
-            - 歌詞
+        - title（曲名）
+        - artist（歌手名）
+        - lyricist（作詞者名）
+        - composer（作曲者名）
+        - lyric（歌詞）
 
 ```bash
 # 抽出されたテキストはデフォルトで"songs.json"に保存される
@@ -270,7 +277,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 - bm_rnn_sentence.py: rnn_sentence.pyベースのベンチマークスクリプト
     - 基本的にオリジナルの機能を大きく省いただけ
-- 1時間（仮）で何epoch学習できて，そのモデルから1000文字（仮）生成した時にどの程度読める文章ができるかを比較
+- 1時間（仮）で何epoch学習できて，そのモデルから20行生成した時にどの程度読める文章ができるかを比較
 
 ### データセット
 
@@ -296,13 +303,15 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 1. あらかじめ決められた時間の間学習を続ける
 1. 決められた時間を超過した場合，そのepochを終えた段階で学習を終了する
     - 例：制限時間15分
-        - epoch数3の学習中に15分経過した場合，epoch3の学習を終えてループ終了
-        - つまり，実際の実行時間は制限時間を超える
+        - epoch数3の学習中に15分経過した場合，epoch3の学習を終えて終了
+    - 制限時間内に _50（仮）_ epoch学習できた場合，経過時間にかかわらず学習を終了
 1. 結果を表示
     - 所要時間
     - epoch数
     - 上二つから計算できる1分あたりのepoch数
     - loss（損失関数）の値
+    - モデルから生成されたテキスト
+        - 20行
 
 ### 評価基準
 

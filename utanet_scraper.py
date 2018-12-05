@@ -18,10 +18,12 @@ def search(query):
     bodies = [scraper.go(search_url)]
 
     try:
-        pages = bodies[0].select("#page_list")[0]
-        last_page = urllib.parse.urlparse(pages.find_all("a")[-1].get("href"))
-        lpq = urllib.parse.parse_qs(last_page.query)
-        last_page_num = int(lpq["pnum"][0])
+        pages = bodies[0].select("#page_list")[0].find_all("a")
+        page_urls = [urllib.parse.urlparse(page.get("href")) for page in pages]
+        queries = [urllib.parse.parse_qs(page.query) for page in page_urls]
+        last_page = page_urls[-1]
+        last_page_num = max([int(query["pnum"][0]) for query in queries])
+        lpq = queries[-1]
 
         for pnum in range(2, last_page_num + 1):
             # ページ番号だけ変えて新しくURLを生成
@@ -72,10 +74,13 @@ def extract_lyric(song_id):
     body = scraper.go(song_url)
     # 歌詞内の改行を全角スラッシュ／に置換して抽出
     lyric = body.find(id="kashi_area").get_text("／")
+
+    ## 表記ブレをなるべく減らすためにテキストを整形
     # 丸括弧（）、全角スペース　、！、？をそれぞれ半角に置換
-    # 3つ以上続くピリオド...を三点リーダー…に置換
+    # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
+    # 2回以上続く三点リーダー……を1つ…にする
     # 各要素：(置換したい文字, 置換先の文字)
-    patterns = [("\u3000", " "), ("（", "("), ("）", ")"), ("！", "!"), ("？", "?"), (r"\.{3,}", "…")]
+    patterns = [("\u3000", " "), ("（", "("), ("）", ")"), ("！", "!"), ("？", "?"), (r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
 
     return replace_str(lyric, patterns)
 
