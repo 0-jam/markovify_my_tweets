@@ -67,6 +67,7 @@
 
 ## Todo
 
+- [ ] Separate RNN trainer and generator
 - [ ] Add search options to Utanet scraper
     - Example:
         - Artist name
