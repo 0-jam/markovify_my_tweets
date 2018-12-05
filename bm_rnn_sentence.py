@@ -7,12 +7,17 @@ import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import show_result, save_result
+from rnn_sentence import load_test_settings
+import settings
+
+def load_settings():
+    return settings.BENCHMARK_PARAMETERS.values()
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
     parser.add_argument("-e", "--max_epochs", type=int, default=50, help="Max number of epochs (default: 50)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
-    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging (default: false)")
+    parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging, ignore -e option (default: false)")
     args = parser.parse_args()
 
     ## Create the dataset from the XZ-compressed text
@@ -20,30 +25,25 @@ def main():
     with lzma.open(path) as file:
         text = file.read().decode()
 
-    dataset = TextDataset(text, 64)
-
     if args.test_mode:
-        # The embedding dimensions
-        embedding_dim = 4
-        # RNN (Recursive Neural Network) nodes
-        units = 16
+        embedding_dim, units, batch_size = load_test_settings()
 
         # Time limit (min)
         time_limit = 5
+        max_epochs = 2
 
         gen_size = 1
     else:
-        # The embedding dimensions
-        embedding_dim = 256
-        # RNN (Recursive Neural Network) nodes
-        units = 1024
+        embedding_dim, units, batch_size = load_settings()
 
         # Time limit (min)
         time_limit = 60
+        max_epochs = args.max_epochs
 
         gen_size = 20
 
-    ## Create the model
+    ## Create the dataset & the model
+    dataset = TextDataset(text, batch_size)
     model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=args.cpu_mode)
 
     epoch = 0
@@ -73,7 +73,7 @@ def main():
         except IndexError:
             pass
 
-        if epoch < args.max_epochs:
+        if epoch >= max_epochs:
             print("You have learned enough epochs! Aborting...")
             break
 
@@ -87,7 +87,7 @@ def main():
     if Path.is_dir(path) is not True:
         Path.mkdir(model_dir, parents=True)
 
-    model.save(path.joinpath(filename))
+    model.save(model_dir.joinpath("model"))
 
     # Generate sentence from the model
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)

@@ -6,6 +6,13 @@ tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
+import settings
+
+def load_settings():
+    return settings.DEFAULT_PARAMETERS.values()
+
+def load_test_settings():
+    return settings.TEST_MODE_PARAMETERS.values()
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
@@ -24,19 +31,14 @@ def main():
 
     ## Parse options and initialize some parameters
     if args.test_mode:
-        embedding_dim = 4
-        units = 16
+        embedding_dim, units, batch_size = load_test_settings()
         epochs = 3
-        batch_size = 128
 
         gen_size = 1
     else:
         # The embedding dimensions
-        embedding_dim = 256
-        # RNN (Recursive Neural Network) nodes
-        units = 2048
+        embedding_dim, units, batch_size = load_settings()
         epochs = args.epochs
-        batch_size = 64
 
         gen_size = args.gen_size
 
@@ -97,8 +99,6 @@ def main():
             elapsed_time / epochs,
             loss
         ))
-
-        save_result(losses)
 
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
