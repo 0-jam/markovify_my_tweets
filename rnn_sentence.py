@@ -118,7 +118,7 @@ def main():
         ))
 
         # Save models and hyper parameters
-        model.save(model_dir, filename, parameters)
+        model.save(model_dir, parameters)
 
     generated_text = generate_text(dataset, model_dir, args.start_string, gen_size, temperature=args.temperature)
     if args.output:
