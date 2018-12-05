@@ -10,6 +10,7 @@ from modules.plot_result import show_result, save_result
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
+    parser.add_argument("-e", "--max_epochs", type=int, default=50, help="Max number of epochs (default: 50)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
     parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging (default: false)")
     args = parser.parse_args()
@@ -72,6 +73,10 @@ def main():
         except IndexError:
             pass
 
+        if epoch < args.max_epochs:
+            print("You have learned enough epochs! Aborting...")
+            break
+
     print("Time!")
     elapsed_time = elapsed_time / 60
 
@@ -82,12 +87,12 @@ def main():
     if Path.is_dir(path) is not True:
         Path.mkdir(model_dir, parents=True)
 
-    model.model.save_weights(str(model_dir.joinpath("model").resolve()))
+    model.save(path.joinpath(filename))
 
     # Generate sentence from the model
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
     # Load learned model
-    generator.model.load_weights(model.path(model_dir))
+    generator.load(model_dir)
     generated_text = generator.generate_text(dataset, "吾輩は", gen_size)
 
     # Show results

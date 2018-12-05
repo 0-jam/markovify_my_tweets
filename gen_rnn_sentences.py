@@ -11,7 +11,7 @@ def main():
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
     parser.add_argument("model_dir", type=str, help="Path to the learned model directory")
-    parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
+    parser.add_argument("-o", "--output", type=str, help="Path to save the generated text (default: None (put into stdout))")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to load CPU compatible model (default: False)")
@@ -48,7 +48,7 @@ def main():
     ## Evaluation
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
     # Load learned model
-    generator.model.load_weights(generator.path(Path(args.model_dir)))
+    generator.load(args.model_dir)
 
     start_string = args.start_string
     generated_text = generator.generate_text(dataset, start_string, gen_size, args.temperature)

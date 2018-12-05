@@ -67,6 +67,7 @@
 ## Todo
 
 - [ ] Separate RNN trainer and generator
+    - Adding "generation-only" option seems better...
 - [ ] Add search options to Utanet scraper
     - Example:
         - Artist name

@@ -11,7 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
-    parser.add_argument("-o", "--output", type=str, help="Output file path (default: stdout)")
+    parser.add_argument("-o", "--output", type=str, help="Path to save losses graph and the generated text (default: None (show without saving))")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
@@ -90,6 +90,7 @@ def main():
                 pass
 
         elapsed_time = time.time() - start
+        print("Training finished.")
         print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
             epochs,
             elapsed_time,
@@ -102,22 +103,23 @@ def main():
         if Path.is_dir(path) is not True:
             Path.mkdir(path, parents=True)
 
-        model.model.save_weights(str(path.joinpath(filename).resolve()))
+        model.save(path.joinpath(filename))
 
     ## Evaluation
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=args.cpu_mode)
     # Load learned model
-    generator.model.load_weights(model.path(path))
+    generator.load(path)
 
     start_string = args.start_string
     generated_text = generator.generate_text(dataset, start_string, gen_size, args.temperature)
     if args.output:
         print("Saving generated text...")
-        with Path(args.output).open('w', encoding='utf-8') as out:
+        outpath = Path(args.output)
+        with outpath.open('w', encoding='utf-8') as out:
             out.write(generated_text)
 
         try:
-            save_result(losses)
+            save_result(losses, outpath)
         except NameError:
             print("Skipped drawing losses graph")
     else:

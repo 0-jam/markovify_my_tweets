@@ -38,6 +38,7 @@ class Model():
 
         # self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
 
+    ## Train model from the dataset
     def train(self, dataset):
         optimizer = tf.train.AdamOptimizer()
         loss_f = tf.losses.sparse_softmax_cross_entropy
@@ -56,6 +57,12 @@ class Model():
             print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
 
         return loss.numpy()
+
+    def save(self, path):
+        self.model.save_weights(str(Path(path).resolve()))
+
+    def load(self, path):
+        self.model.load_weights(self.path(Path(path)))
 
     def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
         generated_text = []
