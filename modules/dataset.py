@@ -3,11 +3,12 @@ import numpy as np
 from pathlib import Path
 
 class TextDataset():
-    def __init__(self, text, batch_size):
+    def __init__(self, text, batch_size, use_dict=False):
         ## Vectorize the text
+        if use_dict:
+            text + self.dict()
         # unique character in text
         vocab = sorted(set(text))
-        # vocab = sorted(set(text + self.dict()))
         self.vocab_size = len(vocab)
         print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size))
         # Creating a mapping from unique characters to indices

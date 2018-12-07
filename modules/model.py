@@ -74,10 +74,15 @@ class Model():
     def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
         generated_text = []
         # Vectorize start_string
-        input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
+        try:
+            input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
+        except KeyError:
+            print("Unknown word")
+            return ""
+
         temperature = temp
 
-        with tqdm(total=gen_size, desc="Generating...") as pbar:
+        with tqdm(total=gen_size, desc="Generating from '{}'...".format(start_string)) as pbar:
             count = 0
             self.model.reset_states()
             while count < gen_size:
