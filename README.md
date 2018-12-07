@@ -11,6 +11,8 @@
     1. [Hardware](#hardware)
 1. [Todo](#todo)
 1. [Installation](#installation)
+    1. [Preprocessing scripts](#preprocessing-scripts)
+    1. [Text generating scripts](#text-generating-scripts)
 1. [Usage](#usage)
     1. [pp_aozora.py](#pp_aozorapy)
     1. [wakachi.py](#wakachipy)
@@ -29,6 +31,7 @@
     1. [Rule](#rule)
     1. [Evaluation](#evaluation)
     1. [Records](#records)
+1. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -76,8 +79,8 @@
 - [ ] Add ROCm instruction in this README
 - [ ] Add CUDA instruction in this README
 - [ ] Enable function to use word as a token for RNN-based generation
-- [ ] Enable using various engine for word dividing
-    - [ ] [Juman++][jumanpp]
+- [x] Enable using various engine for word dividing
+    - [x] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
 - [x] Separate RNN trainer and generator
@@ -106,12 +109,17 @@
 
 ## Installation
 
+### Preprocessing scripts
+
+- [Juman++ download page][jumanpp]
+- No external modules needed for `json_extractor.py`
+
 ```bash
-## wakachi_janome.py
-# Recommended on Windows
+### wakachi.py
+## Use Janome as the word dividing engine
 $ pip install janome
 
-## wakachi_mecab.py
+## Use MeCab as the word dividing engine
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
 # (Optional, only works on Linux) Install additional dictionary for Mecab
@@ -122,6 +130,22 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
+## Use Juman++ as the word dividing engine
+# Install Juman++
+# Download tarball from official page, extract it, and enter to the extracted directory
+$ ./configure --prefix=$HOME/.local
+$ make -j$(nproc)
+$ make install
+$ pip install pyknp
+$ export PATH="$HOME/.local/bin:$PATH"
+
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
+
+### Text generating scripts
+
+```bash
 ## markovify_sentence.py
 $ pip install markovify
 
@@ -131,9 +155,6 @@ $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 $ pip install tensorflow numpy matplotlib tqdm
-
-## utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ## Usage
@@ -324,6 +345,11 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ### Records
 
 - Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
+
+## Troubleshooting
+
+If you got "W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory." and TensorFlow was killed in `rnn_sentence.py`,
+try to give `--disable_point_saving` option.
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

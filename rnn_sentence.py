@@ -15,17 +15,32 @@ def load_settings():
 def load_test_settings():
     return settings.TEST_MODE_PARAMETERS
 
-## Evaluation
-def generate_text(dataset, model_dir, start_string, gen_size, temperature=1.0):
+## Evaluation methods
+# Load learned model
+def init_generator(dataset, model_dir):
     with Path(model_dir).joinpath("parameters.json").open(encoding='utf-8') as params:
         parameters = json.load(params)
         embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
-    # Load learned model
     generator.load(model_dir)
 
+    return generator
+
+# Generate text from single string
+def generate_sentence(dataset, model_dir, start_string, gen_size, temperature=1.0):
+    generator = init_generator(dataset, model_dir)
     return generator.generate_text(dataset, start_string, gen_size, temperature)
+
+# Generate text from multiple lines of text (such as file)
+def generate_text(dataset, model_dir, start_file, gen_size, temperature=1.0):
+    generator = init_generator(dataset, model_dir)
+    generated_text = []
+
+    for start_string in start_file:
+        generated_text.append(generator.generate_text(dataset, start_string, gen_size, temperature))
+
+    return generated_text
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
@@ -40,6 +55,7 @@ def main():
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
+    parser.add_argument("--disable_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
@@ -86,25 +102,33 @@ def main():
         losses = []
         start = time.time()
         for epoch in range(epochs):
-            print("Epoch: {} / {}:".format(epoch + 1, epochs))
+            # Actual epoch number (for displaying)
+            epoch_num = epoch + 1
+
+            print("Epoch: {} / {}:".format(epoch_num, epochs))
             epoch_start = time.time()
 
             loss = model.train(dataset.dataset)
             losses.append(loss)
 
             print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}".format(
-                epoch + 1,
+                epoch_num,
                 epochs,
                 time.time() - epoch_start,
                 loss
             ))
 
-            # If ARC (Average Rate of Change) of last 3 epochs is under 1%, stop learning
+            if (epoch_num) % 5 == 0 and not args.disable_point_saving:
+                print("Saving current model...")
+                model.save(model_dir, parameters)
+
+            # If ARC (Average Rate of Change) of last 5 epochs is under 0.1%, stop learning
             last_losses = losses[-5:]
             try:
                 arc = (last_losses[4] - last_losses[0]) / (len(last_losses) - 1)
                 print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-                if abs(arc) < 0.01:
+                if abs(arc) < 0.005:
+                    epochs = epoch
                     break
             except IndexError:
                 pass
@@ -121,7 +145,7 @@ def main():
         # Save models and hyper parameters
         model.save(model_dir, parameters)
 
-    generated_text = generate_text(dataset, model_dir, args.start_string, gen_size, temperature=args.temperature)
+    generated_text = generate_sentence(dataset, model_dir, args.start_string, gen_size, temperature=args.temperature)
     if args.output:
         print("Saving generated text...")
         outpath = Path(args.output)

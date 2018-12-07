@@ -33,11 +33,11 @@ class Model():
         self.model = keras.Sequential([
             keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
             gru,
-            keras.layers.Dropout(0.5),
             keras.layers.Dense(vocab_size)
         ])
 
-        # self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
+    def compile(self):
+        self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
 
     ## Train model from the dataset
     def train(self, dataset):

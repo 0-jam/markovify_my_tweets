@@ -14,14 +14,14 @@ Execute wakachi.py to multiple files at once
 
   -i [NAME]    Path to file to convert (directory) (default: ./text/novel_orig)
   -o [NAME]    Path to output file (directory) (default: ./text/novel)
-  -j           Specify Janome as the engine of word divider (default: MeCab)
+  -e [NAME]    Specify the engine of word divider (default: MeCab)
   -h           Print this help
 EOS
   exit 1
 }
 
 ### Parse options
-while getopts "hji:o:" opts; do
+while getopts "he:i:o:" opts; do
   case $opts in
     h|\?)
       usage
@@ -32,8 +32,8 @@ while getopts "hji:o:" opts; do
     o)
       outdir=$OPTARG
       ;;
-    j)
-      engine="janome"
+    e)
+      engine=$OPTARG
       ;;
   esac
 done

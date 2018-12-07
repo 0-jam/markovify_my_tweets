@@ -11,6 +11,8 @@
     1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
 1. [インストール](#インストール)
+    1. [前処理スクリプト](#前処理スクリプト)
+    1. [テキスト生成スクリプト](#テキスト生成スクリプト)
 1. [使用法](#使用法)
     1. [pp_aozora.py](#pp_aozorapy)
     1. [wakachi.py](#wakachipy)
@@ -29,6 +31,7 @@
     1. [ルール](#ルール)
     1. [評価基準](#評価基準)
     1. [記録](#記録)
+1. [トラブルシューティング](#トラブルシューティング)
 
 ---
 
@@ -76,8 +79,8 @@
 - [ ] ROCmインストール手順書いておこう
 - [ ] CUDAインストール手順書いておこう
 - [ ] RNN版の分かち書き対応
-- [ ] 分かち書きスクリプトをいろいろなエンジンに対応
-    - [ ] [Juman++][jumanpp]
+- [x] 分かち書きスクリプトをいろいろなエンジンに対応
+    - [x] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
 - [x] RNN版の訓練とテキスト生成を分離
@@ -106,12 +109,17 @@
 
 ## インストール
 
+### 前処理スクリプト
+
+- [Juman++ダウンロードページ][jumanpp]
+- `json_extractor.py`に外部モジュールは必要ない
+
 ```bash
-## wakachi_janome.py
-# Windowsではこちらを推奨
+### wakachi.py
+## Janomeを分かち書きエンジンに使う場合
 $ pip install janome
 
-## wakachi_mecab.py
+## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
 # （任意、Linuxのみ）Mecab追加辞書をインストール
@@ -122,6 +130,22 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
+## Juman++を分かち書きエンジンに使う場合
+# Juman++をインストール
+# tarballを公式ページ（上記）からダウンロードし、それを展開して展開先のディレクトリに入る
+$ ./configure --prefix=$HOME/.local
+$ make -j$(nproc)
+$ make install
+$ pip install pyknp
+$ export PATH="$HOME/.local/bin:$PATH"
+
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
+
+### テキスト生成スクリプト
+
+```bash
 ## markovify_sentence.py
 $ pip install markovify
 
@@ -131,9 +155,6 @@ $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib tqdm
-
-## utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ## 使用法
@@ -324,6 +345,11 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ### 記録
 
 - ベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
+
+## トラブルシューティング
+
+`rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合、
+`--disable_point_saving`オプションを与えて再度実行してみる
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/
