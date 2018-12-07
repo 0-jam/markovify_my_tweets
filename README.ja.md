@@ -31,6 +31,7 @@
     1. [ルール](#ルール)
     1. [評価基準](#評価基準)
     1. [記録](#記録)
+1. [トラブルシューティング](#トラブルシューティング)
 
 ---
 
@@ -343,6 +344,11 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ### 記録
 
 - ベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
+
+## トラブルシューティング
+
+`rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合、
+`--disable_point_saving`オプションを与えて再度実行してみる
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

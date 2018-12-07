@@ -31,6 +31,7 @@
     1. [Rule](#rule)
     1. [Evaluation](#evaluation)
     1. [Records](#records)
+1. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -343,6 +344,11 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ### Records
 
 - Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
+
+## Troubleshooting
+
+If you got "W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory." and TensorFlow was killed in `rnn_sentence.py`,
+try to give `--disable_point_saving` option.
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

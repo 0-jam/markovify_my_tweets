@@ -55,6 +55,7 @@ def main():
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
+    parser.add_argument("--disable_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
@@ -100,18 +101,25 @@ def main():
         losses = []
         start = time.time()
         for epoch in range(epochs):
-            print("Epoch: {} / {}:".format(epoch + 1, epochs))
+            # Actual epoch number (for displaying)
+            epoch_num = epoch + 1
+
+            print("Epoch: {} / {}:".format(epoch_num, epochs))
             epoch_start = time.time()
 
             loss = model.train(dataset.dataset)
             losses.append(loss)
 
             print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}".format(
-                epoch + 1,
+                epoch_num,
                 epochs,
                 time.time() - epoch_start,
                 loss
             ))
+
+            if (epoch_num) % 5 == 0 and not args.disable_point_saving:
+                print("Saving current model...")
+                model.save(model_dir, parameters)
 
             # If ARC (Average Rate of Change) of last 5 epochs is under 0.1%, stop learning
             last_losses = losses[-5:]
