@@ -11,6 +11,8 @@
     1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
 1. [インストール](#インストール)
+    1. [前処理スクリプト](#前処理スクリプト)
+    1. [テキスト生成スクリプト](#テキスト生成スクリプト)
 1. [使用法](#使用法)
     1. [pp_aozora.py](#pp_aozorapy)
     1. [wakachi.py](#wakachipy)
@@ -75,8 +77,8 @@
 - [ ] ROCmインストール手順書いておこう
 - [ ] CUDAインストール手順書いておこう
 - [ ] RNN版の分かち書き対応
-- [ ] 分かち書きスクリプトをいろいろなエンジンに対応
-    - [ ] [Juman++][jumanpp]
+- [x] 分かち書きスクリプトをいろいろなエンジンに対応
+    - [x] [Juman++][jumanpp]
         - WSLでビルドできず
     - [x] [MeCab][mecab]
 - [x] RNN版の訓練とテキスト生成を分離
@@ -105,12 +107,17 @@
 
 ## インストール
 
+### 前処理スクリプト
+
+- [Juman++ダウンロードページ][jumanpp]
+- `json_extractor.py`に外部モジュールは必要ない
+
 ```bash
-## wakachi_janome.py
-# Windowsではこちらを推奨
+### wakachi.py
+## Janomeを分かち書きエンジンに使う場合
 $ pip install janome
 
-## wakachi_mecab.py
+## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
 # （任意、Linuxのみ）Mecab追加辞書をインストール
@@ -121,6 +128,22 @@ $ ./bin/install-mecab-ipadic-neologd -n -a
 [install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
 yes
 
+## Juman++を分かち書きエンジンに使う場合
+# Juman++をインストール
+# tarballを公式ページ（上記）からダウンロードし、それを展開して展開先のディレクトリに入る
+$ ./configure --prefix=$HOME/.local
+$ make -j$(nproc)
+$ make install
+$ pip install pyknp
+$ export PATH="$HOME/.local/bin:$PATH"
+
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
+
+### テキスト生成スクリプト
+
+```bash
 ## markovify_sentence.py
 $ pip install markovify
 
@@ -130,9 +153,6 @@ $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib tqdm
-
-## utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ## 使用法
