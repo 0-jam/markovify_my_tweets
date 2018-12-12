@@ -1,10 +1,10 @@
 DEFAULT_PARAMETERS = {
     # The embedding dimensions
-    "embedding_dim": 512,
+    "embedding_dim": 256,
     # RNN (Recursive Neural Network) nodes
-    "units": 4096,
+    "units": 2048,
     # Batch size of the dataset
-    "batch_size": 64
+    "batch_size": 128
 }
 
 TEST_MODE_PARAMETERS = {

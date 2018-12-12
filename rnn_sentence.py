@@ -111,7 +111,7 @@ def main():
             try:
                 arc = (last_losses[4] - last_losses[0]) / (len(last_losses) - 1)
                 print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-                if abs(arc) < 0.005:
+                if abs(arc) < 0.003:
                     epochs = epoch
                     break
             except IndexError:
