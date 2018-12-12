@@ -45,7 +45,7 @@
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
     - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
-- TensorFlow >= 1.11.0
+- TensorFlow >= 1.11.0 (< 2.0)
 
 ### Hardware
 

@@ -27,21 +27,6 @@ def init_generator(dataset, model_dir):
 
     return generator
 
-# Generate text from single string
-def generate_sentence(dataset, model_dir, start_string, gen_size, temperature=1.0):
-    generator = init_generator(dataset, model_dir)
-    return generator.generate_text(dataset, start_string, gen_size, temperature)
-
-# Generate text from multiple lines of text (such as file)
-def generate_text(dataset, model_dir, start_file, gen_size, temperature=1.0):
-    generator = init_generator(dataset, model_dir)
-    generated_text = []
-
-    for start_string in start_file:
-        generated_text.append(generator.generate_text(dataset, start_string, gen_size, temperature))
-
-    return generated_text
-
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
     ## Required arguments
@@ -144,7 +129,9 @@ def main():
         # Save models and hyper parameters
         model.save(model_dir, parameters)
 
-    generated_text = generate_sentence(dataset, model_dir, args.start_string, gen_size, temperature=args.temperature)
+    generator = init_generator(dataset, model_dir)
+    generated_text = generator.generate_text(dataset, start_string, gen_size=gen_size, temp=args.temperature)
+
     if args.output:
         print("Saving generated text...")
         outpath = Path(args.output)

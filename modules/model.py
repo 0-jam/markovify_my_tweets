@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-from tqdm import tqdm
 from pathlib import Path
 import json
 
@@ -33,6 +32,7 @@ class Model():
         self.model = keras.Sequential([
             keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
             gru,
+            keras.layers.Dropout(0.5),
             keras.layers.Dense(vocab_size)
         ])
 
@@ -77,32 +77,29 @@ class Model():
         try:
             input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
         except KeyError:
-            print("Unknown word")
             return ""
 
         temperature = temp
 
-        with tqdm(total=gen_size, desc="Generating from '{}'...".format(start_string)) as pbar:
-            count = 0
-            self.model.reset_states()
-            while count < gen_size:
-                predictions = self.model(input_eval)
-                # remove the batch dimension
-                predictions = tf.squeeze(predictions, 0)
+        count = 0
+        self.model.reset_states()
+        while count < gen_size:
+            predictions = self.model(input_eval)
+            # remove the batch dimension
+            predictions = tf.squeeze(predictions, 0)
 
-                # Using the multinomial distribution to predict the word returned by the model
-                predictions = predictions / temperature
-                predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
+            # Using the multinomial distribution to predict the word returned by the model
+            predictions = predictions / temperature
+            predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
 
-                # Pass the predicted word as the next input to the model along with the previous hidden state
-                input_eval = tf.expand_dims([predicted_id], 0)
+            # Pass the predicted word as the next input to the model along with the previous hidden state
+            input_eval = tf.expand_dims([predicted_id], 0)
 
-                char = dataset.idx2char[predicted_id]
-                generated_text.append(char)
+            char = dataset.idx2char[predicted_id]
+            generated_text.append(char)
 
-                if char == delimiter:
-                    count += 1
-                    pbar.update(1)
+            if char == delimiter:
+                count += 1
 
         return start_string + "".join(generated_text) + "\n"
 
