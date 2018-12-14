@@ -6,7 +6,9 @@ tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import TextDataset
 import json
-from rnn_sentence import generate_text
+from rnn_sentence import init_generator
+from tqdm import tqdm
+import sys
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN (generation only, without model training)")
@@ -34,18 +36,19 @@ def main():
 
     ## Create the dataset from the text
     dataset = TextDataset(text, batch_size)
+    generator = init_generator(dataset, model_dir)
 
     with Path(args.start_string).open(encoding=encoding) as input:
-        start_strings = [line.strip("\n") for line in input.readlines()]
-
-    generated_text = generate_text(dataset, model_dir, start_strings, gen_size, temperature=args.temperature)
-
-    if args.output:
-        print("Saving generated text...")
-        with Path(args.output).open('w', encoding='utf-8') as out:
-            out.writelines(generated_text)
-    else:
-        print("".join(generated_text))
+        if args.output:
+            print("Saving generated text...")
+            with Path(args.output).open('a', encoding='utf-8') as out:
+                for line in input:
+                    start_string = line.strip("\n")
+                    out.write(generator.generate_text(dataset, start_string, gen_size=gen_size, temp=args.temperature))
+        else:
+            for line in input:
+                start_string = line.strip("\n")
+                print(generator.generate_text(dataset, start_string, gen_size, temperature=args.temperature))
 
 if __name__ == '__main__':
     main()

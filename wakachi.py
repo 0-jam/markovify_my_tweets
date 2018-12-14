@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from tqdm import tqdm
+import os
 
 ## Divide text by word using specified engine
 def main():
@@ -20,17 +21,18 @@ def main():
     elif args.engine in {"juman"}:
         from modules.wakachi.juman import divide_word
 
-    with Path(args.input).open() as input:
-        text = input.readlines()
+    input_path = Path(args.input)
+    with input_path.open() as input, Path(args.output).open('a') as out:
+        with tqdm(total=input_path.stat().st_size, unit="kb", unit_scale=0.001, smoothing=1) as pbar:
+            for line in input:
 
-    with Path(args.output).open('a') as out:
-        for line in tqdm(text):
-            line = line.strip()
+                line = line.strip()
 
-            if not line and not args.allow_empty:
-                continue
+                if not (line or args.allow_empty):
+                    continue
 
-            out.write(divide_word(line) + "\n")
+                out.write(divide_word(line) + "\n")
+                pbar.update(len(line.encode('utf-8')))
 
 if __name__ == '__main__':
     main()

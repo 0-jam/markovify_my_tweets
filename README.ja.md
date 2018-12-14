@@ -7,30 +7,30 @@
 ---
 
 1. [環境](#環境)
-    1. [ソフトウェア](#ソフトウェア)
-    1. [ハードウェア](#ハードウェア)
+   1. [ソフトウェア](#ソフトウェア)
+   1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
 1. [インストール](#インストール)
-    1. [前処理スクリプト](#前処理スクリプト)
-    1. [テキスト生成スクリプト](#テキスト生成スクリプト)
+   1. [前処理スクリプト](#前処理スクリプト)
+   1. [テキスト生成スクリプト](#テキスト生成スクリプト)
 1. [使用法](#使用法)
-    1. [pp_aozora.py](#pp_aozorapy)
-    1. [wakachi.py](#wakachipy)
-    1. [markovify_sentence.py](#markovify_sentencepy)
-    1. [rnn_sentence.py](#rnn_sentencepy)
-    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
-    1. [utanet_scraper.py](#utanet_scraperpy)
-    1. [json_extractor.py](#json_extractorpy)
+   1. [pp_aozora.py](#pp_aozorapy)
+   1. [wakachi.py](#wakachipy)
+   1. [markovify_sentence.py](#markovify_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
+   1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
+   1. [utanet_scraper.py](#utanet_scraperpy)
+   1. [json_extractor.py](#json_extractorpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
-    1. [青空文庫](#青空文庫)
-        1. [手動で削除](#手動で削除)
-        1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
-        1. [半角スペースに置き換える](#半角スペースに置き換える)
+   1. [青空文庫](#青空文庫)
+      1. [手動で削除](#手動で削除)
+      1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
+      1. [半角スペースに置き換える](#半角スペースに置き換える)
 1. [ベンチマーク](#ベンチマーク)
-    1. [データセット](#データセット)
-    1. [ルール](#ルール)
-    1. [評価基準](#評価基準)
-    1. [記録](#記録)
+   1. [データセット](#データセット)
+   1. [ルール](#ルール)
+   1. [評価基準](#評価基準)
+   1. [記録](#記録)
 1. [トラブルシューティング](#トラブルシューティング)
 
 ---
@@ -45,7 +45,7 @@
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
     - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
-- TensorFlow >= 1.11.0
+- TensorFlow >= 1.11.0 (< 2.0)
 
 ### ハードウェア
 
@@ -86,7 +86,7 @@
 - [x] RNN版の訓練とテキスト生成を分離
     - "生成だけする"オプションを追加するほうがいいかも
 - [x] [青空文庫][aozora]テキスト整形用スクリプト
-    - [x] タイトル、作者名、底本除去
+    - [x] タイトル，作者名，底本除去
     - [x] 注釈記号などの除去
 - [x] Windows対応
     - [x] 文字コード
@@ -122,7 +122,7 @@ $ pip install janome
 ## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# （任意、Linuxのみ）Mecab追加辞書をインストール
+# （任意，Linuxのみ）Mecab追加辞書をインストール
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a
@@ -132,7 +132,7 @@ yes
 
 ## Juman++を分かち書きエンジンに使う場合
 # Juman++をインストール
-# tarballを公式ページ（上記）からダウンロードし、それを展開して展開先のディレクトリに入る
+# tarballを公式ページ（上記）からダウンロードし，それを展開して展開先のディレクトリに入る
 $ ./configure --prefix=$HOME/.local
 $ make -j$(nproc)
 $ make install
@@ -197,7 +197,7 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 
 ```bash
 # 特に前処理は必要ない
-# "-c"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる（bm_rnn_sentence.pyも同様）
+# "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # 学習済みモデルを指定
@@ -348,8 +348,8 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 ## トラブルシューティング
 
-`rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合、
-`--disable_point_saving`オプションを与えて再度実行してみる
+`rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合，
+`--no_point_saving`オプションを与えて再度実行してみる
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

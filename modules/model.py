@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-from tqdm import tqdm
 from pathlib import Path
 import json
 
@@ -33,6 +32,7 @@ class Model():
         self.model = keras.Sequential([
             keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
             gru,
+            keras.layers.Dropout(0.5),
             keras.layers.Dense(vocab_size)
         ])
 
@@ -74,31 +74,37 @@ class Model():
     def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
         generated_text = []
         # Vectorize start_string
-        input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
+        try:
+            input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
+            print("Start string:", start_string)
+        except KeyError:
+            print("Unknown word included")
+            return ""
+
         temperature = temp
 
-        with tqdm(total=gen_size, desc="Generating...") as pbar:
-            count = 0
-            self.model.reset_states()
-            while count < gen_size:
-                predictions = self.model(input_eval)
-                # remove the batch dimension
-                predictions = tf.squeeze(predictions, 0)
+        count = 0
+        self.model.reset_states()
+        while count < gen_size:
+            predictions = self.model(input_eval)
+            # remove the batch dimension
+            predictions = tf.squeeze(predictions, 0)
 
-                # Using the multinomial distribution to predict the word returned by the model
-                predictions = predictions / temperature
-                predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
+            # Using the multinomial distribution to predict the word returned by the model
+            predictions = predictions / temperature
+            predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
 
-                # Pass the predicted word as the next input to the model along with the previous hidden state
-                input_eval = tf.expand_dims([predicted_id], 0)
+            # Pass the predicted word as the next input to the model along with the previous hidden state
+            input_eval = tf.expand_dims([predicted_id], 0)
 
-                char = dataset.idx2char[predicted_id]
-                generated_text.append(char)
+            char = dataset.idx2char[predicted_id]
+            generated_text.append(char)
+            print("Generated {} characters".format(len(generated_text)), end="\r")
 
-                if char == delimiter:
-                    count += 1
-                    pbar.update(1)
+            if char == delimiter:
+                count += 1
 
+        print("Generated {} characters".format(len(generated_text)))
         return start_string + "".join(generated_text) + "\n"
 
     ## Return the path to <ckpt_dir>/checkpoint
