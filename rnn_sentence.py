@@ -57,6 +57,7 @@ def main():
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
+        batch_size = 64
 
         gen_size = args.gen_size
 
