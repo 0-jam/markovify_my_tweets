@@ -7,11 +7,7 @@ import lzma
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import show_result, save_result
-from rnn_sentence import load_test_settings, generate_text
-import settings
-
-def load_settings():
-    return settings.BENCHMARK_PARAMETERS
+from rnn_sentence import load_settings, load_test_settings, init_generator
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
@@ -91,7 +87,8 @@ def main():
     model.save(model_dir, parameters)
 
     # Generate sentence from the model
-    generated_text = generate_text(dataset, model_dir, "吾輩は", gen_size)
+    generator = init_generator(dataset, model_dir)
+    generated_text = generator.generate_text(dataset, "吾輩は", gen_size)
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))

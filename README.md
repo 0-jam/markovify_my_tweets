@@ -7,30 +7,30 @@
 ---
 
 1. [Environment](#environment)
-    1. [Software](#software)
-    1. [Hardware](#hardware)
+   1. [Software](#software)
+   1. [Hardware](#hardware)
 1. [Todo](#todo)
 1. [Installation](#installation)
-    1. [Preprocessing scripts](#preprocessing-scripts)
-    1. [Text generating scripts](#text-generating-scripts)
+   1. [Preprocessing scripts](#preprocessing-scripts)
+   1. [Text generating scripts](#text-generating-scripts)
 1. [Usage](#usage)
-    1. [pp_aozora.py](#pp_aozorapy)
-    1. [wakachi.py](#wakachipy)
-    1. [markovify_sentence.py](#markovify_sentencepy)
-    1. [rnn_sentence.py](#rnn_sentencepy)
-    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
-    1. [utanet_scraper.py](#utanet_scraperpy)
-    1. [json_extractor.py](#json_extractorpy)
+   1. [pp_aozora.py](#pp_aozorapy)
+   1. [wakachi.py](#wakachipy)
+   1. [markovify_sentence.py](#markovify_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
+   1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
+   1. [utanet_scraper.py](#utanet_scraperpy)
+   1. [json_extractor.py](#json_extractorpy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
-    1. [Aozora Bunko](#aozora-bunko)
-        1. [Remove manually](#remove-manually)
-        1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
-        1. [Replace with whitespace](#replace-with-whitespace)
+   1. [Aozora Bunko](#aozora-bunko)
+      1. [Remove manually](#remove-manually)
+      1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
+      1. [Replace with whitespace](#replace-with-whitespace)
 1. [Benchmarking](#benchmarking)
-    1. [About Dataset](#about-dataset)
-    1. [Rule](#rule)
-    1. [Evaluation](#evaluation)
-    1. [Records](#records)
+   1. [About Dataset](#about-dataset)
+   1. [Rule](#rule)
+   1. [Evaluation](#evaluation)
+   1. [Records](#records)
 1. [Troubleshooting](#troubleshooting)
 
 ---
@@ -196,7 +196,7 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 
 ```bash
 # No preprocessing needed for input file
-# If you want to force to use Non-CuDNN GRU layer, give "-c" option
+# If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # Specifying learned model
@@ -348,7 +348,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ## Troubleshooting
 
 If you got "W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory." and TensorFlow was killed in `rnn_sentence.py`,
-try to give `--disable_point_saving` option.
+try to give `--no_point_saving` option.
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

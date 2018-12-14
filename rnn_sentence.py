@@ -6,21 +6,21 @@ tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
-import settings
 import json
 
-def load_settings():
-    return settings.DEFAULT_PARAMETERS
+def load_settings(params_json="settings/default.json"):
+    with Path(params_json).open(encoding='utf-8') as params:
+        parameters = json.load(params)
+
+    return parameters
 
 def load_test_settings():
-    return settings.TEST_MODE_PARAMETERS
+    return load_settings("settings/test.json")
 
 ## Evaluation methods
 # Load learned model
 def init_generator(dataset, model_dir):
-    with Path(model_dir).joinpath("parameters.json").open(encoding='utf-8') as params:
-        parameters = json.load(params)
-        embedding_dim, units, batch_size, cpu_mode = parameters.values()
+    embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
     generator.load(model_dir)
@@ -38,9 +38,10 @@ def main():
     parser.add_argument("--test_mode", action='store_true', help="Apply settings to run in short-time for debugging. Epochs and gen_size options are ignored (default: false)")
     ## Arguments for training
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
-    parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
+    parser.add_argument("-c", "--config", type=str, default='settings/default.json', help="Path to configuration file (default: './settings/default.json')")
+    parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("--disable_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
+    parser.add_argument("--no_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
@@ -54,7 +55,7 @@ def main():
 
         gen_size = 1
     else:
-        parameters = load_settings()
+        parameters = load_settings(args.config)
         epochs = args.epochs
 
         gen_size = args.gen_size
@@ -102,7 +103,7 @@ def main():
                 loss
             ))
 
-            if (epoch_num) % 5 == 0 and not args.disable_point_saving:
+            if (epoch_num) % 5 == 0 and not args.no_point_saving:
                 print("Saving current model...")
                 model.save(model_dir, parameters)
 

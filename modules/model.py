@@ -104,7 +104,7 @@ class Model():
             if char == delimiter:
                 count += 1
 
-        print("Stopped generation")
+        print("Generated {} characters".format(len(generated_text)))
         return start_string + "".join(generated_text) + "\n"
 
     ## Return the path to <ckpt_dir>/checkpoint

@@ -196,7 +196,7 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 
 ```bash
 # 特に前処理は必要ない
-# "-c"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる（bm_rnn_sentence.pyも同様）
+# "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # 学習済みモデルを指定
@@ -348,7 +348,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ## トラブルシューティング
 
 `rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合，
-`--disable_point_saving`オプションを与えて再度実行してみる
+`--no_point_saving`オプションを与えて再度実行してみる
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/
