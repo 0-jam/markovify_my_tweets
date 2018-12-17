@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 from tqdm import tqdm
-import os
 
 ## Divide text by word using specified engine
 def main():
@@ -25,7 +24,6 @@ def main():
     with input_path.open() as input, Path(args.output).open('a') as out:
         with tqdm(total=input_path.stat().st_size, unit="kb", unit_scale=0.001, smoothing=1) as pbar:
             for line in input:
-
                 line = line.strip()
 
                 if not (line or args.allow_empty):

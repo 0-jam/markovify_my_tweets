@@ -99,7 +99,7 @@ class Model():
 
             char = dataset.idx2char[predicted_id]
             generated_text.append(char)
-            print("Generated {} characters".format(len(generated_text)), end="\r")
+            print("Generated {} lines, {} characters".format(count, len(generated_text)), end="\r")
 
             if char == delimiter:
                 count += 1

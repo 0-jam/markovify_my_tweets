@@ -115,6 +115,9 @@
 - No external modules needed for `json_extractor.py`
 
 ```bash
+# Common
+$ pip install tqdm
+
 ### wakachi.py
 ## Use Janome as the word dividing engine
 $ pip install janome
@@ -154,7 +157,7 @@ $ pip install markovify
 $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
-$ pip install tensorflow numpy matplotlib tqdm
+$ pip install tensorflow numpy matplotlib
 ```
 
 ## Usage

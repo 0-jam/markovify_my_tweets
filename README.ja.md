@@ -115,6 +115,9 @@
 - `json_extractor.py`に外部モジュールは必要ない
 
 ```bash
+# 共通
+$ pip install tqdm
+
 ### wakachi.py
 ## Janomeを分かち書きエンジンに使う場合
 $ pip install janome
@@ -154,7 +157,7 @@ $ pip install markovify
 $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
-$ pip install tensorflow numpy matplotlib tqdm
+$ pip install tensorflow numpy matplotlib
 ```
 
 ## 使用法

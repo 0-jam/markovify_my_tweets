@@ -7,8 +7,6 @@ from modules.model import Model
 from modules.dataset import TextDataset
 import json
 from rnn_sentence import init_generator
-from tqdm import tqdm
-import sys
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN (generation only, without model training)")
@@ -48,7 +46,7 @@ def main():
         else:
             for line in input:
                 start_string = line.strip("\n")
-                print(generator.generate_text(dataset, start_string, gen_size, temperature=args.temperature))
+                print(generator.generate_text(dataset, start_string, gen_size, temp=args.temperature))
 
 if __name__ == '__main__':
     main()
