@@ -12,7 +12,7 @@ def replace_sentence(sentence):
     return sentence
 
 def replace_text(text):
-    text = re.sub("---.*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))
+    text = re.sub(".*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))
     text = [replace_sentence(line) for line in text.split("\n")]
     # 空行（もともと空行だったものと処理の結果空行になったもの）を削除して返す
     return list(filter(lambda line: line != "", text))
@@ -27,15 +27,9 @@ def main():
     args = parser.parse_args()
 
     with Path(args.input).open(encoding='utf-8') as input:
-        # ほとんどの場合タイトル・作者名がそれぞれ1行目・2行目にあるのでそれを削除
-        text = replace_text(input.read())[2:]
+        text = replace_text(input.read())
 
-    if args.engine != "":
-        from wakachi import divide
-
-        text = divide(text, args.engine)
-
-    with Path(args.output).open('w') as out:
+    with Path(args.output).open('w', encoding='utf-8') as out:
         # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
 

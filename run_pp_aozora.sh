@@ -4,8 +4,6 @@
 # Input / output file location
 indir="text/novel_orig"
 outdir="text/novel"
-# Enable word divider
-wakachi=""
 # Postfix of the file name
 postfix="noruby"
 
@@ -16,14 +14,13 @@ Execute pp_aozora.py to multiple files at once
 
   -i [NAME]    Path to file to convert (directory) (default: ./text/novel_orig)
   -o [NAME]    Path to output file (directory) (default: ./text/novel)
-  -e [NAME]    Enable word divider using specified engine
   -h           Print this help
 EOS
   exit 1
 }
 
 ### Parse options
-while getopts "he:i:o:" opts; do
+while getopts "hi:o:" opts; do
   case $opts in
     h|\?)
       usage
@@ -34,10 +31,6 @@ while getopts "he:i:o:" opts; do
     o)
       outdir=$OPTARG
       ;;
-    e)
-      wakachi=" -e ${OPTARG}"
-      postfix="wakachi"
-      ;;
   esac
 done
 
@@ -47,6 +40,6 @@ if [ ! -d $outdir ]; then
 fi
 
 while read -r f; do
-  echo "pp_aozora.py $f ${outdir%/}/$(basename ${f%.*})_${postfix}.txt${wakachi}"
-  python pp_aozora.py $f ${outdir}/$(basename ${f%.*})_${postfix}.txt${wakachi}
+  echo "pp_aozora.py $f ${outdir%/}/$(basename ${f%.*})_${postfix}.txt"
+  python pp_aozora.py $f ${outdir}/$(basename ${f%.*})_${postfix}.txt
 done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")

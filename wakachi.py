@@ -9,7 +9,7 @@ def main():
     parser.add_argument("output", type=str, help="Output file path")
     parser.add_argument("-e", "--engine", type=str, default="mecab", choices=["janome", "mecab", "juman"], help="Tokenize engine (default: mecab)")
     parser.add_argument("-r", "--allow_empty", action='store_true', help="Don't remove empty line")
-
+    parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
 
     # Select engine for word dividing
@@ -21,7 +21,7 @@ def main():
         from modules.wakachi.juman import divide_word
 
     input_path = Path(args.input)
-    with input_path.open() as input, Path(args.output).open('a') as out:
+    with input_path.open(encoding=args.encoding) as input, Path(args.output).open('w', encoding='utf-8') as out:
         with tqdm(total=input_path.stat().st_size, unit="kb", unit_scale=0.001, smoothing=1) as pbar:
             for line in input:
                 line = line.strip()

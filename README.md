@@ -167,8 +167,8 @@ Execute with `-h` option when you want to see the help.
 ### pp_aozora.py
 
 - Preprocessing script for Aozora Bunko
-- Enable word dividing with `-e` option
-    - This function is also available in `run_pp_aozora.sh`
+- ~~Enable word dividing with `-e` option~~ Temporarily removed
+    - ~~This function is also available in `run_pp_aozora.sh`~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt

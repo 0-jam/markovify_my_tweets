@@ -106,8 +106,8 @@ ENV/
 # Actual Data
 *.csv
 *.txt
+text/*
 *.json
-*.xz
 *.png
 !text/Latin-Lipsum.txt
 !dict/*

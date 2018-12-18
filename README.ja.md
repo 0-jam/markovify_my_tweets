@@ -167,8 +167,8 @@ $ pip install tensorflow numpy matplotlib
 ### pp_aozora.py
 
 - 前処理スクリプト（青空文庫用）
-- `-e`オプションにエンジン名を指定すると単語の分かち書きもする
-    - 一括実行スクリプト`run_pp_aozora.sh`も同様
+- ~~`-e`オプションにエンジン名を指定すると単語の分かち書きもする~~ 一時的に削除
+    - ~~一括実行スクリプト`run_pp_aozora.sh`も同様~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
