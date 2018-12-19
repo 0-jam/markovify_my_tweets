@@ -80,7 +80,7 @@ class Model():
         generated_text = []
         # Vectorize start_string
         try:
-            input_eval = tf.expand_dims(dataset.word_to_indices(start_string), 0)
+            input_eval = tf.expand_dims(dataset.vocab_to_indices(start_string), 0)
             print("Start string:", start_string)
         except KeyError:
             print("Unknown word included")

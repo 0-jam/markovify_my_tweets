@@ -13,7 +13,7 @@ class TextDataset():
         # This list doesn't have word that is not contained in the text
         self.word2idx = {word:index for index, word in enumerate(vocab)}
         self.idx2word = np.array(vocab)
-        word_as_int = np.array(self.word_to_indices(words))
+        word_as_int = np.array(self.vocab_to_indices(words))
 
         # The maximum length sentence we want for single input in words
         seq_length = 100
@@ -36,9 +36,5 @@ class TextDataset():
         return input_text, target_text
 
     ## Convert word to numbers
-    def word_to_indices(self, words):
+    def vocab_to_indices(self, words):
         return [self.word2idx[word] for word in words]
-
-    ## Convert numbers to word
-    def indices_to_word(self, indices):
-        return [self.idx2word[id] for id in indices]
