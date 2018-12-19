@@ -3,19 +3,11 @@ import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
-from modules.model import Model
-from modules.dataset import TextDataset
-from modules.plot_result import save_result, show_result
+from modules.w2vmodel import Model
+from modules.w2vdataset import TextDataset
 import json
-
-def load_settings(params_json="settings/default.json"):
-    with Path(params_json).open(encoding='utf-8') as params:
-        parameters = json.load(params)
-
-    return parameters
-
-def load_test_settings():
-    return load_settings("settings/test.json")
+from modules.wakachi.mecab import divide_word
+from rnn_sentence import load_settings, load_test_settings
 
 ## Evaluation methods
 # Load learned model
@@ -41,10 +33,9 @@ def main():
     parser.add_argument("-c", "--config", type=str, default='settings/default.json', help="Path to configuration file (default: './settings/default.json')")
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("--no_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
-    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of word that you want to generate (default: 100)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
@@ -53,7 +44,7 @@ def main():
         parameters = load_test_settings()
         epochs = 3
 
-        gen_size = 1
+        gen_size = 10
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
@@ -79,79 +70,28 @@ def main():
     elif args.model_dir:
         model_dir = Path(args.model_dir)
     else:
-        model_dir = Path("./learned_models").joinpath(filename)
+        model_dir = Path("./learned_models").joinpath(filename + "_w2v")
 
     ## Training
     if not args.model_dir:
         # Create the model
         model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
-        losses = []
-        start = time.time()
+        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True)
 
-        for epoch in range(epochs):
-            # Actual epoch number (for displaying)
-            epoch_num = epoch + 1
-
-            print("Epoch: {} / {}:".format(epoch_num, epochs))
-            epoch_start = time.time()
-
-            loss = model.train(dataset.dataset)
-            losses.append(loss)
-
-            print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}".format(
-                epoch_num,
-                epochs,
-                time.time() - epoch_start,
-                loss
-            ))
-
-            if (epoch_num) % 5 == 0 and not args.no_point_saving:
-                print("Saving current model...")
-                model.save(model_dir, parameters)
-
-            # If ARC (Average Rate of Change) of last 5 epochs is under 0.1%, stop learning
-            last_losses = losses[-5:]
-            try:
-                arc = (last_losses[4] - last_losses[0]) / (len(last_losses) - 1)
-                print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-                if abs(arc) < 0.003:
-                    epochs = epoch
-                    break
-            except IndexError:
-                pass
-
-        elapsed_time = time.time() - start
-        print("Training finished.")
-        print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
-            epochs,
-            elapsed_time,
-            elapsed_time / epochs,
-            loss
-        ))
-
-        # Save models and hyper parameters
-        model.save(model_dir, parameters)
+        model.compile()
+        model.model.fit(dataset.dataset.repeat(), epochs=epochs, steps_per_epoch=batch_size, callbacks=[checkpoint_callback])
+        model.save_params(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
+    generated_text = generator.generate_text(dataset, divide_word(args.start_string), gen_size=gen_size, temp=args.temperature)
 
     if args.output:
         print("Saving generated text...")
         outpath = Path(args.output)
         with outpath.open('w', encoding='utf-8') as out:
             out.write(generated_text)
-
-        try:
-            save_result(losses, outpath)
-        except NameError:
-            print("Skipped drawing losses graph")
     else:
         print(generated_text)
-
-        try:
-            show_result(losses)
-        except NameError:
-            print("Skipped drawing losses graph")
 
 if __name__ == '__main__':
     main()
