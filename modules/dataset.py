@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 
-class TextDataset():
+class TextDataset(object):
     def __init__(self, text, batch_size, use_dict=False):
         ## Vectorize the text
         if use_dict:
