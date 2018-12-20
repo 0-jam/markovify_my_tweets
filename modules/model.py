@@ -43,7 +43,7 @@ class Model():
 
     def fit(self, model_dir, dataset, epochs):
         checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = tf.keras.callbacks.EarlyStopping(patience=5, verbose=1)
+        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
