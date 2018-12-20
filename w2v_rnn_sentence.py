@@ -5,6 +5,7 @@ import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
 from modules.w2vdataset import W2VDataset
+from modules.plot_result import save_result, show_result
 import json
 from rnn_sentence import load_settings
 
@@ -79,7 +80,8 @@ def main():
         model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
 
         model.compile()
-        model.fit(model_dir, dataset.dataset, epochs)
+        history = model.fit(model_dir, dataset.dataset, epochs)
+        losses = history.history["loss"]
         model.save(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)
@@ -90,8 +92,18 @@ def main():
         outpath = Path(args.output)
         with outpath.open('w', encoding='utf-8') as out:
             out.write(generated_text)
+
+        try:
+            save_result(losses, outpath)
+        except NameError:
+            print("Skipped drawing losses graph")
     else:
         print(generated_text)
+
+        try:
+            show_result(losses)
+        except NameError:
+            print("Skipped drawing losses graph")
 
 if __name__ == '__main__':
     main()
