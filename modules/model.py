@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow import keras
 from pathlib import Path
 import json
+from tqdm import tqdm
+import time
 
 ## Keras Functional API implementation
 class Model():
@@ -39,6 +41,17 @@ class Model():
     def compile(self):
         self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
 
+    def fit(self, model_dir, dataset, epochs):
+        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
+        earlystop_callback = tf.keras.callbacks.EarlyStopping(patience=5, verbose=1)
+
+        start_time = time.time()
+        history = self.model.fit(dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
+        elapsed_time = time.time() - start_time
+        print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
+
+        return history
+
     ## Train model from the dataset
     def train(self, dataset):
         optimizer = tf.train.AdamOptimizer()
@@ -71,40 +84,41 @@ class Model():
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))
 
-    def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
+    def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter=None):
         generated_text = []
         # Vectorize start_string
         try:
-            input_eval = tf.expand_dims(dataset.str_to_indices(start_string), 0)
+            input_eval = tf.expand_dims(dataset.vocab_to_indices(start_string), 0)
             print("Start string:", start_string)
         except KeyError:
             print("Unknown word included")
             return ""
 
+        # Randomness of text generation
         temperature = temp
 
         count = 0
         self.model.reset_states()
-        while count < gen_size:
-            predictions = self.model(input_eval)
-            # remove the batch dimension
-            predictions = tf.squeeze(predictions, 0)
+        with tqdm(desc="Generating...", total=gen_size) as pbar:
+            while count < gen_size:
+                predictions = self.model(input_eval)
+                # remove the batch dimension
+                predictions = tf.squeeze(predictions, 0)
 
-            # Using the multinomial distribution to predict the word returned by the model
-            predictions = predictions / temperature
-            predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
+                # Using the multinomial distribution to predict the word returned by the model
+                predictions = predictions / temperature
+                predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
 
-            # Pass the predicted word as the next input to the model along with the previous hidden state
-            input_eval = tf.expand_dims([predicted_id], 0)
+                # Pass the predicted word as the next input to the model along with the previous hidden state
+                input_eval = tf.expand_dims([predicted_id], 0)
 
-            char = dataset.idx2char[predicted_id]
-            generated_text.append(char)
-            print("Generated {} lines, {} characters".format(count, len(generated_text)), end="\r")
+                char = dataset.idx2vocab[predicted_id]
+                generated_text.append(char)
 
-            if char == delimiter:
-                count += 1
+                if char == delimiter or not delimiter:
+                    count += 1
+                    pbar.update()
 
-        print("Generated {} characters".format(len(generated_text)))
         return start_string + "".join(generated_text) + "\n"
 
     ## Return the path to <ckpt_dir>/checkpoint

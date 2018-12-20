@@ -17,7 +17,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py](#rnn_sentencepy)
+   1. [rnn_sentence.py & w2v_rnn_sentence.py](#rnn_sentencepy--w2v_rnn_sentencepy)
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
@@ -70,7 +70,7 @@
 
 ## Todo
 
-- [ ] Separate RNN trainer and generator
+- [ ] Some cleanup tasks for RNN text generation
 - [ ] Add search options to Utanet scraper
     - Example:
         - Artist name
@@ -78,7 +78,7 @@
         - Number of songs to extract
 - [ ] Add ROCm instruction in this README
 - [ ] Add CUDA instruction in this README
-- [ ] Enable function to use word as a token for RNN-based generation
+- [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
     - [x] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
@@ -152,7 +152,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py & bm_rnn_sentence.py
+## rnn_sentence.py, bm_rnn_sentence.py and w2v_rnn_semtence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
@@ -196,12 +196,17 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py
+### rnn_sentence.py & w2v_rnn_sentence.py
 
 ```bash
-# No preprocessing needed for input file
 # If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
+# Character-based training
+# No preprocessing needed for input file
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
+
+# Word-based training
+# It requires text that is divided by words
+$ python w2v_rnn_sentence.py souseki_wakachi.txt "吾輩" -e 10
 
 # Specifying learned model
 # Example: Learned model exists in directory "./learned_models/Latin-Lipsum.txt"

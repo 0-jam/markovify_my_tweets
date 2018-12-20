@@ -29,7 +29,7 @@ def main():
                 if not (line or args.allow_empty):
                     continue
 
-                out.write(divide_word(line) + "\n")
+                out.write(" ".join(divide_word(line)) + "\n")
                 pbar.update(len(line.encode('utf-8')))
 
 if __name__ == '__main__':

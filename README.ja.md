@@ -17,7 +17,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py](#rnn_sentencepy)
+   1. [rnn_sentence.py & w2v_rnn_sentence.py](#rnn_sentencepy--w2v_rnn_sentencepy)
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
@@ -70,7 +70,7 @@
 
 ## Todo
 
-- [ ] RNN版の訓練とテキスト生成を分離
+- [ ] RNNテキスト生成いろいろ整理
 - [ ] 歌ネットスクレイパーの検索条件
     - 例：
         - アーティスト名
@@ -78,7 +78,7 @@
         - 抽出件数
 - [ ] ROCmインストール手順書いておこう
 - [ ] CUDAインストール手順書いておこう
-- [ ] RNN版の分かち書き対応
+- [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
     - [x] [Juman++][jumanpp]
         - WSLでビルドできず
@@ -152,7 +152,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py & bm_rnn_sentence.py
+## rnn_sentence.py, bm_rnn_sentence.py, w2v_rnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
@@ -196,12 +196,17 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py
+### rnn_sentence.py & w2v_rnn_sentence.py
 
 ```bash
-# 特に前処理は必要ない
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
+# 文字ベースの学習
+# 特に前処理は必要ない
 $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
+
+# 単語ベースの学習
+# 事前に分かち書きをしておく必要がある
+$ python w2v_rnn_sentence.py souseki_wakachi.txt "吾輩" -e 10
 
 # 学習済みモデルを指定
 # 例：ディレクトリ"./learned_models/Latin-Lipsum.txt"内にモデルがあるとする
