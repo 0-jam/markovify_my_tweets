@@ -46,9 +46,11 @@ class Model():
         earlystop_callback = tf.keras.callbacks.EarlyStopping(patience=5, verbose=1)
 
         start_time = time.time()
-        self.model.fit(dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
+        history = self.model.fit(dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
         elapsed_time = time.time() - start_time
-        print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} epochs / minutes)".format(epochs, elapsed_time / 60, (epochs / elapsed_time) / 60))
+        print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
+
+        return history
 
     ## Train model from the dataset
     def train(self, dataset):
