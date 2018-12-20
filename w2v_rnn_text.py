@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.w2vdataset import W2VDataset
+from modules.dataset import W2VDataset
 import json
 from w2v_rnn_sentence import init_generator
 

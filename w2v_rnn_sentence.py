@@ -4,10 +4,10 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.w2vdataset import W2VDataset
+from modules.dataset import W2VDataset
 from modules.plot_result import save_result, show_result
 import json
-from rnn_sentence import load_settings
+from rnn_sentence import load_settings, load_test_settings
 
 ## Evaluation methods
 # Load learned model
@@ -18,9 +18,6 @@ def init_generator(dataset, model_dir):
     generator.load(model_dir)
 
     return generator
-
-def load_test_settings():
-    return load_settings("settings/w2vtest.json")
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
