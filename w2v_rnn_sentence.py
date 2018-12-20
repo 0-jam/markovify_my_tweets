@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.w2vdataset import TextDataset
+from modules.w2vdataset import W2VDataset
 import json
 from rnn_sentence import load_settings
 
@@ -63,7 +63,7 @@ def main():
         text = file.read()
 
     ## Create the dataset from the text
-    dataset = TextDataset(text, batch_size)
+    dataset = W2VDataset(text, batch_size)
 
     # Specify directory to save model
     if args.save_dir:
@@ -77,13 +77,9 @@ def main():
     if not args.model_dir:
         # Create the model
         model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
-        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5)
 
         model.compile()
-        start_time = time.time()
-        model.model.fit(dataset.dataset.repeat(), epochs=epochs, steps_per_epoch=batch_size, callbacks=[checkpoint_callback])
-        elapsed_time = time.time() - start_time
-        print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} epochs / minutes)".format(epochs, elapsed_time / 60, (epochs / elapsed_time) / 60))
+        model.fit(model_dir, dataset.dataset, epochs)
         model.save(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)

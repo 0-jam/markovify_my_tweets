@@ -2,8 +2,9 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 from modules.wakachi.mecab import divide_word
+from modules.dataset import TextDataset
 
-class TextDataset():
+class W2VDataset(TextDataset):
     def __init__(self, text, batch_size):
         # unique word in text
         words = text.split()
@@ -27,14 +28,6 @@ class TextDataset():
         ## Creating batches and shuffling them
         dataset = chunks.map(self.split_into_target)
         self.dataset = dataset.shuffle(buffer_size).batch(self.batch_size, drop_remainder=True)
-
-    ## Create input and target texts from the text
-    @staticmethod
-    def split_into_target(chunk):
-        input_text = chunk[:-1]
-        target_text = chunk[1:]
-
-        return input_text, target_text
 
     ## Convert word to numbers
     def vocab_to_indices(self, words):

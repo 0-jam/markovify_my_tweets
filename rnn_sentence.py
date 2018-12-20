@@ -63,7 +63,7 @@ def main():
     parameters["cpu_mode"] = args.cpu_mode
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
     input_path = Path(args.input)
-    filename = input_path.name
+    filename = input_path.stem
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:

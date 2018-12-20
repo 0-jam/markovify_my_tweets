@@ -70,6 +70,7 @@
 
 ## Todo
 
+- [ ] Some cleanup tasks for RNN text generation
 - [ ] Add search options to Utanet scraper
     - Example:
         - Artist name
