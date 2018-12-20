@@ -71,7 +71,7 @@ class Model():
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))
 
-    def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter="\n"):
+    def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter=None):
         generated_text = []
         # Vectorize start_string
         try:
@@ -98,14 +98,14 @@ class Model():
             # Pass the predicted word as the next input to the model along with the previous hidden state
             input_eval = tf.expand_dims([predicted_id], 0)
 
-            char = dataset.idx2char[predicted_id]
+            char = dataset.idx2vocab[predicted_id]
             generated_text.append(char)
-            print("Generated {} lines, {} characters".format(count, len(generated_text)), end="\r")
+            print("Generating... {}".format(len(generated_text)), end="\r")
 
-            if char == delimiter:
+            if char == delimiter or not delimiter:
                 count += 1
 
-        print("Generated {} characters".format(len(generated_text)))
+        print("Generation complete!")
         return start_string + "".join(generated_text) + "\n"
 
     ## Return the path to <ckpt_dir>/checkpoint

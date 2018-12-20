@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from pathlib import Path
+from modules.wakachi.mecab import divide_word
 
 class TextDataset():
     def __init__(self, text, batch_size):
@@ -11,8 +12,8 @@ class TextDataset():
         print("Text has {} words ({} unique words)".format(len(words), self.vocab_size))
         # Creating a mapping from unique words to indices
         # This list doesn't have word that is not contained in the text
-        self.word2idx = {word:index for index, word in enumerate(vocab)}
-        self.idx2word = np.array(vocab)
+        self.vocab2idx = {word:index for index, word in enumerate(vocab)}
+        self.idx2vocab = np.array(vocab)
         word_as_int = np.array(self.vocab_to_indices(words))
 
         # The maximum length sentence we want for single input in words
@@ -37,4 +38,7 @@ class TextDataset():
 
     ## Convert word to numbers
     def vocab_to_indices(self, words):
-        return [self.word2idx[word] for word in words]
+        if type(words) == str:
+            words = divide_word(words)
+
+        return [self.vocab2idx[word] for word in words]

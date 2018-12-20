@@ -57,7 +57,6 @@ def main():
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
-        batch_size = 64
 
         gen_size = args.gen_size
 
@@ -133,7 +132,7 @@ def main():
         model.save(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
+    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature, delimiter="\n")
 
     if args.output:
         print("Saving generated text...")

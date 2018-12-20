@@ -42,11 +42,11 @@ def main():
             with Path(args.output).open('a', encoding='utf-8') as out:
                 for line in input:
                     start_string = line.strip("\n")
-                    out.write(generator.generate_text(dataset, start_string, gen_size=gen_size, temp=args.temperature))
+                    out.write(generator.generate_text(dataset, start_string, gen_size=gen_size, temp=args.temperature, delimiter="\n"))
         else:
             for line in input:
                 start_string = line.strip("\n")
-                print(generator.generate_text(dataset, start_string, gen_size, temp=args.temperature))
+                print(generator.generate_text(dataset, start_string, gen_size, temp=args.temperature, delimiter="\n"))
 
 if __name__ == '__main__':
     main()

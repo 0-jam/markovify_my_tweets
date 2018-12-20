@@ -13,8 +13,8 @@ class TextDataset():
         print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size))
         # Creating a mapping from unique characters to indices
         # This list doesn't have character that is not contained in the text
-        self.char2idx = {char:index for index, char in enumerate(vocab)}
-        self.idx2char = np.array(vocab)
+        self.vocab2idx = {char:index for index, char in enumerate(vocab)}
+        self.idx2vocab = np.array(vocab)
         text_as_int = np.array(self.vocab_to_indices(text))
 
         # The maximum length sentence we want for single input in characters
@@ -39,7 +39,7 @@ class TextDataset():
 
     ## Convert string to numbers
     def vocab_to_indices(self, str):
-        return [self.char2idx[c] for c in str]
+        return [self.vocab2idx[c] for c in str]
 
     ## Load dictionary data
     @staticmethod

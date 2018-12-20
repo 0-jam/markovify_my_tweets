@@ -3,11 +3,10 @@ import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
-from modules.w2vmodel import Model
+from modules.model import Model
 from modules.w2vdataset import TextDataset
 import json
-from modules.wakachi.mecab import divide_word
-from rnn_sentence import load_settings, load_test_settings
+from rnn_sentence import load_settings
 
 ## Evaluation methods
 # Load learned model
@@ -18,6 +17,9 @@ def init_generator(dataset, model_dir):
     generator.load(model_dir)
 
     return generator
+
+def load_test_settings():
+    return load_settings("settings/w2vtest.json")
 
 def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN")
@@ -48,14 +50,13 @@ def main():
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
-        batch_size = 64
 
         gen_size = args.gen_size
 
     parameters["cpu_mode"] = args.cpu_mode
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
     input_path = Path(args.input)
-    filename = input_path.name
+    filename = input_path.stem
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:
@@ -86,7 +87,7 @@ def main():
         model.save(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, divide_word(args.start_string), gen_size=gen_size, temp=args.temperature)
+    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
 
     if args.output:
         print("Saving generated text...")
