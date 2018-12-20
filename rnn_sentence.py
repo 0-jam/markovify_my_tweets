@@ -84,51 +84,10 @@ def main():
     if not args.model_dir:
         # Create the model
         model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
-        losses = []
-        start = time.time()
 
-        for epoch in range(epochs):
-            # Actual epoch number (for displaying)
-            epoch_num = epoch + 1
-
-            print("Epoch: {} / {}:".format(epoch_num, epochs))
-            epoch_start = time.time()
-
-            loss = model.train(dataset.dataset)
-            losses.append(loss)
-
-            print("Time taken for epoch {} / {}: {:.3f} sec, Loss: {:.3f}".format(
-                epoch_num,
-                epochs,
-                time.time() - epoch_start,
-                loss
-            ))
-
-            if (epoch_num) % 5 == 0 and not args.no_point_saving:
-                print("Saving current model...")
-                model.save(model_dir, parameters)
-
-            # If ARC (Average Rate of Change) of last 5 epochs is under 0.1%, stop learning
-            last_losses = losses[-5:]
-            try:
-                arc = (last_losses[4] - last_losses[0]) / (len(last_losses) - 1)
-                print("ARC of last {} epochs: {}".format(len(last_losses), arc))
-                if abs(arc) < 0.003:
-                    epochs = epoch
-                    break
-            except IndexError:
-                pass
-
-        elapsed_time = time.time() - start
-        print("Training finished.")
-        print("Time taken for learning {} epochs: {:.3f} sec ({:.3f} seconds / epoch), Loss: {:.3f}\n".format(
-            epochs,
-            elapsed_time,
-            elapsed_time / epochs,
-            loss
-        ))
-
-        # Save models and hyper parameters
+        model.compile()
+        history = model.fit(model_dir, dataset.dataset, epochs)
+        losses = history.history["loss"]
         model.save(model_dir, parameters)
 
     generator = init_generator(dataset, model_dir)
