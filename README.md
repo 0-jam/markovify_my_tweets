@@ -128,10 +128,7 @@ $ pip install mecab-python3
 # (Optional, only works on Linux) Install additional dictionary for Mecab
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
-$ ./bin/install-mecab-ipadic-neologd -n -a
-# When you are asked about the installation of mecab-ipadic-NEologd, answer "yes"
-[install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
-yes
+$ ./bin/install-mecab-ipadic-neologd -n -a -y
 
 ## Use Juman++ as the word dividing engine
 # Install Juman++
