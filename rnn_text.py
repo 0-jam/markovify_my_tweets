@@ -9,7 +9,7 @@ import json
 from rnn_sentence import init_generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN (generation only, without model training)")
+    parser = argparse.ArgumentParser(description="Character-based sentence generation using RNN (generation only, without model training)")
     parser.add_argument("input", type=str, help="Path to the dataset file")
     parser.add_argument("start_string", type=str, help="Path to the start string file")
     parser.add_argument("model_dir", type=str, help="Path to the learned model directory")

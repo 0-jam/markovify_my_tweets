@@ -43,7 +43,7 @@ class Model():
 
     def fit(self, model_dir, dataset, epochs):
         checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=5, verbose=1)
+        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
@@ -79,7 +79,11 @@ class Model():
         with model_dir.joinpath("parameters.json").open('w', encoding='utf-8') as params:
             params.write(json.dumps(parameters))
 
-        self.model.save_weights(str(Path(model_dir.joinpath("weights")).resolve()))
+        path = Path(model_dir.joinpath("weights"))
+        if type(path) == WindowsPath:
+            path = path.resolve()
+
+        self.model.save_weights(str(path))
 
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))

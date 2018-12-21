@@ -70,6 +70,8 @@
 
 ## Todo
 
+- [ ] Separate RNN trainer and generator
+    - ~~Adding "generation-only" option seems better...~~
 - [ ] Some cleanup tasks for RNN text generation
 - [ ] Add search options to Utanet scraper
     - Example:
@@ -83,8 +85,6 @@
     - [x] [Juman++][jumanpp]
         - Juman++ cannot build on WSL
     - [x] [MeCab][mecab]
-- [x] Separate RNN trainer and generator
-    - Adding "generation-only" option seems better...
 - [x] Text formatter for [Aozora bunko][aozora]
     - [x] Remove title, author and footnotes
     - [x] Remove annotation symbols

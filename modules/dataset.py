@@ -53,6 +53,7 @@ class TextDataset(object):
         return dicts
 
 ## Word-based dataset
+# Convert text into one-hot vector
 class W2VDataset(TextDataset):
     def __init__(self, text, batch_size):
         # unique word in text
@@ -60,6 +61,7 @@ class W2VDataset(TextDataset):
         super(W2VDataset, self).__init__(words, batch_size)
 
     ## Convert word to numbers
+    # Automatically convert string into words
     def vocab_to_indices(self, words):
         if type(words) == str:
             words = divide_word(words)
