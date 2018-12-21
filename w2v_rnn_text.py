@@ -6,7 +6,7 @@ tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import W2VDataset
 import json
-from w2v_rnn_sentence import init_generator
+from w2v_rnn_train import init_generator
 
 def main():
     parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")

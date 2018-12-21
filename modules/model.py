@@ -79,11 +79,7 @@ class Model():
         with model_dir.joinpath("parameters.json").open('w', encoding='utf-8') as params:
             params.write(json.dumps(parameters))
 
-        path = Path(model_dir.joinpath("weights"))
-        if type(path) == WindowsPath:
-            path = path.resolve()
-
-        self.model.save_weights(str(path))
+        self.model.save_weights(str(Path(model_dir.joinpath("weights"))))
 
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))

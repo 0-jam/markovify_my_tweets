@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     ## Arguments for generation
-    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of word that you want to generate (default: 100)")
+    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
@@ -43,7 +43,7 @@ def main():
         parameters = load_test_settings()
         epochs = 3
 
-        gen_size = 10
+        gen_size = 1
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
@@ -80,7 +80,7 @@ def main():
     ## Evaluating
     # Test for generation
     generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature, delimiter="\n")
+    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
 
     print(generated_text)
     if args.output:
