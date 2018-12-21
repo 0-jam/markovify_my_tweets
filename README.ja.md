@@ -128,10 +128,7 @@ $ pip install mecab-python3
 # （任意，Linuxのみ）Mecab追加辞書をインストール
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
-$ ./bin/install-mecab-ipadic-neologd -n -a
-# 途中こう訊かれたら"yes"と入力
-[install-mecab-ipadic-NEologd] : Do you want to install mecab-ipadic-NEologd? Type yes or no.
-yes
+$ ./bin/install-mecab-ipadic-neologd -n -a -y
 
 ## Juman++を分かち書きエンジンに使う場合
 # Juman++をインストール
