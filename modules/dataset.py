@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 from modules.wakachi.mecab import divide_word
+import re
 
 ## Character-based dataset
 class TextDataset(object):
@@ -53,13 +54,16 @@ class TextDataset(object):
         return dicts
 
 ## Word-based dataset
+# Convert text into one-hot vector
 class W2VDataset(TextDataset):
     def __init__(self, text, batch_size):
-        # unique word in text
         words = text.split()
+        # Recognize newline
+        # words = [word for word in re.split("(\W)", text) if not (word == " " or word == "")]
         super(W2VDataset, self).__init__(words, batch_size)
 
     ## Convert word to numbers
+    # Automatically convert string into words
     def vocab_to_indices(self, words):
         if type(words) == str:
             words = divide_word(words)

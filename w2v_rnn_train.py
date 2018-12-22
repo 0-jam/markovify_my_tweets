@@ -4,31 +4,23 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.dataset import TextDataset
+from modules.dataset import W2VDataset
 from modules.plot_result import save_result, show_result
 import json
+from rnn_sentence import load_settings, load_test_settings
 
-def load_settings(params_json="settings/default.json"):
-    with Path(params_json).open(encoding='utf-8') as params:
-        parameters = json.load(params)
-
-    return parameters
-
-def load_test_settings():
-    return load_settings("settings/test.json")
-
-## Evaluation methods
 # Load learned model
 def init_generator(dataset, model_dir):
     embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
+    # batch_size is fixed to 1
     generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
     generator.load(model_dir)
 
     return generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN")
+    parser = argparse.ArgumentParser(description="Train the model for generating sentence with RNN (word-based)")
     ## Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
@@ -41,10 +33,8 @@ def main():
     parser.add_argument("-c", "--config", type=str, default='settings/default.json', help="Path to configuration file (default: './settings/default.json')")
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("--no_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
-    parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
-    parser.add_argument("-g", "--gen_size", type=int, default=1, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of line that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
@@ -70,46 +60,37 @@ def main():
         text = file.read()
 
     ## Create the dataset from the text
-    dataset = TextDataset(text, batch_size)
+    dataset = W2VDataset(text, batch_size)
 
     # Specify directory to save model
     if args.save_dir:
         model_dir = Path(args.save_dir)
-    elif args.model_dir:
-        model_dir = Path(args.model_dir)
     else:
         model_dir = Path("./learned_models").joinpath(filename)
 
     ## Training
-    if not args.model_dir:
-        # Create the model
-        model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
+    # Create the model
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
 
-        model.compile()
-        history = model.fit(model_dir, dataset.dataset, epochs)
-        losses = history.history["loss"]
-        model.save(model_dir, parameters)
+    model.compile()
+    history = model.fit(model_dir, dataset.dataset, epochs)
+    losses = history.history["loss"]
+    model.save(model_dir, parameters)
 
+    ## Evaluating
+    # Test for generation
     generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature,)
+    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
 
+    print(generated_text)
     if args.output:
         print("Saving generated text...")
         outpath = Path(args.output)
         with outpath.open('w', encoding='utf-8') as out:
             out.write(generated_text)
 
-        try:
-            save_result(losses, outpath)
-        except NameError:
-            print("Skipped drawing losses graph")
-    else:
-        print(generated_text)
-
-        try:
-            show_result(losses)
-        except NameError:
-            print("Skipped drawing losses graph")
+        save_result(losses, outpath)
+    show_result(losses)
 
 if __name__ == '__main__':
     main()

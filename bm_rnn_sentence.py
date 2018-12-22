@@ -28,7 +28,7 @@ def main():
         time_limit = 5
         max_epochs = 2
 
-        gen_size = 1
+        gen_size = 100
     else:
         parameters = load_settings()
 
@@ -36,7 +36,7 @@ def main():
         time_limit = 60
         max_epochs = args.max_epochs
 
-        gen_size = 20
+        gen_size = 1000
 
     parameters["cpu_mode"] = args.cpu_mode
     embedding_dim, units, batch_size, cpu_mode = parameters.values()

@@ -6,15 +6,15 @@ tf.enable_eager_execution()
 from modules.model import Model
 from modules.dataset import W2VDataset
 import json
-from w2v_rnn_sentence import init_generator
+from w2v_rnn_train import init_generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN (generation only, without model training)")
+    parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")
     parser.add_argument("input", type=str, help="Path to the dataset file")
     parser.add_argument("start_string", type=str, help="Path to the start string file")
     parser.add_argument("model_dir", type=str, help="Path to the learned model directory")
     parser.add_argument("-o", "--output", type=str, help="Path to save the generated text (default: None (put into stdout))")
-    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of word that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
