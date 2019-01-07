@@ -17,7 +17,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & w2v_rnn_sentence.py](#rnn_sentencepy--w2v_rnn_sentencepy)
+   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
@@ -70,6 +70,7 @@
 
 ## Todo
 
+- [ ] word2vecモデル
 - [ ] RNN版の訓練とテキスト生成を分離
     - ~~"生成だけする"オプションを追加するほうがいいかも~~
 - [ ] RNNテキスト生成いろいろ整理
@@ -149,7 +150,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py, bm_rnn_sentence.py, w2v_rnn_sentence.py
+## rnn_sentence.py, bm_rnn_sentence.py, wrnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
 $ pyenv install 3.6.7
@@ -193,7 +194,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py & w2v_rnn_sentence.py
+### rnn_sentence.py & wrnn_sentence.py
 
 ```bash
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
@@ -203,7 +204,7 @@ $ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
 
 # 単語ベースの学習
 # 事前に分かち書きをしておく必要がある
-$ python w2v_rnn_sentence.py souseki_wakachi.txt "吾輩" -e 10
+$ python wrnn_sentence.py souseki_wakachi.txt "吾輩" -e 10
 
 # 学習済みモデルを指定
 # 例：ディレクトリ"./learned_models/Latin-Lipsum.txt"内にモデルがあるとする

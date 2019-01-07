@@ -55,12 +55,12 @@ class TextDataset(object):
 
 ## Word-based dataset
 # Convert text into one-hot vector
-class W2VDataset(TextDataset):
+class WordDataset(TextDataset):
     def __init__(self, text, batch_size):
         words = text.split()
         # Recognize newline
         # words = [word for word in re.split("(\W)", text) if not (word == " " or word == "")]
-        super(W2VDataset, self).__init__(words, batch_size)
+        super(WordDataset, self).__init__(words, batch_size)
 
     ## Convert word to numbers
     # Automatically convert string into words
