@@ -5,6 +5,7 @@ import time
 from tqdm import tqdm
 from beautifulscraper import BeautifulScraper
 from modules.multi_sub import replace_str
+import unicodedata
 
 scraper = BeautifulScraper()
 domain = "https://www.uta-net.com"
@@ -72,15 +73,17 @@ def extract_lyric(song_id):
     song_url = domain + song_id
 
     body = scraper.go(song_url)
-    # 歌詞内の改行を全角スラッシュ／に置換して抽出
-    lyric = body.find(id="kashi_area").get_text("／")
+    # 歌詞内の改行を半角スラッシュ/に置換して抽出
+    lyric = body.find(id="kashi_area").get_text("/")
 
     ## 表記ブレをなるべく減らすためにテキストを整形
-    # 丸括弧（），全角スペース　，！，？をそれぞれ半角に置換
+    # すべての全角英数字，丸括弧（），全角スペース　，！，？などをそれぞれ半角に置換
+    lyric = unicodedata.normalize('NFKC', lyric)
     # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
+    # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
     # 2回以上続く三点リーダー……を1つ…にする
     # 各要素：(置換したい文字, 置換先の文字)
-    patterns = [("\u3000", " "), ("（", "("), ("）", ")"), ("！", "!"), ("？", "?"), (r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
+    patterns = [(r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
 
     return replace_str(lyric, patterns)
 
@@ -103,7 +106,7 @@ def search_songs(query):
     results= {}
     for song_id, title, artist, lyricist, composer, lyric in zip(song_ids, titles, artists, lyricists, composers, lyrics):
         results[song_id]={
-            'title': title,
+            'title': unicodedata.normalize('NFKC', title),
             'artist': artist,
             'lyricist': lyricist,
             'composer': composer,
