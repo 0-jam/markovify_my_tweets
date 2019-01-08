@@ -43,7 +43,7 @@ def main():
 
     ## Create the dataset & the model
     dataset = TextDataset(text, batch_size)
-    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
 
     epoch = 0
     elapsed_time = 0
@@ -84,7 +84,7 @@ def main():
     result_dir = Path("benchmark_" + today)
     model_dir = result_dir.joinpath("model")
 
-    model.save(model_dir, parameters)
+    model.save(model_dir)
 
     # Generate sentence from the model
     generator = init_generator(dataset, model_dir)

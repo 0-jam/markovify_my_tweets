@@ -4,9 +4,9 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.dataset import W2VDataset
+from modules.dataset import WordDataset
 import json
-from w2v_rnn_train import init_generator
+from wrnn_train import init_generator
 
 def main():
     parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")
@@ -33,7 +33,7 @@ def main():
         embedding_dim, units, batch_size, cpu_mode = json.load(params).values()
 
     ## Create the dataset from the text
-    dataset = W2VDataset(text, batch_size)
+    dataset = WordDataset(text, batch_size)
     generator = init_generator(dataset, model_dir)
 
     with Path(args.start_string).open(encoding=encoding) as input:

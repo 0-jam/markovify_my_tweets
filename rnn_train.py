@@ -22,7 +22,7 @@ def init_generator(dataset, model_dir):
     embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
     # batch_size is fixed to 1
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
+    generator = Model(dataset.vocab_size, embedding_dim, units, 1, cpu_mode=cpu_mode)
     generator.load(model_dir)
 
     return generator
@@ -78,12 +78,12 @@ def main():
 
     ## Training
     # Create the model
-    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
+    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
 
     model.compile()
     history = model.fit(model_dir, dataset.dataset, epochs)
     losses = history.history["loss"]
-    model.save(model_dir, parameters)
+    model.save(model_dir)
 
     ## Evaluating
     # Test for generation
