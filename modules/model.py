@@ -6,23 +6,20 @@ from tqdm import tqdm
 import time
 
 ## Keras Functional API implementation
-class Model():
-    def __init__(self, vocab_size, embedding_dim, units, batch_size, force_cpu=False):
+class Model(object):
+    def __init__(self, vocab_size, embedding_dim, units, batch_size, cpu_mode=False):
         # Hyper parameters
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.units = units
         self.batch_size = batch_size
+        self.cpu_mode = not tf.test.is_gpu_available() or cpu_mode
 
-        # Enable CUDA if GPU is available
-        if tf.test.is_gpu_available() and not force_cpu:
-            gru = keras.layers.CuDNNGRU(
-                self.units,
-                return_sequences=True,
-                stateful=True,
-                recurrent_initializer='glorot_uniform'
-            )
-        else:
+        self.model = self.build_model()
+
+    def build_model(self):
+        # Disable CUDA if GPU is not available
+        if not self.cpu_mode:
             gru = keras.layers.GRU(
                 self.units,
                 return_sequences=True,
@@ -30,12 +27,20 @@ class Model():
                 recurrent_activation='sigmoid',
                 recurrent_initializer='glorot_uniform'
             )
+        else:
+            gru = keras.layers.CuDNNGRU(
+                self.units,
+                return_sequences=True,
+                stateful=True,
+                recurrent_activation='sigmoid',
+                recurrent_initializer='glorot_uniform'
+            )
 
-        self.model = keras.Sequential([
-            keras.layers.Embedding(vocab_size, embedding_dim, batch_input_shape=[batch_size, None]),
+        return keras.Sequential([
+            keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None]),
             gru,
             keras.layers.Dropout(0.5),
-            keras.layers.Dense(vocab_size)
+            keras.layers.Dense(self.vocab_size)
         ])
 
     def compile(self):
@@ -72,12 +77,12 @@ class Model():
 
         return loss.numpy()
 
-    def save(self, model_dir, parameters):
+    def save(self, model_dir):
         if Path.is_dir(model_dir) is not True:
             Path.mkdir(model_dir, parents=True)
 
         with model_dir.joinpath("parameters.json").open('w', encoding='utf-8') as params:
-            params.write(json.dumps(parameters))
+            params.write(json.dumps(self.parameters()))
 
         self.model.save_weights(str(Path(model_dir.joinpath("weights"))))
 
@@ -125,3 +130,12 @@ class Model():
     @staticmethod
     def path(ckpt_dir):
         return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
+
+    ## Return model settings as dict
+    def parameters(self):
+        return {
+            'embedding_dim': self.embedding_dim,
+            'units': self.units,
+            'batch_size': self.batch_size,
+            'cpu_mode': self.cpu_mode
+        }

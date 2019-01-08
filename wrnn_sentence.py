@@ -14,7 +14,7 @@ from rnn_sentence import load_settings, load_test_settings
 def init_generator(dataset, model_dir):
     embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, force_cpu=cpu_mode)
+    generator = Model(dataset.vocab_size, embedding_dim, units, 1, cpu_mode=cpu_mode)
     generator.load(model_dir)
 
     return generator
@@ -74,12 +74,12 @@ def main():
     ## Training
     if not args.model_dir:
         # Create the model
-        model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, force_cpu=cpu_mode)
+        model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
 
         model.compile()
         history = model.fit(model_dir, dataset.dataset, epochs)
         losses = history.history["loss"]
-        model.save(model_dir, parameters)
+        model.save(model_dir)
 
     generator = init_generator(dataset, model_dir)
     generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
