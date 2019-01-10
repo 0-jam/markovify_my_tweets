@@ -31,7 +31,6 @@
    1. [ルール](#ルール)
    1. [評価基準](#評価基準)
    1. [記録](#記録)
-1. [トラブルシューティング](#トラブルシューティング)
 
 ---
 
@@ -266,6 +265,9 @@ $ python json_extractor.py akimoto.json akimoto_lyrics.txt
 
 ### 青空文庫
 
+- すべての全角英数字，丸括弧（），全角スペース　，！，？などをそれぞれ半角に置換
+    - `unicodedata.normalize('NFKC', text)`
+
 #### 手動で削除
 
 - タイトル
@@ -351,11 +353,6 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ### 記録
 
 - ベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
-
-## トラブルシューティング
-
-`rnn_sentence.py`実行中に"W tensorflow/core/framework/allocator.cc:122] Allocation of xxx exceeds xx% of system memory."という警告が出てTensorFlowが止まった場合，
-`--no_point_saving`オプションを与えて再度実行してみる
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/
