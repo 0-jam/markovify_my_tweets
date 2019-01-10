@@ -44,6 +44,6 @@ if [ ! -d $outdir ]; then
 fi
 
 while read -r f; do
-  echo "wakachi.py $f ${outdir%/}/$(basename ${f%.*})_wakachi.txt -e ${engine}"
-  python wakachi.py $f ${outdir%/}/$(basename ${f%.*})_wakachi.txt -e ${engine}
+  echo "wakachi.py $f ${outdir%/}/$(basename ${f%.*}).txt -e ${engine}"
+  python wakachi.py $f ${outdir%/}/$(basename ${f%.*}).txt -e ${engine}
 done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")

@@ -4,8 +4,6 @@
 # Input / output file location
 indir="text/novel_orig"
 outdir="text/novel"
-# Postfix of the file name
-postfix="noruby"
 
 usage(){
   cat <<EOS
@@ -40,6 +38,6 @@ if [ ! -d $outdir ]; then
 fi
 
 while read -r f; do
-  echo "pp_aozora.py $f ${outdir%/}/$(basename ${f%.*})_${postfix}.txt"
-  python pp_aozora.py $f ${outdir}/$(basename ${f%.*})_${postfix}.txt
+  echo "pp_aozora.py $f ${outdir%/}/$(basename ${f%.*}).txt"
+  python pp_aozora.py $f ${outdir}/$(basename ${f%.*}).txt
 done < <(find ${indir} -maxdepth 1 -type f -name "*.txt")
