@@ -41,7 +41,6 @@ def main():
     parser.add_argument("-c", "--config", type=str, default='settings/default.json', help="Path to configuration file (default: './settings/default.json')")
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
-    parser.add_argument("--no_point_saving", action='store_true', help="Disable to save model every 5 epochs for saving memory (default: False)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of line that you want to generate (default: 1)")

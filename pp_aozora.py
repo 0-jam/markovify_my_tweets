@@ -1,6 +1,7 @@
 import argparse
 import re
 from pathlib import Path
+import unicodedata
 
 ## 引数sentenceを整形
 def replace_sentence(sentence):
@@ -9,7 +10,7 @@ def replace_sentence(sentence):
     # 不要な記号を半角スペースに置換
     sentence = re.sub("〔|〕", " ", sentence)
 
-    return sentence
+    return unicodedata.normalize('NFKC', sentence)
 
 def replace_text(text):
     text = re.sub(".*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))

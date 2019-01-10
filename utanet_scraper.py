@@ -103,7 +103,7 @@ def search_songs(query):
 
     lyrics = extract_lyrics(song_ids)
 
-    results= {}
+    results = {}
     for song_id, title, artist, lyricist, composer, lyric in zip(song_ids, titles, artists, lyricists, composers, lyrics):
         results[song_id]={
             'title': unicodedata.normalize('NFKC', title),
