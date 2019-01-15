@@ -19,7 +19,7 @@ class Model(object):
 
     def build_model(self):
         # Disable CUDA if GPU is not available
-        if not self.cpu_mode:
+        if self.cpu_mode:
             gru = keras.layers.GRU(
                 self.units,
                 return_sequences=True,
@@ -32,7 +32,6 @@ class Model(object):
                 self.units,
                 return_sequences=True,
                 stateful=True,
-                recurrent_activation='sigmoid',
                 recurrent_initializer='glorot_uniform'
             )
 

@@ -1,5 +1,4 @@
 import argparse
-import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
