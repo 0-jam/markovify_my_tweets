@@ -1,5 +1,4 @@
 import argparse
-import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
@@ -20,7 +19,7 @@ def init_generator(dataset, model_dir):
     return generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN (word-based)")
     ## Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
@@ -69,7 +68,7 @@ def main():
     elif args.model_dir:
         model_dir = Path(args.model_dir)
     else:
-        model_dir = Path("./learned_models").joinpath(filename + "_w2v")
+        model_dir = Path("./learned_models").joinpath(filename + "_wrnn")
 
     ## Training
     if not args.model_dir:

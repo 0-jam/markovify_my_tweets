@@ -1,5 +1,4 @@
 import argparse
-import time
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
@@ -28,7 +27,7 @@ def init_generator(dataset, model_dir):
     return generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN (character-based)")
     ## Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
@@ -43,7 +42,7 @@ def main():
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of line that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of character that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
@@ -52,7 +51,7 @@ def main():
         parameters = load_test_settings()
         epochs = 3
 
-        gen_size = 1
+        gen_size = 100
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
