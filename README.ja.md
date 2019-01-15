@@ -17,7 +17,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
+   1. [rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py](#rnn_sentencepy--wrnn_sentencepy--w2v_sentencepy)
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
@@ -69,7 +69,6 @@
 
 ## Todo
 
-- [ ] word2vecモデル
 - [ ] RNN版の訓練とテキスト生成を分離
     - ~~"生成だけする"オプションを追加するほうがいいかも~~
 - [ ] RNNテキスト生成いろいろ整理
@@ -78,8 +77,7 @@
         - アーティスト名
         - 複数条件対応
         - 抽出件数
-- [ ] ROCmインストール手順書いておこう
-- [ ] CUDAインストール手順書いておこう
+- [x] word2vecモデル
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
     - [x] [Juman++][jumanpp]
@@ -152,9 +150,11 @@ $ pip install markovify
 ## rnn_sentence.py, bm_rnn_sentence.py, wrnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
-$ pyenv install 3.6.7
+$ pyenv install 3.6.8
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib
+## w2v_sentence.py
+$ pip install gensim
 ```
 
 ## 使用法
@@ -193,7 +193,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py & wrnn_sentence.py
+### rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py
 
 ```bash
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
