@@ -10,29 +10,25 @@ import multiprocessing as mp
 import re
 
 # Word2vec model
-MAX_SENTENCE_LEN = 200
+MAX_SENTENCE_LEN = 500
 NUM_CPU = mp.cpu_count()
 class W2VModel(Model):
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
-        # Hyper parameters
-        self.units = units
-        self.batch_size = batch_size
-        self.cpu_mode = not tf.test.is_gpu_available() or cpu_mode
-
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
+        print("Generating word2vec model ...")
         self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
         self.w2vweights = self.w2vmodel.wv.syn0
-        self.vocab_size, self.embedding_dim = self.w2vweights.shape
+        vocab_size, embedding_dim = self.w2vweights.shape
+        print("Text has {} unique words".format(vocab_size))
 
         self._train_x, self._train_y = self.text2idxs(sentences)
 
-        self.model = self.build_model()
+        super().__init__(vocab_size, embedding_dim, units, batch_size, cpu_mode)
 
     def build_model(self):
         # Disable CUDA if GPU is not available
         if self.cpu_mode:
-            print("cpu mode")
             gru = keras.layers.GRU(
                 self.units,
                 recurrent_activation='sigmoid',
@@ -53,7 +49,7 @@ class W2VModel(Model):
 
     def fit(self, model_dir, epochs):
         checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=10, verbose=1)
+        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(self._train_x, self._train_y, batch_size=self.batch_size, epochs=epochs, callbacks=[checkpoint_callback, earlystop_callback])
@@ -61,25 +57,6 @@ class W2VModel(Model):
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
         return history
-
-    # Vectorize the text
-    def text2idxs(self, sentences):
-        train_x = np.zeros([len(sentences), MAX_SENTENCE_LEN], dtype=np.int32)
-        train_y = np.zeros([len(sentences)], dtype=np.int32)
-        for i, sentence in enumerate(sentences):
-            for t, word in enumerate(sentence[:-1]):
-                train_x[i, t] = self.vocab2idx(word)
-            train_y[i] = self.vocab2idx(sentence[-1])
-
-        print('train_x shape:', train_x.shape)
-        print('train_y shape:', train_y.shape)
-        return train_x, train_y
-
-    def vocab2idx(self, vocab):
-        return self.w2vmodel.wv.vocab[vocab].index
-
-    def idx2vocab(self, idx):
-        return self.w2vmodel.wv.index2word[idx]
 
     def generate_text(self, start_string, gen_size=1, temp=1.0):
         generated_text = [start_string]
@@ -118,3 +95,20 @@ class W2VModel(Model):
                 pbar.update()
 
         return "".join(generated_text) + "\n"
+
+    # Vectorize the text
+    def text2idxs(self, sentences):
+        train_x = np.zeros([len(sentences), MAX_SENTENCE_LEN], dtype=np.int32)
+        train_y = np.zeros([len(sentences)], dtype=np.int32)
+        for i, sentence in enumerate(sentences):
+            for t, word in enumerate(sentence[:-1]):
+                train_x[i, t] = self.vocab2idx(word)
+            train_y[i] = self.vocab2idx(sentence[-1])
+
+        return train_x, train_y
+
+    def vocab2idx(self, vocab):
+        return self.w2vmodel.wv.vocab[vocab].index
+
+    def idx2vocab(self, idx):
+        return self.w2vmodel.wv.index2word[idx]

@@ -69,6 +69,7 @@
 
 ## Todo
 
+- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
 - [ ] Separate RNN trainer and generator
     - ~~Adding "generation-only" option seems better...~~
 - [ ] Some cleanup tasks for RNN text generation
