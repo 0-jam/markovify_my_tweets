@@ -70,6 +70,7 @@
 ## Todo
 
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
+- [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
     - ~~Adding "generation-only" option seems better...~~
 - [ ] Some cleanup tasks for RNN text generation
@@ -322,8 +323,8 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
     1. 吾輩は猫である (Wagahai wa neko de aru)
 - Based on [Aozora Bunko](https://www.aozora.gr.jp/index_pages/person148.html)
     - Already preprocessed by [this](#aozora-bunko) method
-- Dataset is XZ-compressed
-    - Extract automatically when execute
+- Dataset is compressed to XZ
+    - Extract automatically when execute benchmarking
     - About 3.01MiB after decompressing
     - Compress: `$ xz -9 -e -T 0 souseki_utf8.txt`
     - Extract: `$ xz -d souseki_utf8.txt -k`

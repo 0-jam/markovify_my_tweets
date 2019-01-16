@@ -70,6 +70,7 @@
 ## Todo
 
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
+- [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離
     - ~~"生成だけする"オプションを追加するほうがいいかも~~
 - [ ] RNNテキスト生成いろいろ整理

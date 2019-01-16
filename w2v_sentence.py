@@ -12,7 +12,7 @@ from rnn_sentence import load_settings, load_test_settings
 def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
-    generator = W2VModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
+    generator = W2VModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode, w2vmodel=model_dir.joinpath("w2v.model"))
     generator.load(model_dir)
 
     return generator

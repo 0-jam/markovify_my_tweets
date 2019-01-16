@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
+from pathlib import Path
 import numpy as np
 import time
 from modules.model import Model
@@ -13,11 +14,16 @@ import re
 MAX_SENTENCE_LEN = 500
 NUM_CPU = mp.cpu_count()
 class W2VModel(Model):
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False, w2vmodel=None):
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
-        print("Generating word2vec model ...")
-        self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
+        if w2vmodel:
+            print("Loading word2vec model ...")
+            self.w2vmodel = Word2Vec.load(str(w2vmodel))
+        else:
+            print("Generating word2vec model ...")
+            self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
+
         self.w2vweights = self.w2vmodel.wv.syn0
         vocab_size, embedding_dim = self.w2vweights.shape
         print("Text has {} unique words".format(vocab_size))
@@ -57,6 +63,10 @@ class W2VModel(Model):
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
         return history
+
+    def save(self, model_dir):
+        super().save(model_dir)
+        self.w2vmodel.save(str(model_dir.joinpath("w2v.model")))
 
     def generate_text(self, start_string, gen_size=1, temp=1.0):
         generated_text = [start_string]
