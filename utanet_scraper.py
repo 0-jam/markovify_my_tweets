@@ -76,7 +76,6 @@ def extract_lyric(song_id):
     # 歌詞内の改行を半角スラッシュ/に置換して抽出
     lyric = body.find(id="kashi_area").get_text("/")
 
-    ## 表記ブレをなるべく減らすためにテキストを整形
     # すべての全角英数字，丸括弧（），全角スペース　，！，？などをそれぞれ半角に置換
     lyric = unicodedata.normalize('NFKC', lyric)
     # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換

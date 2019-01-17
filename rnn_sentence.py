@@ -3,7 +3,6 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.dataset import TextDataset
 from modules.plot_result import save_result, show_result
 import json
 
@@ -18,10 +17,10 @@ def load_test_settings():
 
 ## Evaluation methods
 # Load learned model
-def init_generator(dataset, model_dir):
+def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
 
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, cpu_mode=cpu_mode)
+    generator = Model(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
     generator.load(model_dir)
 
     return generator
@@ -67,9 +66,6 @@ def main():
     with input_path.open(encoding=encoding) as file:
         text = file.read()
 
-    ## Create the dataset from the text
-    dataset = TextDataset(text, batch_size)
-
     # Specify directory to save model
     if args.save_dir:
         model_dir = Path(args.save_dir)
@@ -81,15 +77,15 @@ def main():
     ## Training
     if not args.model_dir:
         # Create the model
-        model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
+        model = Model(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
         model.compile()
-        history = model.fit(model_dir, dataset.dataset, epochs)
+        history = model.fit(model_dir, epochs)
         losses = history.history["loss"]
         model.save(model_dir)
 
-    generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
+    generator = init_generator(model_dir, text)
+    generated_text = generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature)
 
     if args.output:
         print("Saving generated text...")

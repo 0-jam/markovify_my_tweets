@@ -2,6 +2,7 @@ import argparse
 import re
 from pathlib import Path
 import unicodedata
+from modules.multi_sub import replace_str
 
 ## 引数sentenceを整形
 def replace_sentence(sentence):
@@ -9,8 +10,16 @@ def replace_sentence(sentence):
     sentence = re.sub("《.+?》|［.+?］|｜|　", "", sentence.strip())
     # 不要な記号を半角スペースに置換
     sentence = re.sub("〔|〕", " ", sentence)
+    # unicode正規化
+    sentence = unicodedata.normalize('NFKC', sentence)
 
-    return unicodedata.normalize('NFKC', sentence)
+    # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
+    # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
+    # 2回以上続く三点リーダー……を1つ…にする
+    patterns = [(r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
+    sentence = replace_str(sentence, patterns)
+
+    return sentence
 
 def replace_text(text):
     text = re.sub(".*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))
