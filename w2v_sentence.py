@@ -2,32 +2,23 @@ import argparse
 from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
-from modules.model import Model
-from modules.dataset import TextDataset
+from modules.w2vmodel import W2VModel
 from modules.plot_result import save_result, show_result
 import json
-
-def load_settings(params_json="settings/default.json"):
-    with Path(params_json).open(encoding='utf-8') as params:
-        parameters = json.load(params)
-
-    return parameters
-
-def load_test_settings():
-    return load_settings("settings/test.json")
+from rnn_sentence import load_settings, load_test_settings
 
 ## Evaluation methods
 # Load learned model
-def init_generator(dataset, model_dir):
-    embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
+def init_generator(model_dir, text):
+    embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
-    generator = Model(dataset.vocab_size, embedding_dim, units, 1, cpu_mode=cpu_mode)
+    generator = W2VModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode, w2vmodel=model_dir.joinpath("w2v.model"))
     generator.load(model_dir)
 
     return generator
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN (character-based)")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN (word2vec-based)")
     ## Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
@@ -42,7 +33,7 @@ def main():
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     ## Arguments for generation
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of character that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of word that you want to generate (default: 100)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
@@ -51,7 +42,7 @@ def main():
         parameters = load_test_settings()
         epochs = 3
 
-        gen_size = 100
+        gen_size = 10
     else:
         parameters = load_settings(args.config)
         epochs = args.epochs
@@ -65,10 +56,7 @@ def main():
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:
-        text = file.read()
-
-    ## Create the dataset from the text
-    dataset = TextDataset(text, batch_size)
+        text = file.readlines()
 
     # Specify directory to save model
     if args.save_dir:
@@ -76,20 +64,20 @@ def main():
     elif args.model_dir:
         model_dir = Path(args.model_dir)
     else:
-        model_dir = Path("./learned_models").joinpath(filename)
+        model_dir = Path("./learned_models").joinpath(filename + "_w2v")
 
     ## Training
     if not args.model_dir:
         # Create the model
-        model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
-
+        model = W2VModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
         model.compile()
-        history = model.fit(model_dir, dataset.dataset, epochs)
+
+        history = model.fit(model_dir, epochs)
         losses = history.history["loss"]
         model.save(model_dir)
 
-    generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, args.start_string, gen_size=gen_size, temp=args.temperature)
+    generator = init_generator(model_dir, text)
+    generated_text = generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature)
 
     if args.output:
         print("Saving generated text...")

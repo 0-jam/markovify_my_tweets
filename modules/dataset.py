@@ -60,7 +60,7 @@ class WordDataset(TextDataset):
         words = text.split()
         # Recognize newline
         # words = [word for word in re.split("(\W)", text) if not (word == " " or word == "")]
-        super(WordDataset, self).__init__(words, batch_size)
+        super().__init__(words, batch_size)
 
     ## Convert word to numbers
     # Automatically convert string into words

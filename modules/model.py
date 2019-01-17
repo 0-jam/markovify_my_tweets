@@ -89,8 +89,8 @@ class Model(object):
         self.model.load_weights(self.path(Path(model_dir)))
 
     def generate_text(self, dataset, start_string, gen_size=1, temp=1.0, delimiter=None):
-        generated_text = []
-        # Vectorize start_string
+        generated_text = [start_string]
+        # Vectorize start string
         try:
             input_eval = tf.expand_dims(dataset.vocab_to_indices(start_string), 0)
             print("Start string:", start_string)
@@ -123,7 +123,7 @@ class Model(object):
                     count += 1
                     pbar.update()
 
-        return start_string + "".join(generated_text) + "\n"
+        return "".join(generated_text) + "\n"
 
     ## Return the path to <ckpt_dir>/checkpoint
     @staticmethod
