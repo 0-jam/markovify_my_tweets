@@ -4,13 +4,12 @@ from pathlib import Path
 import tensorflow as tf
 tf.enable_eager_execution()
 from modules.model import Model
-from modules.dataset import WordDataset
 import json
 from wrnn_sentence import init_generator
 
 def main():
     parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")
-    parser.add_argument("input", type=str, help="Path to the dataset file")
+    parser.add_argument("input", type=str, help="Path to the text file")
     parser.add_argument("start_string", type=str, help="Path to the start string file")
     parser.add_argument("model_dir", type=str, help="Path to the learned model directory")
     parser.add_argument("-o", "--output", type=str, help="Path to save the generated text (default: None (put into stdout))")
@@ -32,9 +31,7 @@ def main():
     with model_dir.joinpath("parameters.json").open(encoding='utf-8') as params:
         embedding_dim, units, batch_size, cpu_mode = json.load(params).values()
 
-    ## Create the dataset from the text
-    dataset = WordDataset(text, batch_size)
-    generator = init_generator(dataset, model_dir)
+    generator = init_generator(model_dir, text)
 
     with Path(args.start_string).open(encoding=encoding) as input:
         if args.output:
@@ -42,11 +39,11 @@ def main():
             with Path(args.output).open('a', encoding='utf-8') as out:
                 for line in input:
                     start_string = line.strip("\n")
-                    out.write(generator.generate_text(dataset, start_string, gen_size=gen_size, temp=args.temperature))
+                    out.write(generator.generate_text(start_string, gen_size=gen_size, temp=args.temperature))
         else:
             for line in input:
                 start_string = line.strip("\n")
-                print(generator.generate_text(dataset, start_string, gen_size, temp=args.temperature))
+                print(generator.generate_text(start_string, gen_size=gen_size, temp=args.temperature))
 
 if __name__ == '__main__':
     main()

@@ -5,18 +5,16 @@ import tensorflow as tf
 tf.enable_eager_execution()
 import lzma
 from modules.model import Model
-from modules.dataset import TextDataset
 from modules.plot_result import show_result, save_result
 from rnn_sentence import load_settings, load_test_settings, init_generator
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
-    parser.add_argument("-e", "--max_epochs", type=int, default=50, help="Max number of epochs (default: 50)")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
     parser.add_argument("-t", "--test_mode", action='store_true', help="Apply settings to train model in short-time for debugging, ignore -e option (default: false)")
     args = parser.parse_args()
 
-    ## Create the dataset from the XZ-compressed text
+    # Retrieve and decompress text
     path = tf.keras.utils.get_file("souseki.txt.xz", "https://drive.google.com/uc?export=download&id=1RnvBPi0GSg07-FhiuHpkwZahGwl4sMb5")
     with lzma.open(path) as file:
         text = file.read().decode()
@@ -34,16 +32,15 @@ def main():
 
         # Time limit (min)
         time_limit = 60
-        max_epochs = args.max_epochs
+        max_epochs = 50
 
         gen_size = 1000
 
     parameters["cpu_mode"] = args.cpu_mode
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
-    ## Create the dataset & the model
-    dataset = TextDataset(text, batch_size)
-    model = Model(dataset.vocab_size, embedding_dim, units, dataset.batch_size, cpu_mode=cpu_mode)
+    ## Create the model
+    model = Model(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
     epoch = 0
     elapsed_time = 0
@@ -55,7 +52,7 @@ def main():
         print("Epoch:", epoch)
         epoch_start = time.time()
 
-        loss = model.train(dataset.dataset)
+        loss = model.train()
         losses.append(loss)
 
         elapsed_time = time.time() - start
@@ -87,8 +84,8 @@ def main():
     model.save(model_dir)
 
     # Generate sentence from the model
-    generator = init_generator(dataset, model_dir)
-    generated_text = generator.generate_text(dataset, "吾輩は", gen_size)
+    generator = init_generator(model_dir, text)
+    generated_text = generator.generate_text("吾輩は", gen_size)
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))

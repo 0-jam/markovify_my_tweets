@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow import keras
-from pathlib import Path
 import numpy as np
 import time
 from modules.model import Model
@@ -25,12 +24,15 @@ class W2VModel(Model):
             self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
 
         self.w2vweights = self.w2vmodel.wv.syn0
-        vocab_size, embedding_dim = self.w2vweights.shape
-        print("Text has {} unique words".format(vocab_size))
+        self.vocab_size, self.embedding_dim = self.w2vweights.shape
+        print("Text has {} unique words".format(self.vocab_size))
 
         self._train_x, self._train_y = self.text2idxs(sentences)
 
-        super().__init__(vocab_size, embedding_dim, units, batch_size, cpu_mode)
+        self.units = units
+        self.batch_size = batch_size
+        self.cpu_mode = not tf.test.is_gpu_available() or cpu_mode
+        self.model = self.build_model()
 
     def build_model(self):
         # Disable CUDA if GPU is not available

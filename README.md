@@ -72,7 +72,6 @@
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
-    - ~~Adding "generation-only" option seems better...~~
 - [ ] Some cleanup tasks for RNN text generation
 - [ ] Add search options to Utanet scraper
     - Example:
