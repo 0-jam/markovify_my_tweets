@@ -56,8 +56,8 @@ class W2VModel(Model):
         ])
 
     def fit(self, model_dir, epochs):
-        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=4, verbose=1)
+        checkpoint_callback = keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
+        earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=4, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(self._train_x, self._train_y, batch_size=self.batch_size, epochs=epochs, callbacks=[checkpoint_callback, earlystop_callback])

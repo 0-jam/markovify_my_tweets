@@ -32,18 +32,14 @@ def main():
         embedding_dim, units, batch_size, cpu_mode = json.load(params).values()
 
     generator = init_generator(model_dir, text)
-
     with Path(args.start_string).open(encoding=encoding) as input:
-        if args.output:
-            print("Saving generated text...")
-            with Path(args.output).open('a', encoding='utf-8') as out:
-                for line in input:
-                    start_string = line.strip("\n")
-                    out.write(generator.generate_text(start_string, gen_size=gen_size, temp=args.temperature, delimiter="\n"))
-        else:
-            for line in input:
-                start_string = line.strip("\n")
-                print(generator.generate_text(start_string, gen_size=gen_size, temp=args.temperature, delimiter="\n"))
+        for line in input:
+            generated_text = "".join(generator.generate_text(line.strip("\n"), gen_size=gen_size, temp=args.temperature, delimiter="\n"))
+            if args.output:
+                with Path(args.output).open('a', encoding='utf-8') as out:
+                    out.write(generated_text)
+            else:
+                print(generated_text)
 
 if __name__ == '__main__':
     main()

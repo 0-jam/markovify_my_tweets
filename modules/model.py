@@ -9,6 +9,7 @@ from modules.wakachi.mecab import divide_word
 
 ## Character-based model
 class Model(object):
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=True)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         # Hyper parameters
         self.embedding_dim = embedding_dim
@@ -17,15 +18,15 @@ class Model(object):
         self.cpu_mode = not tf.test.is_gpu_available() or cpu_mode
 
         # Vectorize the text
-        vocab = sorted(set(text))
-        self.vocab_size = len(vocab)
-        print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size))
+        self.tokenizer.fit_on_texts(text)
+        self.vocab2idx = self.tokenizer.word_index
+        self.idx2vocab = dict([(i, v) for v, i in self.vocab2idx.items()])
+        # Index 0 is preserved in the Keras tokenizer
+        self.vocab_size = len(self.vocab2idx) + 1
+        print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size - 1))
 
         # Creating a mapping from unique characters to indices
-        # This list doesn't have character that is not contained in the text
-        self.vocab2idx = {char:index for index, char in enumerate(vocab)}
-        self.idx2vocab = np.array(vocab)
-        text_as_int = np.array(self.vocab_to_indices(text))
+        text_as_int = self.vocab_to_indices(text)
 
         # The maximum length sentence we want for single input in characters
         seq_length = 100
@@ -65,8 +66,8 @@ class Model(object):
         self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
 
     def fit(self, model_dir, epochs):
-        checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
+        checkpoint_callback = keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
+        earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
@@ -142,7 +143,7 @@ class Model(object):
                     count += 1
                     pbar.update()
 
-        return "".join(generated_text) + "\n"
+        return generated_text
 
     ## Return the path to <ckpt_dir>/checkpoint
     @staticmethod
@@ -168,21 +169,20 @@ class Model(object):
 
     ## Convert string to numbers
     def vocab_to_indices(self, sentence):
-        return [self.vocab2idx[vocab] for vocab in sentence]
+        return np.array(self.tokenizer.texts_to_sequences(sentence.lower())).reshape(-1,)
 
 ## Word-based model
 # Convert text into one-hot vector
 class WordModel(Model):
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=False)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         words = text.split()
-        # Recognize newline
-        # words = [word for word in re.split("(\W)", text) if not (word == " " or word == "")]
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)
 
     ## Convert word to numbers
     # Automatically convert string into words
-    def vocab_to_indices(self, words):
-        if type(words) == str:
-            words = divide_word(words)
+    def vocab_to_indices(self, sentence):
+        if type(sentence) == str:
+            sentence = divide_word(sentence.lower())
 
-        return [self.vocab2idx[word] for word in words]
+        return np.array(self.tokenizer.texts_to_sequences(sentence)).reshape(-1,)
