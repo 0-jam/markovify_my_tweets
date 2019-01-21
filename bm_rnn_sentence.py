@@ -5,7 +5,7 @@ import tensorflow as tf
 tf.enable_eager_execution()
 import lzma
 from modules.model import Model
-from modules.plot_result import show_result, save_result
+from modules.plot_result import save_result
 from rnn_sentence import load_settings, load_test_settings, init_generator
 
 def main():
@@ -85,7 +85,7 @@ def main():
 
     # Generate sentence from the model
     generator = init_generator(model_dir, text)
-    generated_text = generator.generate_text("吾輩は", gen_size)
+    generated_text = "".join(generator.generate_text("吾輩は", gen_size))
 
     # Show results
     print("Learned {} epochs in {:.3f} minutes ({:.3f} epochs / minute)".format(epoch, elapsed_time, epoch / elapsed_time))
