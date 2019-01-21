@@ -56,9 +56,8 @@
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
     - GPU: AMD Radeon RX 580
-        - 2304 cores (64 CUs), 8GB VRAM
-        - [ROCm](https://github.com/RadeonOpenCompute/ROCm)が必要
-        - [公式Dockerイメージ](https://hub.docker.com/r/rocm/tensorflow/)で動作確認済み
+    - OS: Ubuntu 18.04.1
+        - [ROCm](https://github.com/RadeonOpenCompute/ROCm) < 2.0
 - PC 3
     - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
     - RAM: 16GB
@@ -69,6 +68,7 @@
 
 ## Todo
 
+- [ ] ROCm 2.0
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
 - [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離

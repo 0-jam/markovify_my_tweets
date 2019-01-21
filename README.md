@@ -56,9 +56,8 @@
     - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
     - RAM: 16GB
     - GPU: AMD Radeon RX 580
-        - 2304 cores (64 CUs), 8GB VRAM
-        - It requires [ROCm](https://github.com/RadeonOpenCompute/ROCm)
-        - Script executed successfully by using [official Docker image](https://hub.docker.com/r/rocm/tensorflow/)
+    - OS: Ubuntu 18.04.1
+        - [ROCm](https://github.com/RadeonOpenCompute/ROCm) < 2.0
 - PC 3
     - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
     - RAM: 16GB
@@ -69,6 +68,7 @@
 
 ## Todo
 
+- [ ] ROCm 2.0
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator

@@ -77,7 +77,7 @@ def main():
         model.save(model_dir)
 
     generator = init_generator(model_dir, text)
-    generated_text = generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature)
+    generated_text = " ".join(generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
 
     if args.output:
         print("Saving generated text...")
