@@ -9,12 +9,22 @@ import unicodedata
 
 scraper = BeautifulScraper()
 domain = "https://www.uta-net.com"
+attributes = {
+    # 歌手名
+    'artist': "1",
+    # 曲名
+    'title': "2",
+    # 作詞者名
+    'lyricist': "3",
+    # 作曲者名
+    'composer': "8",
+}
 
-## queryで作詞家を検索
-def search(query):
+## queryで指定したattribute（デフォルト：lyricist（作詞者））を検索
+def search(query, attribute='lyricist'):
     # 検索URLを生成
     # クエリが日本語だと正しく処理されないのでエンコード
-    search_url = domain + "/search/?Aselect=3&Keyword=" + urllib.parse.quote(query) + "&Bselect=4&sort="
+    search_url = domain + "/search/?Aselect=" + attributes[attribute] + "&Keyword=" + urllib.parse.quote(query) + "&Bselect=4&sort="
 
     bodies = [scraper.go(search_url)]
 
@@ -97,8 +107,8 @@ def extract_lyrics(song_ids):
 
 ## queryで作詞家を検索して情報を抽出
 # 戻り値はdict
-def search_songs(query):
-    (song_ids, titles, artists, lyricists, composers) = search(query)
+def search_songs(query, attribute='lyricist'):
+    (song_ids, titles, artists, lyricists, composers) = search(query, attribute=attribute)
 
     lyrics = extract_lyrics(song_ids)
 
@@ -118,11 +128,12 @@ def main():
     parser = argparse.ArgumentParser(description="引数に指定した名前で作詞家を検索して曲情報を抽出")
     parser.add_argument("query", type=str, help="検索したい名前")
     parser.add_argument("-o", "--output", type=str, default="songs.json", help="出力ファイル名（デフォルト：'./songs.json'）")
+    parser.add_argument("-a", "--attribute", type=str, default="lyricist", choices=['title', 'artist', 'lyricist', 'composer'], help="検索したい属性（デフォルト：'lyricist'（作詞者））")
     args = parser.parse_args()
 
-    results = search_songs(args.query)
+    results = search_songs(args.query, attribute=args.attribute)
 
-    with open(args.output, "w", encoding='utf-8') as out:
+    with open(args.output, 'w', encoding='utf-8') as out:
         # json.dumps(results, out)だと最後の波括弧が閉じられない
         out.write(json.dumps(results, ensure_ascii=False, indent=4))
 

@@ -73,11 +73,8 @@
 - [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離
 - [ ] RNNテキスト生成いろいろ整理
-- [ ] 歌ネットスクレイパーの検索条件
-    - 例：
-        - アーティスト名
-        - 複数条件対応
-        - 抽出件数
+- [x] 歌ネットスクレイパーの検索条件
+    - 検索時に属性を指定するオプションを追加した
 - [x] word2vecモデル
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
@@ -224,7 +221,7 @@ $ python bm_rnn_sentence.py
 
 ### utanet_scraper.py
 
-- [歌ネット](https://www.uta-net.com/)で作詞家を検索して曲情報を抽出
+- [歌ネット](https://www.uta-net.com/)を検索して曲情報を抽出
 - 抽出結果はJSONで保存される
     - key: song_id（抽出元のURL）
     - values:
@@ -233,10 +230,16 @@ $ python bm_rnn_sentence.py
         - lyricist（作詞者名）
         - composer（作曲者名）
         - lyric（歌詞）
+- 検索できる属性
+    - 'title'（曲名）
+    - 'artist'（歌手名）
+    - 'lyricist'（作詞者名）
+    - 'composer'（作曲者名）
 
 ```bash
-# 抽出されたテキストはデフォルトで"songs.json"に保存される
+# 抽出されたテキストはデフォルトで"songs.json"に保存される（-oオプションで指定できる）
 $ python utanet_scraper.py "秋元康"
+$ python utanet_scraper.py "AKB48" -a 'artist'
 ```
 
 ### json_extractor.py

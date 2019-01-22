@@ -73,11 +73,8 @@
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
-- [ ] Add search options to Utanet scraper
-    - Example:
-        - Artist name
-        - Enable multiple search options
-        - Number of songs to extract
+- [x] Add search options to Utanet scraper
+    - Added option to set attribute to search
 - [x] Try word2vec
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
@@ -224,7 +221,7 @@ $ python bm_rnn_sentence.py
 
 ### utanet_scraper.py
 
-- Do scraping and extract song informations by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
+- Do scraping and extract song informations from [Utanet（歌ネット）](https://www.uta-net.com/)
 - Song information is saved as JSON
     - key: song_id from original URL
     - values:
@@ -233,10 +230,16 @@ $ python bm_rnn_sentence.py
         - lyricist
         - composer
         - lyric
+- Available attributes to search
+    - 'title'
+    - 'artist'
+    - 'lyricist'
+    - 'composer'
 
 ```bash
-# Extracted song information is saved as "songs.json" by default
+# Extracted song information is saved as "songs.json" by default (It can be specified with -o option)
 $ python utanet_scraper.py "秋元康"
+$ python utanet_scraper.py "AKB48" -a 'artist'
 ```
 
 ### json_extractor.py
