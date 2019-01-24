@@ -21,6 +21,8 @@
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
+   1. [cat_json.py](#cat_jsonpy)
+   1. [classify_lyric.py](#classify_lyricpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
    1. [青空文庫](#青空文庫)
       1. [手動で削除](#手動で削除)
@@ -259,6 +261,25 @@ $ python utanet_scraper.py "AKB48" -a 'artist'
 ```bash
 # デフォルトの属性：lyrics
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
+```
+
+### cat_json.py
+
+- 指定したディレクトリ内のJSONファイルを結合する
+
+```bash
+# 入力はディレクトリ名、出力はファイル名
+$ python cat_json.py text/lyrics_json lyrics_all.json
+```
+
+### classify_lyric.py
+
+- 生成されたテキストをアーティスト名や作詞者名で分類
+- [doc2vec](https://radimrehurek.com/gensim/models/doc2vec.html)を使用
+
+```bash
+# --d2vmodel オプションを指定すると訓練済みのdoc2vecモデルを使える
+$ python classify_lyric.py text/lyrics_all.json generated_texts/aki_kosoado_512.txt
 ```
 
 ## 前処理 (markovify_sentence.py)

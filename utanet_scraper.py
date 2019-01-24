@@ -20,7 +20,6 @@ attributes = {
     'composer': "8",
 }
 
-## queryで指定したattribute（デフォルト：lyricist（作詞者））を検索
 def search(query, attribute='lyricist'):
     # 検索URLを生成
     # クエリが日本語だと正しく処理されないのでエンコード
@@ -112,15 +111,15 @@ def search_songs(query, attribute='lyricist'):
 
     lyrics = extract_lyrics(song_ids)
 
-    results = {}
-    for song_id, title, artist, lyricist, composer, lyric in zip(song_ids, titles, artists, lyricists, composers, lyrics):
-        results[song_id]={
+    results = {
+        song_id: {
             'title': unicodedata.normalize('NFKC', title),
             'artist': artist,
             'lyricist': lyricist,
             'composer': composer,
             'lyric': lyric
-        }
+        } for song_id, title, artist, lyricist, composer, lyric in zip(song_ids, titles, artists, lyricists, composers, lyrics)
+    }
 
     return results
 

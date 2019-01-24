@@ -21,6 +21,8 @@
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
+   1. [cat_json.py](#cat_jsonpy)
+   1. [classify_lyric.py](#classify_lyricpy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
    1. [Aozora Bunko](#aozora-bunko)
       1. [Remove manually](#remove-manually)
@@ -259,6 +261,25 @@ $ python utanet_scraper.py "AKB48" -a 'artist'
 ```bash
 # Default attribute: lyrics
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
+```
+
+### cat_json.py
+
+- Combine multiple JSON files in the specified directory
+
+```bash
+# Input as the directory, output as the file name
+$ python cat_json.py text/lyrics_json lyrics_all.json
+```
+
+### classify_lyric.py
+
+- Classify generated lyrics by artist or lyricist
+- Using [doc2vec](https://radimrehurek.com/gensim/models/doc2vec.html)
+
+```bash
+# Specify --d2vmodel option to use pretrained doc2vec model
+$ python classify_lyric.py text/lyrics_all.json generated_texts/aki_kosoado_512.txt
 ```
 
 ## Preprocessing (markovify_sentence.py)
