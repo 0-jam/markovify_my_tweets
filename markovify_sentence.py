@@ -4,6 +4,7 @@ import time
 import multiprocessing as mp
 from pathlib import Path
 import sys
+from modules.combine_sentence import combine_sentence
 
 ## Generate text from the model
 def generate(queue, model, count):
@@ -12,7 +13,7 @@ def generate(queue, model, count):
         count.value += 1
 
         if text is not None:
-            queue.put(text)
+            queue.put(combine_sentence(text.split()))
             break
 
 ## Wrapper method of generate()
