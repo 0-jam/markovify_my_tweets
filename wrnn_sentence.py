@@ -1,11 +1,10 @@
 import argparse
 from pathlib import Path
-import tensorflow as tf
-tf.enable_eager_execution()
 from modules.model import WordModel
 from modules.plot_result import save_result, show_result
 import json
 from rnn_sentence import load_settings, load_test_settings
+from modules.combine_sentence import combine_sentence
 
 ## Evaluation methods
 # Load learned model
@@ -77,7 +76,7 @@ def main():
         model.save(model_dir)
 
     generator = init_generator(model_dir, text)
-    generated_text = " ".join(generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
+    generated_text = combine_sentence(generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
 
     if args.output:
         print("Saving generated text...")

@@ -1,7 +1,5 @@
 import argparse
 from pathlib import Path
-import tensorflow as tf
-tf.enable_eager_execution()
 from modules.model import Model
 from modules.plot_result import save_result, show_result
 import json

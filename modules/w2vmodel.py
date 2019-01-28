@@ -98,15 +98,12 @@ class W2VModel(Model):
                 # Pass the predicted word as the next input to the model along with the previous hidden state
                 input_eval = tf.expand_dims([predicted_id], 0)
 
-                char = self.idx2vocab(predicted_id)
-                if re.search("[A-Za-z0-9]$", char):
-                    char += " "
-                generated_text.append(char)
+                generated_text.append(self.idx2vocab(predicted_id))
 
                 count += 1
                 pbar.update()
 
-        return "".join(generated_text) + "\n"
+        return generated_text
 
     # Vectorize the text
     def text2idxs(self, sentences):

@@ -21,6 +21,8 @@
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
+   1. [cat_json.py](#cat_jsonpy)
+   1. [classify_lyric.py](#classify_lyricpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
    1. [青空文庫](#青空文庫)
       1. [手動で削除](#手動で削除)
@@ -73,11 +75,8 @@
 - [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離
 - [ ] RNNテキスト生成いろいろ整理
-- [ ] 歌ネットスクレイパーの検索条件
-    - 例：
-        - アーティスト名
-        - 複数条件対応
-        - 抽出件数
+- [x] 歌ネットスクレイパーの検索条件
+    - 検索時に属性を指定するオプションを追加した
 - [x] word2vecモデル
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
@@ -224,7 +223,7 @@ $ python bm_rnn_sentence.py
 
 ### utanet_scraper.py
 
-- [歌ネット](https://www.uta-net.com/)で作詞家を検索して曲情報を抽出
+- [歌ネット](https://www.uta-net.com/)を検索して曲情報を抽出
 - 抽出結果はJSONで保存される
     - key: song_id（抽出元のURL）
     - values:
@@ -233,10 +232,16 @@ $ python bm_rnn_sentence.py
         - lyricist（作詞者名）
         - composer（作曲者名）
         - lyric（歌詞）
+- 検索できる属性
+    - 'title'（曲名）
+    - 'artist'（歌手名）
+    - 'lyricist'（作詞者名）
+    - 'composer'（作曲者名）
 
 ```bash
-# 抽出されたテキストはデフォルトで"songs.json"に保存される
+# 抽出されたテキストはデフォルトで"songs.json"に保存される（-oオプションで指定できる）
 $ python utanet_scraper.py "秋元康"
+$ python utanet_scraper.py "AKB48" -a 'artist'
 ```
 
 ### json_extractor.py
@@ -256,6 +261,25 @@ $ python utanet_scraper.py "秋元康"
 ```bash
 # デフォルトの属性：lyrics
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
+```
+
+### cat_json.py
+
+- 指定したディレクトリ内のJSONファイルを結合する
+
+```bash
+# 入力はディレクトリ名、出力はファイル名
+$ python cat_json.py text/lyrics_json lyrics_all.json
+```
+
+### classify_lyric.py
+
+- 生成されたテキストをアーティスト名や作詞者名で分類
+- [doc2vec](https://radimrehurek.com/gensim/models/doc2vec.html)を使用
+
+```bash
+# --d2vmodel オプションを指定すると訓練済みのdoc2vecモデルを使える
+$ python classify_lyric.py text/lyrics_all.json generated_texts/aki_kosoado_512.txt
 ```
 
 ## 前処理 (markovify_sentence.py)

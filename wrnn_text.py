@@ -1,11 +1,10 @@
 import argparse
 import time
 from pathlib import Path
-import tensorflow as tf
-tf.enable_eager_execution()
 from modules.model import WordModel
 import json
 from wrnn_sentence import init_generator
+from modules.combine_sentence import combine_sentence
 
 def main():
     parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")
@@ -34,7 +33,7 @@ def main():
     generator = init_generator(model_dir, text)
     with Path(args.start_string).open(encoding=encoding) as input:
         for line in input:
-            generated_text = " ".join(generator.generate_text(line.strip("\n"), gen_size=gen_size, temp=args.temperature))
+            generated_text = combine_sentence(generator.generate_text(line.strip("\n"), gen_size=gen_size, temp=args.temperature))
             if args.output:
                 with Path(args.output).open('a', encoding='utf-8') as out:
                     out.write(generated_text + "\n")

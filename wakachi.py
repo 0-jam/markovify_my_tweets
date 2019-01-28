@@ -2,6 +2,7 @@ import argparse
 from pathlib import Path
 from tqdm import tqdm
 import unicodedata
+from modules.multi_sub import replace_str
 
 ## Divide text by word using specified engine
 def main():
@@ -24,8 +25,10 @@ def main():
     input_path = Path(args.input)
     with input_path.open(encoding=args.encoding) as input, Path(args.output).open('w', encoding='utf-8') as out:
         with tqdm(total=input_path.stat().st_size, unit="kb", unit_scale=0.001, smoothing=1) as pbar:
+            patterns = [(r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
             for line in input:
                 line = unicodedata.normalize('NFKC', line.strip())
+                line = replace_str(line, patterns)
 
                 if not (line or args.allow_empty):
                     continue

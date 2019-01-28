@@ -21,6 +21,8 @@
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
+   1. [cat_json.py](#cat_jsonpy)
+   1. [classify_lyric.py](#classify_lyricpy)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
    1. [Aozora Bunko](#aozora-bunko)
       1. [Remove manually](#remove-manually)
@@ -73,11 +75,8 @@
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
-- [ ] Add search options to Utanet scraper
-    - Example:
-        - Artist name
-        - Enable multiple search options
-        - Number of songs to extract
+- [x] Add search options to Utanet scraper
+    - Added option to set attribute to search
 - [x] Try word2vec
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
@@ -224,7 +223,7 @@ $ python bm_rnn_sentence.py
 
 ### utanet_scraper.py
 
-- Do scraping and extract song informations by the lyricist name from [Utanet（歌ネット）](https://www.uta-net.com/)
+- Do scraping and extract song informations from [Utanet（歌ネット）](https://www.uta-net.com/)
 - Song information is saved as JSON
     - key: song_id from original URL
     - values:
@@ -233,10 +232,16 @@ $ python bm_rnn_sentence.py
         - lyricist
         - composer
         - lyric
+- Available attributes to search
+    - 'title'
+    - 'artist'
+    - 'lyricist'
+    - 'composer'
 
 ```bash
-# Extracted song information is saved as "songs.json" by default
+# Extracted song information is saved as "songs.json" by default (It can be specified with -o option)
 $ python utanet_scraper.py "秋元康"
+$ python utanet_scraper.py "AKB48" -a 'artist'
 ```
 
 ### json_extractor.py
@@ -256,6 +261,25 @@ $ python utanet_scraper.py "秋元康"
 ```bash
 # Default attribute: lyrics
 $ python json_extractor.py akimoto.json akimoto_lyrics.txt
+```
+
+### cat_json.py
+
+- Combine multiple JSON files in the specified directory
+
+```bash
+# Input as the directory, output as the file name
+$ python cat_json.py text/lyrics_json lyrics_all.json
+```
+
+### classify_lyric.py
+
+- Classify generated lyrics by artist or lyricist
+- Using [doc2vec](https://radimrehurek.com/gensim/models/doc2vec.html)
+
+```bash
+# Specify --d2vmodel option to use pretrained doc2vec model
+$ python classify_lyric.py text/lyrics_all.json generated_texts/aki_kosoado_512.txt
 ```
 
 ## Preprocessing (markovify_sentence.py)
