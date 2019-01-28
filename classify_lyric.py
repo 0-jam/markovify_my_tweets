@@ -18,6 +18,7 @@ def main():
     args = parser.parse_args()
 
     if args.d2vmodel:
+        print("Loading doc2vec model...")
         d2vmodel = Doc2Vec.load(args.d2vmodel)
     else:
         input_path = Path(args.input)
@@ -28,6 +29,7 @@ def main():
         data_attr = "lyric"
         label_attrs = ["artist", "lyricist"]
 
+        print("Generating doc2vec model...")
         docs = [TaggedDocument(divide_word(data[data_attr]), tags=[data[attr] for attr in label_attrs]) for data in dataset]
         d2vmodel = Doc2Vec(docs, vector_size=256, window=5, min_count=1, epochs=D2V_EPOCHS, workers=NUM_CPU)
         d2vmodel.save(input_path.stem + ".model")

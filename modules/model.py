@@ -1,4 +1,5 @@
 import tensorflow as tf
+tf.enable_eager_execution()
 from tensorflow import keras
 from pathlib import Path
 import json
@@ -174,7 +175,7 @@ class Model(object):
 ## Word-based model
 # Convert text into one-hot vector
 class WordModel(Model):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=False)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=False, num_words=20000)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         words = text.split()
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)

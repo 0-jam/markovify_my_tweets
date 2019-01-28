@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 def main():
-    parser = argparse.ArgumentParser(description="Combine JSON in the specific directory")
+    parser = argparse.ArgumentParser(description="Combine JSON in the specified directory")
     parser.add_argument("input", type=str, help="Input directory")
     parser.add_argument("output", type=str, help="Output file name")
     args = parser.parse_args()

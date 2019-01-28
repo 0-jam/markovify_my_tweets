@@ -1,8 +1,6 @@
 import argparse
 import time
 from pathlib import Path
-import tensorflow as tf
-tf.enable_eager_execution()
 from modules.model import WordModel
 import json
 from wrnn_sentence import init_generator

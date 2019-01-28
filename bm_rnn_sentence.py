@@ -1,12 +1,11 @@
 import argparse
 import time
 from pathlib import Path
-import tensorflow as tf
-tf.enable_eager_execution()
 import lzma
 from modules.model import Model
 from modules.plot_result import save_result
 from rnn_sentence import load_settings, load_test_settings, init_generator
+from tensorflow import keras
 
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
@@ -15,7 +14,7 @@ def main():
     args = parser.parse_args()
 
     # Retrieve and decompress text
-    path = tf.keras.utils.get_file("souseki.txt.xz", "https://drive.google.com/uc?export=download&id=1RnvBPi0GSg07-FhiuHpkwZahGwl4sMb5")
+    path = keras.utils.get_file("souseki.txt.xz", "https://drive.google.com/uc?export=download&id=1RnvBPi0GSg07-FhiuHpkwZahGwl4sMb5")
     with lzma.open(path) as file:
         text = file.read().decode()
 
