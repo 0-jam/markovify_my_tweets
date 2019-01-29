@@ -9,7 +9,7 @@ import numpy as np
 from modules.wakachi.mecab import divide_word
 
 ## Character-based model
-class Model(object):
+class TextModel(object):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=True)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         # Hyper parameters
@@ -174,7 +174,7 @@ class Model(object):
 
 ## Word-based model
 # Convert text into one-hot vector
-class WordModel(Model):
+class WordModel(TextModel):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=False, num_words=20000)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         words = text.split()

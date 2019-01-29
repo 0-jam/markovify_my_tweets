@@ -2,7 +2,7 @@ import argparse
 import time
 from pathlib import Path
 import lzma
-from modules.model import Model
+from modules.model import TextModel
 from modules.plot_result import save_result
 from rnn_sentence import load_settings, load_test_settings, init_generator
 from tensorflow import keras
@@ -39,7 +39,7 @@ def main():
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
     ## Create the model
-    model = Model(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
+    model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
     epoch = 0
     elapsed_time = 0

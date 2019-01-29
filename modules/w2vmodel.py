@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import time
-from modules.model import Model
+from modules.model import TextModel
 from gensim.models import Word2Vec
 from modules.wakachi.mecab import divide_word
 from tqdm import tqdm
@@ -12,7 +12,7 @@ import re
 # Word2vec model
 MAX_SENTENCE_LEN = 500
 NUM_CPU = mp.cpu_count()
-class W2VModel(Model):
+class W2VModel(TextModel):
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False, w2vmodel=None):
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
