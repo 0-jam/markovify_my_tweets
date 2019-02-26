@@ -1,5 +1,7 @@
 import tensorflow as tf
-tf.enable_eager_execution()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.enable_eager_execution(config=config)
 from tensorflow import keras
 from pathlib import Path
 import json
@@ -7,10 +9,11 @@ from tqdm import tqdm
 import time
 import numpy as np
 from modules.wakachi.mecab import divide_word
+import functools
 
 ## Character-based model
 class TextModel(object):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=True)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=True)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         # Hyper parameters
         self.embedding_dim = embedding_dim
@@ -21,8 +24,9 @@ class TextModel(object):
         # Vectorize the text
         self.tokenizer.fit_on_texts(text)
         self.vocab2idx = self.tokenizer.word_index
+        # Index 0 is preserved in the Keras tokenizer for the unknown word, but it's not included in vocab2idx
         self.idx2vocab = dict([(i, v) for v, i in self.vocab2idx.items()])
-        # Index 0 is preserved in the Keras tokenizer
+        self.idx2vocab[0] = '<oov>'
         self.vocab_size = len(self.vocab2idx) + 1
         print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size - 1))
 
@@ -41,30 +45,31 @@ class TextModel(object):
     def build_model(self):
         # Disable CUDA if GPU is not available
         if self.cpu_mode:
-            gru = keras.layers.GRU(
-                self.units,
-                return_sequences=True,
-                stateful=True,
+            gru = functools.partial(
+                keras.layers.GRU,
                 recurrent_activation='sigmoid',
-                recurrent_initializer='glorot_uniform'
             )
         else:
-            gru = keras.layers.CuDNNGRU(
-                self.units,
-                return_sequences=True,
-                stateful=True,
-                recurrent_initializer='glorot_uniform'
-            )
+            gru = keras.layers.CuDNNGRU
 
         return keras.Sequential([
             keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None]),
-            gru,
+            gru(
+                self.units,
+                return_sequences=True,
+                stateful=True,
+                recurrent_initializer='glorot_uniform'
+            ),
             keras.layers.Dropout(0.5),
             keras.layers.Dense(self.vocab_size)
         ])
 
+    @staticmethod
+    def loss(labels, logits):
+        return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
+
     def compile(self):
-        self.model.compile(optimizer = tf.train.AdamOptimizer(), loss = tf.losses.sparse_softmax_cross_entropy)
+        self.model.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
 
     def fit(self, model_dir, epochs):
         checkpoint_callback = keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
@@ -78,10 +83,11 @@ class TextModel(object):
         return history
 
     ## Train model from the dataset
-    def train(self):
+    def train(self, model_dir, epochs=1):
         optimizer = tf.train.AdamOptimizer()
         loss_f = tf.losses.sparse_softmax_cross_entropy
 
+        start = time.time()
         for (batch, (input, target)) in enumerate(self.dataset):
             with tf.GradientTape() as tape:
                 # feeding the hidden state back into the model
@@ -95,16 +101,22 @@ class TextModel(object):
 
             print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
 
+        elapsed_time = time.time() - start
+        print("Time taken for this epoch: {:.3f} sec, Loss: {:.3f}".format(
+            elapsed_time,
+            loss
+        ))
+
         return loss.numpy()
 
     def save(self, model_dir):
         if Path.is_dir(model_dir) is not True:
             Path.mkdir(model_dir, parents=True)
 
-        with model_dir.joinpath("parameters.json").open('w', encoding='utf-8') as params:
+        with model_dir.joinpath('parameters.json').open('w', encoding='utf-8') as params:
             params.write(json.dumps(self.parameters()))
 
-        self.model.save_weights(str(Path(model_dir.joinpath("weights"))))
+        self.model.save_weights(str(Path(model_dir.joinpath('weights'))))
 
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))
@@ -114,17 +126,17 @@ class TextModel(object):
         # Vectorize start string
         try:
             input_eval = tf.expand_dims(self.vocab_to_indices(start_string), 0)
-            print("Start string:", start_string)
+            print('Start string:', start_string)
         except KeyError:
-            print("Unknown word included")
-            return ""
+            print('Unknown word included')
+            return ''
 
         # Randomness of text generation
         temperature = temp
 
         count = 0
         self.model.reset_states()
-        with tqdm(desc="Generating...", total=gen_size) as pbar:
+        with tqdm(desc='Generating...', total=gen_size) as pbar:
             while count < gen_size:
                 predictions = self.model(input_eval)
                 # remove the batch dimension
@@ -137,7 +149,11 @@ class TextModel(object):
                 # Pass the predicted word as the next input to the model along with the previous hidden state
                 input_eval = tf.expand_dims([predicted_id], 0)
 
-                char = self.idx2vocab[predicted_id]
+                try:
+                    char = self.idx2vocab[predicted_id]
+                except KeyError:
+                    # Mark as unknown word if predicted ID is out of bounds
+                    char = '<oob>'
                 generated_text.append(char)
 
                 if char == delimiter or not delimiter:
@@ -175,7 +191,7 @@ class TextModel(object):
 ## Word-based model
 # Convert text into one-hot vector
 class WordModel(TextModel):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<>', char_level=False, num_words=20000)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=False, num_words=20000)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         words = text.split()
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)
@@ -186,4 +202,4 @@ class WordModel(TextModel):
         if type(sentence) == str:
             sentence = divide_word(sentence.lower())
 
-        return np.array(self.tokenizer.texts_to_sequences(sentence)).reshape(-1,)
+        return np.array(self.tokenizer.texts_to_sequences([sentence])).reshape(-1,)

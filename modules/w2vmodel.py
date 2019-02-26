@@ -17,10 +17,10 @@ class W2VModel(TextModel):
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
         if w2vmodel:
-            print("Loading word2vec model ...")
+            print('Loading word2vec model ...')
             self.w2vmodel = Word2Vec.load(str(w2vmodel))
         else:
-            print("Generating word2vec model ...")
+            print('Generating word2vec model ...')
             self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
 
         self.w2vweights = self.w2vmodel.wv.syn0
@@ -75,17 +75,17 @@ class W2VModel(TextModel):
         # Vectorize start_string
         try:
             input_eval = tf.expand_dims([self.vocab2idx(word) for word in divide_word(start_string)], 0)
-            print("Start string:", start_string)
+            print('Start string:', start_string)
         except KeyError:
-            print("Unknown word included")
-            return ""
+            print('Unknown word included')
+            return ''
 
         # Randomness of text generation
         temperature = temp
 
         count = 0
         self.model.reset_states()
-        with tqdm(desc="Generating...", total=gen_size) as pbar:
+        with tqdm(desc='Generating...', total=gen_size) as pbar:
             while count < gen_size:
                 predictions = self.model(input_eval)
                 # remove the batch dimension

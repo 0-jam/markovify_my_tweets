@@ -70,6 +70,7 @@
 
 ## Todo
 
+- [ ] Move benchmarking to another repository
 - [ ] TensorFlow 1.13 + CUDA 10
 - [ ] ROCm 2.1
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
