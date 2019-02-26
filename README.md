@@ -45,8 +45,8 @@
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
-    - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
-- TensorFlow >= 1.11.0 (< 2.0)
+    - Ubuntu 18.04.2 + CUDA 9.0 + CuDNN 7.4.1.5
+- TensorFlow >= 1.11.0 (< 1.13.0)
 
 ### Hardware
 
@@ -65,12 +65,13 @@
     - RAM: 16GB
     - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
     - VRAM: 8GB
-    - OS: Ubuntu 18.04.1
+    - OS: Ubuntu 18.04.2
         - CUDA 9.0
 
 ## Todo
 
-- [ ] ROCm 2.0
+- [ ] TensorFlow 1.13 + CUDA 10
+- [ ] ROCm 2.1
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
