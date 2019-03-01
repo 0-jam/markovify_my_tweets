@@ -83,7 +83,8 @@ class TextModel(object):
         return history
 
     ## Train model from the dataset
-    def train(self, model_dir, epochs=1):
+    # TODO: Early stopping during the training
+    def train(self, model_dir):
         optimizer = tf.train.AdamOptimizer()
         loss_f = tf.losses.sparse_softmax_cross_entropy
 
@@ -100,6 +101,7 @@ class TextModel(object):
             optimizer.apply_gradients(zip(gradients, self.model.variables))
 
             print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
+            self.save(model_dir)
 
         elapsed_time = time.time() - start
         print("Time taken for this epoch: {:.3f} sec, Loss: {:.3f}".format(
@@ -144,7 +146,7 @@ class TextModel(object):
 
                 # Using the multinomial distribution to predict the word returned by the model
                 predictions = predictions / temperature
-                predicted_id = tf.multinomial(predictions, num_samples=1)[-1, 0].numpy()
+                predicted_id = tf.random.categorical(predictions, num_samples=1)[-1, 0].numpy()
 
                 # Pass the predicted word as the next input to the model along with the previous hidden state
                 input_eval = tf.expand_dims([predicted_id], 0)
