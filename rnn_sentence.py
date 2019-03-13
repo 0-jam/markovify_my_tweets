@@ -18,7 +18,7 @@ def load_test_settings():
 def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
 
-    generator = TextModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
+    generator = TextModel(embedding_dim, units, 1, text, cpu_mode=True)
     generator.load(model_dir)
 
     return generator
@@ -75,7 +75,7 @@ def main():
     ## Training
     if not args.model_dir:
         # Create the model
-        model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
+        model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=True)
 
         model.compile()
         history = model.fit(model_dir, epochs)

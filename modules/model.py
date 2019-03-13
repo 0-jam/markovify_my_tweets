@@ -14,7 +14,7 @@ import functools
 ## Character-based model
 class TextModel(object):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=True)
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         # Hyper parameters
         self.embedding_dim = embedding_dim
         self.units = units
@@ -50,6 +50,7 @@ class TextModel(object):
                 recurrent_activation='sigmoid',
             )
         else:
+            # CuDNNGRU seems to be deprecated
             gru = keras.layers.CuDNNGRU
 
         return keras.Sequential([
@@ -194,7 +195,7 @@ class TextModel(object):
 # Convert text into one-hot vector
 class WordModel(TextModel):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=False, num_words=20000)
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         words = text.split()
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)
 

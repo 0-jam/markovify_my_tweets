@@ -13,7 +13,7 @@ import re
 MAX_SENTENCE_LEN = 500
 NUM_CPU = mp.cpu_count()
 class W2VModel(TextModel):
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False, w2vmodel=None):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True, w2vmodel=None):
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
         if w2vmodel:

@@ -41,9 +41,7 @@
 
 - Python <= 3.7.2
 - Tested OSs
-    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-    - Windows 10 Home 1803 (April 2018)
-    - Ubuntu 18.04.1 + ROCm 1.9
+    - Ubuntu 18.04.2 + ROCm 2.1
     - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
 - TensorFlow >= 1.12.0 (< 2.0)
 

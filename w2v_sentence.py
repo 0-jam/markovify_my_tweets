@@ -11,7 +11,7 @@ from modules.combine_sentence import combine_sentence
 def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(Path(model_dir).joinpath("parameters.json")).values()
 
-    generator = W2VModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode, w2vmodel=model_dir.joinpath("w2v.model"))
+    generator = W2VModel(embedding_dim, units, 1, text, cpu_mode=True, w2vmodel=model_dir.joinpath("w2v.model"))
     generator.load(model_dir)
 
     return generator
@@ -68,7 +68,7 @@ def main():
     ## Training
     if not args.model_dir:
         # Create the model
-        model = W2VModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
+        model = W2VModel(embedding_dim, units, batch_size, text, cpu_mode=True)
         model.compile()
 
         history = model.fit(model_dir, epochs)
