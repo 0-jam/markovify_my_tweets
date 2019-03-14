@@ -8,7 +8,6 @@
 
 1. [Environment](#environment)
    1. [Software](#software)
-   1. [Hardware](#hardware)
 1. [Todo](#todo)
 1. [Installation](#installation)
    1. [Preprocessing scripts](#preprocessing-scripts)
@@ -40,41 +39,26 @@
 
 ### Software
 
-- Python < 3.7.0
+- Python <= 3.7.2
 - Tested OSs
-    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-    - Windows 10 Home 1803 (April 2018)
-    - Ubuntu 18.04.1 + ROCm 1.9
-    - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
-- TensorFlow >= 1.11.0 (< 2.0)
-
-### Hardware
-
-- It seems TensorFlow uses CPU as many as possible
-- PC 1
-    - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
-    - RAM: 8GB
-- PC 2
-    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-    - RAM: 16GB
-    - GPU: AMD Radeon RX 580
-    - OS: Ubuntu 18.04.1
-        - [ROCm](https://github.com/RadeonOpenCompute/ROCm) < 2.0
-- PC 3
-    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
-    - RAM: 16GB
-    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
-    - VRAM: 8GB
-    - OS: Ubuntu 18.04.1
-        - CUDA 9.0
+    - Ubuntu 18.04.2 + ROCm 2.1
+    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+- TensorFlow >= 1.12.0 (< 2.0)
 
 ## Todo
 
-- [ ] ROCm 2.0
-- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
+- [ ] Prepare for upgrading to TensorFlow 2.0
+- [ ] CuDNN does not work on TensorFlow in some case
+    - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
+- [ ] Move benchmarking to another repository
+- [ ] ROCm 2.1
+- [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
+    - The program seems to work successfully, but output does not make any sense ...
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
+- [x] TensorFlow 1.13 + CUDA 10.0
+    - CUDA 10.1 doesn't work because `libcublas.so` is missing
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
 - [x] Try word2vec
@@ -124,6 +108,7 @@ $ pip install janome
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
 # (Optional, only works on Linux) Install additional dictionary for Mecab
+$ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y

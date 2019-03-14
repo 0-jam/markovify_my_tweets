@@ -27,7 +27,7 @@ def main():
 
         # Attribute as data or labels
         data_attr = "lyric"
-        label_attrs = ["artist", "lyricist"]
+        label_attrs = ["artist"]
 
         print("Generating doc2vec model...")
         docs = [TaggedDocument(divide_word(data[data_attr]), tags=[data[attr] for attr in label_attrs]) for data in dataset]

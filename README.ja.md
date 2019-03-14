@@ -8,7 +8,6 @@
 
 1. [環境](#環境)
    1. [ソフトウェア](#ソフトウェア)
-   1. [ハードウェア](#ハードウェア)
 1. [Todo](#todo)
 1. [インストール](#インストール)
    1. [前処理スクリプト](#前処理スクリプト)
@@ -40,44 +39,31 @@
 
 ### ソフトウェア
 
-- Python < 3.7.0
+- Python <= 3.7.2
 - テスト済みOS
     - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
     - Windows 10 Home 1803 (April 2018)
     - Ubuntu 18.04.1 + ROCm 1.9
-    - Ubuntu 18.04.1 + CUDA 9.0 + CuDNN 7.4.1.5
-- TensorFlow >= 1.11.0 (< 2.0)
-
-### ハードウェア
-
-- CPUはあればあるだけ使ってくれるらしい
-- PC 1
-    - CPU: Intel [Core i5 7200U](https://ark.intel.com/products/95443/Intel-Core-i5-7200U-Processor-3M-Cache-up-to-3_10-GHz)
-    - RAM: 8GB
-- PC 2
-    - CPU: AMD [Ryzen 7 1700](https://www.amd.com/ja/products/cpu/amd-ryzen-7-1700)
-    - RAM: 16GB
-    - GPU: AMD Radeon RX 580
-    - OS: Ubuntu 18.04.1
-        - [ROCm](https://github.com/RadeonOpenCompute/ROCm) < 2.0
-- PC 3
-    - CPU: Intel [Core i5-8400](https://ark.intel.com/ja/products/126687/Intel-Core-i5-8400-Processor-9M-Cache-up-to-4-00-GHz-)
-    - RAM: 16GB
-    - GPU: NVIDIA [Geforce RTX 2080](https://www.nvidia.com/ja-jp/geforce/graphics-cards/rtx-2080/)
-    - VRAM: 8GB
-    - OS: Ubuntu 18.04.1
-        - CUDA 9.0
+    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+- TensorFlow >= 1.12.0 (< 2.0)
 
 ## Todo
 
-- [ ] ROCm 2.0
-- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
+- [ ] TensorFlow 2.0へのアップデート準備
+- [ ] たまにTensorFlowでCuDNNが有効にならない
+    - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
+- [ ] ベンチマークを別リポジトリに分ける
+- [ ] ROCm 2.1
+- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)試す
+    - プログラムは動いているが、意味のある出力は得られていない…
 - [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離
 - [ ] RNNテキスト生成いろいろ整理
+- [x] TensorFlow 1.13 + CUDA 10.0
+    - CUDA 10.1には`libcublas.so`が含まれておらずエラー
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
-- [x] word2vecモデル
+- [x] word2vec試す
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
     - [x] [Juman++][jumanpp]
@@ -124,6 +110,7 @@ $ pip install janome
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
 # （任意，Linuxのみ）Mecab追加辞書をインストール
+$ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
@@ -268,7 +255,7 @@ $ python json_extractor.py akimoto.json akimoto_lyrics.txt
 - 指定したディレクトリ内のJSONファイルを結合する
 
 ```bash
-# 入力はディレクトリ名、出力はファイル名
+# 入力はディレクトリ名，出力はファイル名
 $ python cat_json.py text/lyrics_json lyrics_all.json
 ```
 

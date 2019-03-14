@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import time
-from modules.model import Model
+from modules.model import TextModel
 from gensim.models import Word2Vec
 from modules.wakachi.mecab import divide_word
 from tqdm import tqdm
@@ -12,15 +12,15 @@ import re
 # Word2vec model
 MAX_SENTENCE_LEN = 500
 NUM_CPU = mp.cpu_count()
-class W2VModel(Model):
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False, w2vmodel=None):
+class W2VModel(TextModel):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True, w2vmodel=None):
         sentences = [line.split()[:MAX_SENTENCE_LEN] for line in text]
 
         if w2vmodel:
-            print("Loading word2vec model ...")
+            print('Loading word2vec model ...')
             self.w2vmodel = Word2Vec.load(str(w2vmodel))
         else:
-            print("Generating word2vec model ...")
+            print('Generating word2vec model ...')
             self.w2vmodel = Word2Vec(sentences, size=embedding_dim, min_count=1, window=5, iter=100, workers=NUM_CPU)
 
         self.w2vweights = self.w2vmodel.wv.syn0
@@ -75,17 +75,17 @@ class W2VModel(Model):
         # Vectorize start_string
         try:
             input_eval = tf.expand_dims([self.vocab2idx(word) for word in divide_word(start_string)], 0)
-            print("Start string:", start_string)
+            print('Start string:', start_string)
         except KeyError:
-            print("Unknown word included")
-            return ""
+            print('Unknown word included')
+            return ''
 
         # Randomness of text generation
         temperature = temp
 
         count = 0
         self.model.reset_states()
-        with tqdm(desc="Generating...", total=gen_size) as pbar:
+        with tqdm(desc='Generating...', total=gen_size) as pbar:
             while count < gen_size:
                 predictions = self.model(input_eval)
                 # remove the batch dimension

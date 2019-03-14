@@ -1,16 +1,15 @@
 import argparse
-from pathlib import Path
-from modules.model import WordModel
-from modules.plot_result import save_result, show_result
+from modules.s2smodel import S2SModel
 from rnn_sentence import load_settings, load_test_settings
-from modules.combine_sentence import combine_sentence
+from pathlib import Path
+from modules.plot_result import show_result
 
 ## Evaluation methods
 # Load learned model
 def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
 
-    generator = WordModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
+    generator = S2SModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
     generator.load(model_dir)
 
     return generator
@@ -62,20 +61,19 @@ def main():
     elif args.model_dir:
         model_dir = Path(args.model_dir)
     else:
-        model_dir = Path("./learned_models").joinpath(filename + "_wrnn")
+        model_dir = Path("./learned_models").joinpath(filename + "_s2s")
 
     ## Training
     if not args.model_dir:
         # Create the model
-        model = WordModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
+        model = S2SModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
         model.compile()
-        history = model.fit(model_dir, epochs)
-        losses = history.history["loss"]
+        losses = [model.train() for _ in range(epochs)]
         model.save(model_dir)
 
     generator = init_generator(model_dir, text)
-    generated_text = combine_sentence(generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
+    generated_text = "".join(generator.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
 
     if args.output:
         print("Saving generated text...")
