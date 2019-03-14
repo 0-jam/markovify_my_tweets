@@ -49,6 +49,7 @@
 
 ## Todo
 
+- [ ] TensorFlow 2.0へのアップデート準備
 - [ ] たまにTensorFlowでCuDNNが有効にならない
     - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
 - [ ] ベンチマークを別リポジトリに分ける

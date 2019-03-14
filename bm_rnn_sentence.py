@@ -39,7 +39,7 @@ def main():
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
     ## Create the model
-    model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=True)
+    model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
     epoch = 0
     elapsed_time = 0

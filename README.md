@@ -47,6 +47,7 @@
 
 ## Todo
 
+- [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] CuDNN does not work on TensorFlow in some case
     - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
 - [ ] Move benchmarking to another repository

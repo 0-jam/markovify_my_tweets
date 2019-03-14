@@ -10,7 +10,7 @@ from modules.combine_sentence import combine_sentence
 def init_generator(model_dir, text):
     embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
 
-    generator = WordModel(embedding_dim, units, 1, text, cpu_mode=True)
+    generator = WordModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
     generator.load(model_dir)
 
     return generator
@@ -67,7 +67,7 @@ def main():
     ## Training
     if not args.model_dir:
         # Create the model
-        model = WordModel(embedding_dim, units, batch_size, text, cpu_mode=True)
+        model = WordModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
         model.compile()
         history = model.fit(model_dir, epochs)

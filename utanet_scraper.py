@@ -4,8 +4,6 @@ import urllib
 import time
 from tqdm import tqdm
 from beautifulscraper import BeautifulScraper
-from modules.multi_sub import replace_str
-import unicodedata
 
 scraper = BeautifulScraper()
 domain = 'https://www.uta-net.com'
@@ -21,7 +19,7 @@ attributes = {
 }
 
 def bs_get_text(elem):
-    return unicodedata.normalize('NFKC', elem.get_text())
+    return elem.get_text()
 
 def search(query, attribute='lyricist'):
     # 検索URLを生成
@@ -89,17 +87,7 @@ def extract_lyric(song_id):
     # 歌詞内の改行を半角スラッシュ/に置換して抽出
     lyric = body.find(id='kashi_area').get_text('/')
 
-    # すべての全角英数字，丸カッコ（），全角スペース　，！，？などをそれぞれ半角に置換
-    lyric = unicodedata.normalize('NFKC', lyric)
-    # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
-    # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
-    # 2回以上続く三点リーダー……を1つ…にする
-    # 波ダッシュ〜（上記normalize()で半角~に変換済み）をダッシューに置換
-    # すべてのカッコ{}[]()<>を丸カッコ()に統一
-    # 各要素：(置換したい文字, 置換先の文字)
-    patterns = [(r'\.{3,}', '…'), (r'・{3,}', '…'), (r'…{2,}', '…'), (r'~', 'ー'), (r'\[|{|<', '\('), (r'\]|}|>', '\)')]
-
-    return replace_str(lyric, patterns)
+    return lyric
 
 def main():
     parser = argparse.ArgumentParser(description='引数に指定した名前で作詞家を検索して曲情報を抽出')

@@ -13,7 +13,7 @@ import functools
 
 ## Character-based model
 class TextModel(object):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=True)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=True)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         # Hyper parameters
         self.embedding_dim = embedding_dim
@@ -85,7 +85,7 @@ class TextModel(object):
 
     ## Train model from the dataset
     # TODO: Early stopping during the training
-    def train(self, model_dir):
+    def train(self):
         optimizer = tf.train.AdamOptimizer()
         loss_f = tf.losses.sparse_softmax_cross_entropy
 
@@ -102,7 +102,6 @@ class TextModel(object):
             optimizer.apply_gradients(zip(gradients, self.model.variables))
 
             print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
-            self.save(model_dir)
 
         elapsed_time = time.time() - start
         print("Time taken for this epoch: {:.3f} sec, Loss: {:.3f}".format(
@@ -194,7 +193,7 @@ class TextModel(object):
 ## Word-based model
 # Convert text into one-hot vector
 class WordModel(TextModel):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', char_level=False, num_words=20000)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=False, num_words=20000)
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         words = text.split()
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)
