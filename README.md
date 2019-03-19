@@ -28,10 +28,7 @@
       1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
       1. [Replace with whitespace](#replace-with-whitespace)
 1. [Benchmarking](#benchmarking)
-   1. [About Dataset](#about-dataset)
-   1. [Rule](#rule)
-   1. [Evaluation](#evaluation)
-   1. [Records](#records)
+   1. [Former Rule (Regulation #2, 20181205)](#former-rule-regulation-2-20181205)
 
 ---
 
@@ -50,13 +47,13 @@
 - [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] CuDNN does not work on TensorFlow in some case
     - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
-- [ ] Move benchmarking to another repository
 - [ ] ROCm 2.1
 - [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
     - The program seems to work successfully, but output does not make any sense ...
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
+- [x] Move benchmarking to another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
 - [x] Add search options to Utanet scraper
@@ -135,7 +132,7 @@ $ pip install markovify
 ## rnn_sentence.py, bm_rnn_sentence.py and wrnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
-$ pyenv install 3.6.8
+$ pyenv install 3.7.2
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 $ pip install tensorflow numpy matplotlib
 ## w2v_sentence.py
@@ -315,29 +312,10 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 ## Benchmarking
 
-- bm_rnn_sentence.py: Benchmarking script based on rnn_sentence.py
-    - Almost all functions have been removed from the original script
-- Learn specified dataset _in 1 hours(TBD)_, and compare the performance
+- Moved to [0-jam/regen_sentence_bm](https://github.com/0-jam/regen_sentence_bm)
+    - Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
 
-### About Dataset
-
-- 7 novels written by Souseki Natsume（夏目漱石）
-    1. 坊っちゃん (Bocchan)
-    1. こころ (Kokoro)
-    1. 草枕 (Kusamakura)
-    1. 思い出す事など (Omoidasu koto nado)
-    1. 三四郎 (Sanshiro)
-    1. それから (Sorekara)
-    1. 吾輩は猫である (Wagahai wa neko de aru)
-- Based on [Aozora Bunko](https://www.aozora.gr.jp/index_pages/person148.html)
-    - Already preprocessed by [this](#aozora-bunko) method
-- Dataset is compressed to XZ
-    - Extract automatically when execute benchmarking
-    - About 3.01MiB after decompressing
-    - Compress: `$ xz -9 -e -T 0 souseki_utf8.txt`
-    - Extract: `$ xz -d souseki_utf8.txt -k`
-
-### Rule
+### Former Rule (Regulation #2, 20181205)
 
 1. Time measurement begins when training of the model is started
 1. Keep training for an hour (default)
@@ -352,17 +330,6 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
     - The value of loss function
     - Generated text
         - The number of characters: 20 lines
-
-### Evaluation
-
-- How many epochs did the system learned?
-    - How many times per epoch?
-- What loss function's value?
-    - The smaller loss function's value, the more _readable_ sentence can be generated ...probably
-
-### Records
-
-- Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

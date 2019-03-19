@@ -28,10 +28,7 @@
       1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
       1. [半角スペースに置き換える](#半角スペースに置き換える)
 1. [ベンチマーク](#ベンチマーク)
-   1. [データセット](#データセット)
-   1. [ルール](#ルール)
-   1. [評価基準](#評価基準)
-   1. [記録](#記録)
+   1. [過去のルール (Regulation #2, 20181205)](#過去のルール-regulation-2-20181205)
 
 ---
 
@@ -41,9 +38,7 @@
 
 - Python <= 3.7.2
 - テスト済みOS
-    - Ubuntu 18.04.1 on Windows Subsystem for Linux (Windows 10 Home 1803 (April 2018))
-    - Windows 10 Home 1803 (April 2018)
-    - Ubuntu 18.04.1 + ROCm 1.9
+    - Ubuntu 18.04.2 + ROCm 2.1
     - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
 - TensorFlow >= 1.12.0 (< 2.0)
 
@@ -137,7 +132,7 @@ $ pip install markovify
 ## rnn_sentence.py, bm_rnn_sentence.py, wrnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
-$ pyenv install 3.6.8
+$ pyenv install 3.7.2
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 $ pip install tensorflow numpy matplotlib
 ## w2v_sentence.py
@@ -317,29 +312,10 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 ## ベンチマーク
 
-- bm_rnn_sentence.py: rnn_sentence.pyベースのベンチマークスクリプト
-    - 基本的にオリジナルの機能を大きく省いただけ
-- 1時間（仮）で何epoch学習できて，そのモデルから20行生成した時にどの程度読める文章ができるかを比較
+- [0-jam/regen_sentence_bm](https://github.com/0-jam/regen_sentence_bm) に移動した
+- 過去のベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
 
-### データセット
-
-- 夏目漱石の小説7編
-    1. 坊っちゃん
-    1. こころ
-    1. 草枕
-    1. 思い出す事など
-    1. 三四郎
-    1. それから
-    1. 吾輩は猫である
-- [この方法](#青空文庫)で前処理済
-    - [青空文庫](https://www.aozora.gr.jp/index_pages/person148.html)がベース
-- 前処理後にXZで圧縮
-    - スクリプト実行時にPythonによって展開される
-    - 展開後サイズ：約3.01MiB
-    - 圧縮：`$ xz -9 -e -T 0 souseki_utf8.txt`
-    - 展開：`$ xz -d souseki_utf8.txt -k`
-
-### ルール
+### 過去のルール (Regulation #2, 20181205)
 
 1. モデルの学習が始まった瞬間から計測スタート
 1. あらかじめ決められた時間の間学習を続ける
@@ -353,18 +329,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
     - 上二つから計算できる1分あたりのepoch数
     - loss（損失関数）の値
     - モデルから生成されたテキスト
-        - 20行
-
-### 評価基準
-
-- 何epoch学習できたか？
-    - 1epochあたりにかかった時間は？
-- loss（損失関数）の値は？
-    - 小さければ小さいほど _まともな_ 文章が生成される…はず
-
-### 記録
-
-- ベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
+        - 1000字
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/
