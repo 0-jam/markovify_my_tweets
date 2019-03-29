@@ -18,25 +18,36 @@ attributes = {
     'composer': '8',
 }
 
+
+# ページをBeautifulSoupオブジェクトとして取得
+def get_page(url):
+    body = scraper.go(url)
+    time.sleep(1.0)
+
+    return body
+
+
 def bs_get_text(elem):
     return elem.get_text()
+
 
 def search(query, attribute='lyricist'):
     # 検索URLを生成
     # クエリが日本語だと正しく処理されないのでエンコード
     search_url = domain + '/search/?Aselect=' + attributes[attribute] + '&Keyword=' + urllib.parse.quote(query) + '&Bselect=4&sort='
 
-    bodies = [scraper.go(search_url)]
+    bodies = [get_page(search_url)]
 
-    try:
-        pages = bodies[0].select('#page_list')[0].find_all('a')
+    pages = bodies[0].select('#page_list')[0].find_all('a')
+    if len(pages) > 0:
         page_urls = [urllib.parse.urlparse(page.get('href')) for page in pages]
         queries = [urllib.parse.parse_qs(page.query) for page in page_urls]
         last_page = page_urls[-1]
         last_page_num = max([int(query['pnum'][0]) for query in queries])
         lpq = queries[-1]
+        print(last_page_num, 'pages found')
 
-        for pnum in range(2, last_page_num + 1):
+        for pnum in tqdm(range(2, last_page_num + 1)):
             # ページ番号だけ変えて新しくURLを生成
             lpq['pnum'] = [str(pnum)]
             page = urllib.parse.ParseResult(
@@ -49,9 +60,9 @@ def search(query, attribute='lyricist'):
             )
             page_url = urllib.parse.urlunparse(page)
 
-            bodies.append(scraper.go(page_url))
-    except IndexError:
-        pass
+            bodies.append(get_page(page_url))
+    else:
+        print('1 page found')
 
     song_ids = []
     titles = []
@@ -78,16 +89,17 @@ def search(query, attribute='lyricist'):
 
     return (song_ids, titles, artists, lyricists, composers)
 
-## song_idから歌詞を抽出
+
+# song_idから歌詞を抽出
 def extract_lyric(song_id):
     song_url = domain + song_id
 
-    body = scraper.go(song_url)
-    time.sleep(1.0)
+    body = get_page(song_url)
     # 歌詞内の改行を半角スラッシュ/に置換して抽出
     lyric = body.find(id='kashi_area').get_text('/')
 
     return lyric
+
 
 def main():
     parser = argparse.ArgumentParser(description='引数に指定した名前で作詞家を検索して曲情報を抽出')
@@ -110,6 +122,7 @@ def main():
     with open(args.output, 'w', encoding='utf-8') as out:
         # json.dumps(results, out)だと最後の波カッコが閉じられない
         out.write(json.dumps(results, ensure_ascii=False, indent=4))
+
 
 if __name__ == '__main__':
     main()

@@ -4,6 +4,7 @@ from modules.model import WordModel
 import json
 from rnn_sentence import init_generator
 
+
 def main():
     parser = argparse.ArgumentParser(description="Character-based sentence generation using RNN (generation only, without model training)")
     parser.add_argument("input", type=str, help="Path to the text file")
@@ -16,7 +17,7 @@ def main():
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
 
-    ## Parse options and initialize some parameters
+    # Parse options and initialize some parameters
     gen_size = args.gen_size
     input_path = Path(args.input)
     model_dir = Path(args.model_dir)
@@ -38,6 +39,7 @@ def main():
                     out.write(generated_text)
             else:
                 print(generated_text)
+
 
 if __name__ == '__main__':
     main()

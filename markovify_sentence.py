@@ -6,7 +6,8 @@ from pathlib import Path
 import sys
 from modules.combine_sentence import combine_sentence
 
-## Generate text from the model
+
+# Generate text from the model
 def generate(queue, model, count):
     while True:
         text = model.make_sentence()
@@ -16,18 +17,21 @@ def generate(queue, model, count):
             queue.put(combine_sentence(text.split()))
             break
 
-## Wrapper method of generate()
+
+# Wrapper method of generate()
 # Because Pool.map() can give only one argument, give this method tuple value and extract it before giving extract()
 def generate_sentence(args):
     generate(*args)
 
-## Extract values in queue
+
+# Extract values in queue
 def dump_queue(queue):
     ret = []
     while queue.empty() is False:
         ret.append(queue.get())
 
     return ret
+
 
 def main():
     cores = mp.cpu_count()
@@ -76,6 +80,7 @@ def main():
         elapsed_time,
         args.number / elapsed_time
     ))
+
 
 if __name__ == '__main__':
     main()
