@@ -1,10 +1,12 @@
 import argparse
 import re
-from pathlib import Path
 import unicodedata
+from pathlib import Path
+
 from modules.multi_sub import replace_str
 
-## 引数sentenceを整形
+
+# 引数sentenceを整形
 def replace_sentence(sentence):
     # 不要な記号を削除
     sentence = re.sub("《.+?》|［.+?］|｜|　", "", sentence.strip())
@@ -16,16 +18,21 @@ def replace_sentence(sentence):
     # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
     # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
     # 2回以上続く三点リーダー……を1つ…にする
-    patterns = [(r"\.{3,}", "…"), (r"・{3,}", "…"), (r"…{2,}", "…")]
+    # 波ダッシュ〜（上記normalize()で半角~に変換済み）をダッシューに置換
+    # すべての半角カッコ{}[]()<>を丸カッコ()に統一
+    # すべての全角かぎかっこ「」『』｢｣をこの形「」に統一
+    patterns = [(r'\.{3,}', '…'), (r'・{3,}', '…'), (r'…{2,}', '…'), (r'~', 'ー'), (r'\[|{|<', r'\('), (r'\]|}|>', r'\)'), (r'｢|『', '「'), (r'』|｣', '」')]
     sentence = replace_str(sentence, patterns)
 
     return sentence
 
+
 def replace_text(text):
-    text = re.sub(".*---\n|底本：.*", "", text, flags=(re.MULTILINE|re.DOTALL))
+    text = re.sub(".*---\n|底本：.*", "", text, flags=(re.MULTILINE | re.DOTALL))
     text = [replace_sentence(line) for line in text.split("\n")]
     # 空行（もともと空行だったものと処理の結果空行になったもの）を削除して返す
     return list(filter(lambda line: line != "", text))
+
 
 def main():
     # オプション設定・取得
@@ -42,6 +49,7 @@ def main():
     with Path(args.output).open('w', encoding='utf-8') as out:
         # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
+
 
 if __name__ == '__main__':
     main()

@@ -4,6 +4,7 @@ from pathlib import Path
 from modules.multi_sub import replace_str
 import unicodedata
 
+
 def normalize(text):
     # すべての全角英数字，丸カッコ（），全角スペース　，！，？などをそれぞれ半角に置換
     text = unicodedata.normalize('NFKC', text)
@@ -11,12 +12,14 @@ def normalize(text):
     # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
     # 2回以上続く三点リーダー……を1つ…にする
     # 波ダッシュ〜（上記normalize()で半角~に変換済み）をダッシューに置換
-    # すべてのカッコ{}[]()<>を丸カッコ()に統一
+    # すべての半角カッコ{}[]()<>を丸カッコ()に統一
+    # すべての全角かぎかっこ「」『』｢｣をこれ「」に統一
     # 各要素：(置換したい文字, 置換先の文字)
-    patterns = [(r'\.{3,}', '…'), (r'・{3,}', '…'), (r'…{2,}', '…'), (r'~', 'ー'), (r'\[|{|<', '\('), (r'\]|}|>', '\)')]
+    patterns = [(r'\.{3,}', '…'), (r'・{3,}', '…'), (r'…{2,}', '…'), (r'~', 'ー'), (r'\[|{|<', r'\('), (r'\]|}|>', r'\)'), (r'｢|『', '「'), (r'』|｣', '」')]
     text = replace_str(text, patterns)
 
     return text
+
 
 def main():
     parser = argparse.ArgumentParser(description='utanet_scraper.pyで抽出した曲情報から特定の項目を抽出')
@@ -39,6 +42,7 @@ def main():
 
     with Path(args.output).open('w', encoding='utf-8') as out:
         out.write('\n'.join(values))
+
 
 if __name__ == "__main__":
     main()

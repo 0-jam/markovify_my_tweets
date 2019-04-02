@@ -1,19 +1,22 @@
+import functools
+import json
+import time
+from pathlib import Path
+import numpy as np
 import tensorflow as tf
+from tensorflow import keras
+from tqdm import tqdm
+from modules.wakachi.mecab import divide_word
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 tf.enable_eager_execution(config=config)
-from tensorflow import keras
-from pathlib import Path
-import json
-from tqdm import tqdm
-import time
-import numpy as np
-from modules.wakachi.mecab import divide_word
-import functools
 
-## Character-based model
+
+# Character-based model
 class TextModel(object):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=True)
+
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         # Hyper parameters
         self.embedding_dim = embedding_dim
@@ -28,7 +31,8 @@ class TextModel(object):
         self.idx2vocab = dict([(i, v) for v, i in self.vocab2idx.items()])
         self.idx2vocab[0] = '<oov>'
         self.vocab_size = len(self.vocab2idx) + 1
-        print("Text has {} characters ({} unique characters)".format(len(text), self.vocab_size - 1))
+        text_size = len(text)
+        print("Text has {} characters ({} unique characters)".format(text_size, self.vocab_size - 1))
 
         # Creating a mapping from unique characters to indices
         text_as_int = self.vocab_to_indices(text)
@@ -39,8 +43,10 @@ class TextModel(object):
         chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(seq_length + 1, drop_remainder=True)
         self.dataset = chunks.map(self.split_into_target)
         self.dataset = self.dataset.shuffle(buffer_size).batch(self.batch_size, drop_remainder=True)
+        self.steps_per_epoch = text_size // seq_length // batch_size
 
         self.model = self.build_model()
+        self.model.summary()
 
     def build_model(self):
         # Disable CUDA if GPU is not available
@@ -50,7 +56,6 @@ class TextModel(object):
                 recurrent_activation='sigmoid',
             )
         else:
-            # CuDNNGRU seems to be deprecated
             gru = keras.layers.CuDNNGRU
 
         return keras.Sequential([
@@ -77,13 +82,13 @@ class TextModel(object):
         earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
 
         start_time = time.time()
-        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.batch_size, callbacks=[checkpoint_callback, earlystop_callback])
+        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=[checkpoint_callback, earlystop_callback])
         elapsed_time = time.time() - start_time
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
         return history
 
-    ## Train model from the dataset
+    # Train model from the dataset
     # TODO: Early stopping during the training
     def train(self):
         optimizer = tf.train.AdamOptimizer()
@@ -164,12 +169,12 @@ class TextModel(object):
 
         return generated_text
 
-    ## Return the path to <ckpt_dir>/checkpoint
+    # Return the path to <ckpt_dir>/checkpoint
     @staticmethod
     def path(ckpt_dir):
         return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
 
-    ## Return model settings as dict
+    # Return model settings as dict
     def parameters(self):
         return {
             'embedding_dim': self.embedding_dim,
@@ -178,7 +183,7 @@ class TextModel(object):
             'cpu_mode': self.cpu_mode
         }
 
-    ## Create input and target texts from the text
+    # Create input and target texts from the text
     @staticmethod
     def split_into_target(chunk):
         input_text = chunk[:-1]
@@ -186,19 +191,21 @@ class TextModel(object):
 
         return input_text, target_text
 
-    ## Convert string to numbers
+    # Convert string to numbers
     def vocab_to_indices(self, sentence):
         return np.array(self.tokenizer.texts_to_sequences(sentence.lower())).reshape(-1,)
 
-## Word-based model
+
+# Word-based model
 # Convert text into one-hot vector
 class WordModel(TextModel):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=False, num_words=20000)
+
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         words = text.split()
         super().__init__(embedding_dim, units, batch_size, words, cpu_mode)
 
-    ## Convert word to numbers
+    # Convert word to numbers
     # Automatically convert string into words
     def vocab_to_indices(self, sentence):
         if type(sentence) == str:

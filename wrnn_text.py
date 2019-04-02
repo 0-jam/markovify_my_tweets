@@ -1,10 +1,12 @@
 import argparse
+import json
 import time
 from pathlib import Path
-from modules.model import WordModel
-import json
-from wrnn_sentence import init_generator
+
 from modules.combine_sentence import combine_sentence
+from modules.model import WordModel
+from wrnn_sentence import init_generator
+
 
 def main():
     parser = argparse.ArgumentParser(description="Word-based sentence generation using RNN (generation only, without model training)")
@@ -17,7 +19,7 @@ def main():
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of target text file (default: utf-8)")
     args = parser.parse_args()
 
-    ## Parse options and initialize some parameters
+    # Parse options and initialize some parameters
     gen_size = args.gen_size
     input_path = Path(args.input)
     model_dir = Path(args.model_dir)
@@ -39,6 +41,7 @@ def main():
                     out.write(generated_text + "\n")
             else:
                 print(generated_text)
+
 
 if __name__ == '__main__':
     main()

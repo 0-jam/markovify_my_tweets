@@ -2,6 +2,7 @@ import argparse
 import json
 from pathlib import Path
 
+
 def main():
     parser = argparse.ArgumentParser(description="Combine JSON in the specified directory")
     parser.add_argument("input", type=str, help="Input directory")
@@ -14,6 +15,7 @@ def main():
 
     with Path(args.output).open('w', encoding='utf-8') as out:
         out.write(json.dumps(out_data, ensure_ascii=False, indent=4))
+
 
 if __name__ == "__main__":
     main()

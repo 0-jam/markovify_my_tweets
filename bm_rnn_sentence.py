@@ -8,6 +8,7 @@ from modules.plot_result import save_result
 from rnn_sentence import load_settings, load_test_settings, init_generator
 from tensorflow import keras
 
+
 def main():
     parser = argparse.ArgumentParser(description="Benchmarking of sentence generation with RNN.")
     parser.add_argument("-c", "--cpu_mode", action='store_true', help="Force to use CPU (default: False)")
@@ -39,7 +40,7 @@ def main():
     parameters["cpu_mode"] = args.cpu_mode
     embedding_dim, units, batch_size, cpu_mode = parameters.values()
 
-    ## Create the model
+    # Create the model
     model = TextModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
     epoch = 0
@@ -95,6 +96,7 @@ def main():
         out.write(generated_text)
 
     save_result(losses, save_to=str(result_dir) + "/losses_" + today + ".png")
+
 
 if __name__ == '__main__':
     main()

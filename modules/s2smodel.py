@@ -1,7 +1,10 @@
-from modules.model import TextModel
-from tensorflow import keras
 import functools
 import time
+
+from tensorflow import keras
+
+from modules.model import TextModel, WordModel
+
 
 # Character-based Seq2seq model
 class S2SModel(TextModel):
@@ -36,6 +39,7 @@ class S2SModel(TextModel):
         dec_dense = keras.layers.Dense(self.vocab_size, activation='softmax')(enc_lstm)
 
         return keras.Model([enc_in, dec_in], dec_dense)
+
 
 # Word-based Seq2seq model
 # Currently it requires a large amount of VRAM

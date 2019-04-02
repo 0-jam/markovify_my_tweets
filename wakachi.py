@@ -1,10 +1,13 @@
 import argparse
-from pathlib import Path
-from tqdm import tqdm
 import unicodedata
+from pathlib import Path
+
+from tqdm import tqdm
+
 from modules.multi_sub import replace_str
 
-## Divide text by word using specified engine
+
+# Divide text by word using specified engine
 def main():
     parser = argparse.ArgumentParser(description='Preprocessing script for Japanese text.')
     parser.add_argument('input', type=str, help='Input file path')
@@ -35,6 +38,7 @@ def main():
 
                 out.write(' '.join(divide_word(line)) + '\n')
                 pbar.update(len(line.encode('utf-8')))
+
 
 if __name__ == '__main__':
     main()
