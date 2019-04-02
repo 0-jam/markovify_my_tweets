@@ -36,24 +36,23 @@
 
 ### Software
 
-- Python <= 3.7.2
+- Python 3.7.3
 - Tested OSs
     - Ubuntu 18.04.2 + ROCm 2.1
     - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
-- TensorFlow >= 1.12.0 (< 2.0)
+- TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] CuDNN does not work on TensorFlow in some case
-    - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
-- [ ] ROCm 2.1
 - [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
     - The program seems to work successfully, but output does not make any sense ...
 - [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
-- [x] Move benchmarking to another repository
+- [x] ROCm 2.x
+- [x] Move benchmarking to the another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
 - [x] Add search options to Utanet scraper
@@ -77,12 +76,6 @@
     - [x] README
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
-    - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
-        - Enabled command-line options
-    - It takes very long time for execution ...
-        - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
-            - `$ mecab -O yomi`
-        - It should be executed on GPU
 - [x] Multiprocessing
     - The script gets about 2.5x faster when it spawns 4 processes
 
@@ -132,9 +125,10 @@ $ pip install markovify
 ## rnn_sentence.py, bm_rnn_sentence.py and wrnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
-$ pyenv install 3.7.2
+$ pyenv install 3.7.3
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
-$ pip install tensorflow numpy matplotlib
+# If you have AMD GPU, install tensorflow-rocm instead of tensorflow to enable HIP + MIOpen-based computing
+$ pip install tensorflow matplotlib
 ## w2v_sentence.py
 $ pip install gensim
 ```
@@ -176,6 +170,11 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
 ### rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py
+
+- Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
+- It takes very long time for execution ...
+    - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
+        - `$ mecab -O yomi`
 
 ```bash
 # If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option

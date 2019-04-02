@@ -36,24 +36,23 @@
 
 ### ソフトウェア
 
-- Python <= 3.7.2
+- Python 3.7.3
 - テスト済みOS
     - Ubuntu 18.04.2 + ROCm 2.1
     - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
-- TensorFlow >= 1.12.0 (< 2.0)
+- TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] どこでも実行できるようにWeb API化できたらいいな
 - [ ] TensorFlow 2.0へのアップデート準備
-- [ ] たまにTensorFlowでCuDNNが有効にならない
-    - > tensorflow.python.framework.errors_impl.UnknownError: Fail to find the dnn implementation. [Op:CudnnRNN]
-- [ ] ベンチマークを別リポジトリに分ける
-- [ ] ROCm 2.1
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)試す
-    - プログラムは動いているが、意味のある出力は得られていない…
+    - プログラムは動いているが，意味のある出力は得られていない…
 - [ ] 既存のword2vecモデルを読み込めるようにする
 - [ ] RNN版の訓練とテキスト生成を分離
 - [ ] RNNテキスト生成いろいろ整理
+- [x] ベンチマークを別リポジトリに分ける
+- [x] ROCm 2.x
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1には`libcublas.so`が含まれておらずエラー
 - [x] 歌ネットスクレイパーの検索条件
@@ -70,7 +69,6 @@
 - [x] Windows対応
     - [x] 文字コード
     - [x] 学習済みモデルディレクトリ作成
-        - >ValueError: Parent directory of C:\path\of\repo\regen_my_sentences\learned_models\Latin-Lipsum.txt\Latin-Lipsum.txt doesn't exist, can't save.
 - [x] [ベンチマークスクリプト](https://github.com/0-jam/regen_sentence_bm)をこちらに統合
     - [x] スクリプト
     - [x] データセット
@@ -78,11 +76,6 @@
     - [x] README
 - [x] RNN版でモデルを保存できるようにする
 - [x] Recurrent Neural Networkに対応
-    - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)をベースに，コマンドラインオプションに対応
-    - 実行にはかなり時間かかるうえ，5-10世代程度ではロクな精度が出ない
-        - たぶんデータも足りていないが，これ以上増やすと学習時間どうなるんだ
-        - 前処理後のファイルを`$ mecab -O yomi`でカタカナに変換すると多少マシになる
-        - GPU使わないとダメか
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 
@@ -132,8 +125,9 @@ $ pip install markovify
 ## rnn_sentence.py, bm_rnn_sentence.py, wrnn_sentence.py
 # pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
-$ pyenv install 3.7.2
+$ pyenv install 3.7.3
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
+# AMD GPUを持っていて，HIP + MIOpenで計算できるようにしたかったらtensorflowではなくtensorflow-rocmをインストール
 $ pip install tensorflow numpy matplotlib
 ## w2v_sentence.py
 $ pip install gensim
@@ -176,6 +170,11 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
 ### rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py
+
+- [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)がベース
+- GPUが使える環境での実行を推奨
+    - 前処理後のファイルをカタカナに変換すると多少マシになる
+        - `$ mecab -O yomi`
 
 ```bash
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
