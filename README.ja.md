@@ -17,7 +17,6 @@
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
    1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
-   1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -28,7 +27,6 @@
       1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
       1. [半角スペースに置き換える](#半角スペースに置き換える)
 1. [ベンチマーク](#ベンチマーク)
-   1. [過去のルール (Regulation #2, 20181205)](#過去のルール-regulation-2-20181205)
 
 ---
 
@@ -71,11 +69,6 @@
 - [x] Windows対応
     - [x] 文字コード
     - [x] 学習済みモデルディレクトリ作成
-- [x] [ベンチマークスクリプト](https://github.com/0-jam/regen_sentence_bm)をこちらに統合
-    - [x] スクリプト
-    - [x] データセット
-        - 自分のGoogle Driveからダウンロードするようにした
-    - [x] README
 - [x] RNN版でモデルを保存できるようにする
 - [x] Recurrent Neural Networkに対応
 - [x] マルチプロセス化
@@ -124,8 +117,8 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py, bm_rnn_sentence.py, wrnn_sentence.py
-# pyenv環境ではPythonビルド前にLZMAライブラリのヘッダーをインストールする必要がある
+## rnn_sentence.py, wrnn_sentence.py
+# pyenv環境ではPythonビルド前にliblzmaのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
@@ -195,13 +188,6 @@ Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # ディレクトリ名を指定
 # モデルの訓練はスキップされる
 $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
-```
-
-### bm_rnn_sentence.py
-
-```bash
-# これだけ
-$ python bm_rnn_sentence.py
 ```
 
 ### utanet_scraper.py
@@ -315,22 +301,6 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 
 - [0-jam/regen_sentence_bm](https://github.com/0-jam/regen_sentence_bm) に移動した
 - 過去のベンチマーク記録は[こちら](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
-
-### 過去のルール (Regulation #2, 20181205)
-
-1. モデルの学習が始まった瞬間から計測スタート
-1. あらかじめ決められた時間の間学習を続ける
-1. 決められた時間を超過した場合，そのepochを終えた段階で学習を終了する
-    - 例：制限時間15分
-        - epoch数3の学習中に15分経過した場合，epoch3の学習を終えて終了
-    - 制限時間内に _50（仮）_ epoch学習できた場合，経過時間にかかわらず学習を終了
-1. 結果を表示
-    - 所要時間
-    - epoch数
-    - 上二つから計算できる1分あたりのepoch数
-    - loss（損失関数）の値
-    - モデルから生成されたテキスト
-        - 1000字
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/
