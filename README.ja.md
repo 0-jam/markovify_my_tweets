@@ -16,7 +16,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py](#rnn_sentencepy--wrnn_sentencepy--w2v_sentencepy)
+   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
    1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
@@ -131,7 +131,7 @@ $ pyenv install 3.7.3
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 # AMD GPUを持っていて，HIP + MIOpenで計算できるようにしたかったらtensorflowではなくtensorflow-rocmをインストール
 $ pip install tensorflow numpy matplotlib
-## w2v_sentence.py
+## classify_lyric.py
 $ pip install gensim
 ```
 
@@ -171,7 +171,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py
+### rnn_sentence.py & wrnn_sentence.py
 
 - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)がベース
 - GPUが使える環境での実行を推奨
