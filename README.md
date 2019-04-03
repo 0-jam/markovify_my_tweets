@@ -44,11 +44,13 @@
 
 ## Todo
 
+- [ ] Simplify specifying hyper parameters
+- [ ] Separate building the dataset and the model
+    - There is a lot of duplicated code around them
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
     - The program seems to work successfully, but output does not make any sense ...
-- [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
 - [x] ROCm 2.x
@@ -57,7 +59,7 @@
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
-- [x] Try word2vec
+- [x] ~~Try word2vec~~
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
     - [x] [Juman++][jumanpp]

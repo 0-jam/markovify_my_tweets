@@ -1,4 +1,5 @@
 from pyknp import Juman
+
 juman = Juman()
 
 

@@ -1,10 +1,8 @@
 import argparse
 import json
-import time
 from pathlib import Path
 
 from modules.combine_sentence import combine_sentence
-from modules.model import WordModel
 from wrnn_sentence import init_generator
 
 
@@ -23,7 +21,6 @@ def main():
     gen_size = args.gen_size
     input_path = Path(args.input)
     model_dir = Path(args.model_dir)
-    filename = input_path.name
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:

@@ -1,8 +1,9 @@
 import argparse
 import json
-from pathlib import Path
-from modules.multi_sub import replace_str
 import unicodedata
+from pathlib import Path
+
+from modules.multi_sub import replace_str
 
 
 def normalize(text):

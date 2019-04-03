@@ -1,9 +1,11 @@
-import markovify
 import argparse
-import time
 import multiprocessing as mp
-from pathlib import Path
 import sys
+import time
+from pathlib import Path
+
+import markovify
+
 from modules.combine_sentence import combine_sentence
 
 
