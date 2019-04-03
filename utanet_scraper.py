@@ -1,9 +1,10 @@
 import argparse
 import json
-import urllib
 import time
-from tqdm import tqdm
+import urllib
+
 from beautifulscraper import BeautifulScraper
+from tqdm import tqdm
 
 scraper = BeautifulScraper()
 domain = 'https://www.uta-net.com'
