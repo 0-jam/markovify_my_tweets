@@ -1,7 +1,7 @@
 import argparse
-from pathlib import Path
-from modules.model import WordModel
 import json
+from pathlib import Path
+
 from rnn_sentence import init_generator
 
 
@@ -21,7 +21,6 @@ def main():
     gen_size = args.gen_size
     input_path = Path(args.input)
     model_dir = Path(args.model_dir)
-    filename = input_path.name
     encoding = args.encoding
 
     with input_path.open(encoding=encoding) as file:

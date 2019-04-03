@@ -16,8 +16,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py](#rnn_sentencepy--wrnn_sentencepy--w2v_sentencepy)
-   1. [bm_rnn_sentence.py](#bm_rnn_sentencepy)
+   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -28,7 +27,6 @@
       1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
       1. [Replace with whitespace](#replace-with-whitespace)
 1. [Benchmarking](#benchmarking)
-   1. [Former Rule (Regulation #2, 20181205)](#former-rule-regulation-2-20181205)
 
 ---
 
@@ -44,11 +42,13 @@
 
 ## Todo
 
+- [ ] Simplify specifying hyper parameters
+- [ ] Separate building the dataset and the model
+    - There is a lot of duplicated code around them
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
     - The program seems to work successfully, but output does not make any sense ...
-- [ ] Load existing word2vec model
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
 - [x] ROCm 2.x
@@ -57,7 +57,7 @@
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
-- [x] Try word2vec
+- [x] ~~Try word2vec~~
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
     - [x] [Juman++][jumanpp]
@@ -69,11 +69,6 @@
 - [x] Windows port
     - [x] Text encoding
     - [x] Create directory to save learned model
-- [x] Merge [Benchmarking script](https://github.com/0-jam/regen_sentence_bm) into here
-    - [x] Script
-    - [x] Dataset
-        - Automatically download from my Google Drive
-    - [x] README
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
 - [x] Multiprocessing
@@ -122,14 +117,14 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py, bm_rnn_sentence.py and wrnn_sentence.py
+## rnn_sentence.py and wrnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 # If you have AMD GPU, install tensorflow-rocm instead of tensorflow to enable HIP + MIOpen-based computing
 $ pip install tensorflow matplotlib
-## w2v_sentence.py
+## classify_lyric.py
 $ pip install gensim
 ```
 
@@ -169,7 +164,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt -n 100
 ```
 
-### rnn_sentence.py & wrnn_sentence.py & w2v_sentence.py
+### rnn_sentence.py & wrnn_sentence.py
 
 - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
 - It takes very long time for execution ...
@@ -193,13 +188,6 @@ Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # Specify the directory name
 # Training model is automatically skipped
 $ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
-```
-
-### bm_rnn_sentence.py
-
-```bash
-# Just execute:
-$ python bm_rnn_sentence.py
 ```
 
 ### utanet_scraper.py
@@ -312,23 +300,7 @@ regex2 = "　|^\n+|《.+?》|［.+?］|｜"
 ## Benchmarking
 
 - Moved to [0-jam/regen_sentence_bm](https://github.com/0-jam/regen_sentence_bm)
-    - Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
-
-### Former Rule (Regulation #2, 20181205)
-
-1. Time measurement begins when training of the model is started
-1. Keep training for an hour (default)
-1. If it exceeded the time limit, finish training at the current epoch
-    - Example: time limit is 15 minutes
-        - If it elapsed 15 minutes while training epoch 3, abort training when finished training epoch 3
-    - If it learned 50 epochs within the time limit, stop learning regardless of elapsed time
-1. Print results
-    - Elapsed time
-    - Trained epochs
-    - Epochs per minute
-    - The value of loss function
-    - Generated text
-        - The number of characters: 20 lines
+- Records of benchmarking is [here](https://gist.github.com/0-jam/f21f44375cb70b987e99cda485d6940d)
 
 [markovify]: https://github.com/jsvine/markovify
 [tensorflow]: https://www.tensorflow.org/

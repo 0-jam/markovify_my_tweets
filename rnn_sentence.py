@@ -1,8 +1,9 @@
 import argparse
+import json
 from pathlib import Path
+
 from modules.model import TextModel
 from modules.plot_result import save_result, show_result
-import json
 
 
 def load_settings(params_json="settings/default.json"):
@@ -32,7 +33,6 @@ def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN (character-based)")
     # Required arguments
     parser.add_argument("input", type=str, help="Input file path")
-    parser.add_argument("start_string", type=str, help="Generation start with this string")
     # Common arguments
     parser.add_argument("-o", "--output", type=str, help="Path to save losses graph and the generated text (default: None (show without saving))")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of input text file (default: utf-8)")
@@ -43,7 +43,8 @@ def main():
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     # Arguments for generation
-    parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
+    parser.add_argument("--start_string", type=str, help="Generation start with this string (default: None (generate from the random string in the input text))")
+    parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training of the model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of character that you want to generate (default: 1)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()

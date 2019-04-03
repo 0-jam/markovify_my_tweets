@@ -2,10 +2,13 @@ import functools
 import json
 import time
 from pathlib import Path
+from random import choice
+
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
+
 from modules.wakachi.mecab import divide_word
 
 config = tf.ConfigProto()
@@ -79,7 +82,7 @@ class TextModel(object):
 
     def fit(self, model_dir, epochs):
         checkpoint_callback = keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
+        earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=10, verbose=1)
 
         start_time = time.time()
         history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=[checkpoint_callback, earlystop_callback])
@@ -128,7 +131,10 @@ class TextModel(object):
     def load(self, model_dir):
         self.model.load_weights(self.path(Path(model_dir)))
 
-    def generate_text(self, start_string, gen_size=1, temp=1.0, delimiter=None):
+    def generate_text(self, start_string=None, gen_size=1, temp=1.0, delimiter=None):
+        if not start_string:
+            start_string = choice(self.idx2vocab)
+
         generated_text = [start_string]
         # Vectorize start string
         try:

@@ -21,7 +21,6 @@ def main():
     parser = argparse.ArgumentParser(description="Generate sentence with RNN (word-based)")
     # Required arguments
     parser.add_argument("input", type=str, help="Input file path")
-    parser.add_argument("start_string", type=str, help="Generation start with this string")
     # Common arguments
     parser.add_argument("-o", "--output", type=str, help="Path to save losses graph and the generated text (default: None (show without saving))")
     parser.add_argument("--encoding", type=str, default='utf-8', help="Encoding of input text file (default: utf-8)")
@@ -32,6 +31,7 @@ def main():
     parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     # Arguments for generation
+    parser.add_argument("--start_string", type=str, help="Generation start with this string (default: None (generate from the random word in the input text))")
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training model will be skipped.")
     parser.add_argument("-g", "--gen_size", type=int, default=100, help="The number of word that you want to generate (default: 100)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
