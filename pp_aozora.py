@@ -43,7 +43,7 @@ def main():
 
     args = parser.parse_args()
 
-    with Path(args.input).open(encoding='utf-8') as input:
+    with Path(args.input).open(encoding='cp932') as input:
         text = replace_text(input.read())
 
     with Path(args.output).open('w', encoding='utf-8') as out:
