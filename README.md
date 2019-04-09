@@ -175,11 +175,12 @@ $ python markovify_sentence.py souseki_wakachi.txt -n 100
 # If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
 # Character-based training
 # No preprocessing needed for input file
-$ python rnn_sentence.py souseki_utf8.txt "吾輩" -e 10
+# If you don't specify start_string, generator will use a random charactor in the text
+$ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
 
 # Word-based training
 # It requires text that is divided by words
-$ python wrnn_sentence.py souseki_wakachi.txt "吾輩" -e 10
+$ python wrnn_sentence.py souseki_wakachi.txt --start_string "吾輩" -e 10
 
 # Specifying learned model
 # Example: Learned model exists in directory "./learned_models/Latin-Lipsum.txt"
@@ -187,7 +188,7 @@ $ ls learned_models/Latin-Lipsum.txt/
 Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
 # Specify the directory name
 # Training model is automatically skipped
-$ python rnn_sentence.py text/Latin-Lipsum.txt "Lorem " --model_dir learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum.txt
 ```
 
 ### utanet_scraper.py

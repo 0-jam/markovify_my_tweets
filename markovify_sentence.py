@@ -55,7 +55,7 @@ def main():
     jobs = min([args.jobs, args.number])
     mgr = mp.Manager()
     generated_sentences = mgr.Queue()
-    # BUG: Count is incorrect if multiprocessing is enabled
+    # Count is incorrect if multiprocessing is enabled
     count = mgr.Value('i', 0)
 
     print("Processes:", jobs)
