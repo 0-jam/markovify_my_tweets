@@ -11,9 +11,14 @@ from tqdm import tqdm
 
 from modules.wakachi.mecab import divide_word
 
-config = tf.ConfigProto()
+config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
+config.gpu_options.per_process_gpu_memory_fraction = 0.2
 tf.enable_eager_execution(config=config)
+
+SEQ_LENGTH = 100
+BUFFER_SIZE = 10000
+NUM_HIDDEN_LAYERS = 1
 
 
 # Character-based model
@@ -41,12 +46,10 @@ class TextModel(object):
         text_as_int = self.vocab_to_indices(text)
 
         # The maximum length sentence we want for single input in characters
-        seq_length = 100
-        buffer_size = 10000
-        chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(seq_length + 1, drop_remainder=True)
+        chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(SEQ_LENGTH + 1, drop_remainder=True)
         self.dataset = chunks.map(self.split_into_target)
-        self.dataset = self.dataset.shuffle(buffer_size).batch(self.batch_size, drop_remainder=True)
-        self.steps_per_epoch = text_size // seq_length // batch_size
+        self.dataset = self.dataset.shuffle(BUFFER_SIZE).batch(self.batch_size, drop_remainder=True)
+        self.steps_per_epoch = text_size // SEQ_LENGTH // batch_size
 
         self.model = self.build_model()
         self.model.summary()
@@ -61,31 +64,39 @@ class TextModel(object):
         else:
             gru = keras.layers.CuDNNGRU
 
-        return keras.Sequential([
-            keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None]),
-            gru(
+        grus = []
+        for _ in range(NUM_HIDDEN_LAYERS):
+            grus.append(gru(
                 self.units,
                 return_sequences=True,
                 stateful=True,
                 recurrent_initializer='glorot_uniform'
-            ),
-            keras.layers.Dropout(0.5),
-            keras.layers.Dense(self.vocab_size)
-        ])
+            ))
+            grus.append(keras.layers.Dropout(0.5))
+
+        return keras.Sequential(
+            [keras.layers.Embedding(self.vocab_size, self.embedding_dim, batch_input_shape=[self.batch_size, None])]
+            + grus
+            + [keras.layers.Dense(self.vocab_size)]
+        )
 
     @staticmethod
     def loss(labels, logits):
         return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
+    @staticmethod
+    def callbacks(model_dir):
+        return [
+            keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
+            keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
+        ]
+
     def compile(self):
         self.model.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
 
     def fit(self, model_dir, epochs):
-        checkpoint_callback = keras.callbacks.ModelCheckpoint(str(model_dir.joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1)
-        earlystop_callback = keras.callbacks.EarlyStopping(monitor='loss', patience=10, verbose=1)
-
         start_time = time.time()
-        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=[checkpoint_callback, earlystop_callback])
+        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=self.callbacks(model_dir))
         elapsed_time = time.time() - start_time
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
@@ -205,7 +216,7 @@ class TextModel(object):
 # Word-based model
 # Convert text into one-hot vector
 class WordModel(TextModel):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=False, num_words=20000)
+    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=False, num_words=15000)
 
     def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
         words = text.split()

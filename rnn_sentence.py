@@ -20,8 +20,7 @@ def load_test_settings():
 # Evaluation methods
 # Load learned model
 def init_generator(model_dir, text):
-    embedding_dim, units, _, cpu_mode = load_settings(
-        model_dir.joinpath("parameters.json")).values()
+    embedding_dim, units, _, cpu_mode = load_settings(model_dir.joinpath("parameters.json")).values()
 
     generator = TextModel(embedding_dim, units, 1, text, cpu_mode=cpu_mode)
     generator.load(model_dir)
