@@ -48,7 +48,8 @@
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
-    - The program seems to work successfully, but output does not make any sense ...
+    - ~~The program seems to work successfully, but output does not make any sense ...~~
+    - [ ] Currently not working due to some changes of parent Model class
 - [ ] Separate RNN trainer and generator
 - [ ] Some cleanup tasks for RNN text generation
 - [x] ROCm 2.x

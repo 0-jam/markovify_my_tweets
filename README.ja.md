@@ -48,7 +48,8 @@
 - [ ] どこでも実行できるようにWeb API化できたらいいな
 - [ ] TensorFlow 2.0へのアップデート準備
 - [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)試す
-    - プログラムは動いているが，意味のある出力は得られていない…
+    - ~~プログラムは動いているが，意味のある出力は得られていない…~~
+    - [ ] 現在親クラスの変更により動作せず
 - [ ] RNN版の訓練とテキスト生成を分離
 - [ ] RNNテキスト生成いろいろ整理
 - [x] ベンチマークを別リポジトリに分ける

@@ -1,7 +1,8 @@
+# BUG: CURRENTLY NOT WORKING
 import argparse
 from pathlib import Path
 
-from modules.plot_result import show_result
+from modules.plot_result import show_result, save_result
 from modules.s2smodel import S2SModel
 from rnn_sentence import load_settings, load_test_settings
 
@@ -18,7 +19,7 @@ def init_generator(model_dir, text):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate sentence with RNN (word-based)")
+    parser = argparse.ArgumentParser(description="Generate sentence with RNN (Seq2Seq-based)")
     # Required arguments
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("start_string", type=str, help="Generation start with this string")
@@ -72,7 +73,9 @@ def main():
         model = S2SModel(embedding_dim, units, batch_size, text, cpu_mode=cpu_mode)
 
         model.compile()
-        losses = [model.train() for _ in range(epochs)]
+        history = model.fit(model_dir, epochs)
+        losses = history.history["loss"]
+        # losses = [model.train() for _ in range(epochs)]
         model.save(model_dir)
 
     generator = init_generator(model_dir, text)
