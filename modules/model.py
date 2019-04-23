@@ -25,7 +25,7 @@ NUM_HIDDEN_LAYERS = 1
 class TextModel(object):
     tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=True)
 
-    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=True):
+    def __init__(self, embedding_dim, units, batch_size, text, cpu_mode=False):
         # Hyper parameters
         self.embedding_dim = embedding_dim
         self.units = units
@@ -55,7 +55,7 @@ class TextModel(object):
         self.model.summary()
 
     def build_model(self):
-        # Disable CUDA if GPU is not available
+        # Disable CuDNN if GPU is not available
         if self.cpu_mode:
             gru = functools.partial(
                 keras.layers.GRU,
