@@ -13,7 +13,6 @@ from modules.wakachi.mecab import divide_word
 
 config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
-config.gpu_options.per_process_gpu_memory_fraction = 0.2
 tf.enable_eager_execution(config=config)
 tf.logging.set_verbosity(tf.logging.WARN)
 

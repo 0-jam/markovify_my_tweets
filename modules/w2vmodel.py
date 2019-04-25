@@ -1,6 +1,6 @@
-import multiprocessing as mp
 import re
 import time
+from multiprocessing import cpu_count
 
 import numpy as np
 import tensorflow as tf
@@ -12,7 +12,7 @@ from modules.model import TextModel
 from modules.wakachi.mecab import divide_word
 
 MAX_SENTENCE_LEN = 500
-NUM_CPU = mp.cpu_count()
+NUM_CPU = cpu_count()
 
 
 # Word2vec model

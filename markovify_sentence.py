@@ -12,11 +12,11 @@ from modules.combine_sentence import combine_sentence
 # Generate text from the model
 def generate(queue, model, count):
     while True:
-        text = model.make_sentence()
+        generated_sentence = model.make_sentence()
         count.value += 1
 
-        if text is not None:
-            queue.put(combine_sentence(text.split()))
+        if generated_sentence is not None:
+            queue.put(combine_sentence(generated_sentence.split()))
             break
 
 

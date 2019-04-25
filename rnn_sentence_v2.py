@@ -17,12 +17,12 @@ def main():
     # Arguments for training
     parser.add_argument("-s", "--save_dir", type=str, help="Location to save the model checkpoint (default: './learned_models/<input_file_name>', overwrite if checkpoint already exists)")
     parser.add_argument("-c", "--config", type=str, default='settings/default.json', help="Path to configuration file (default: './settings/default.json')")
-    parser.add_argument("--cpu_mode", action='store_true', help="Force to create CPU compatible model (default: False)")
+    parser.add_argument("--cpu_mode", action='store_true', help="Force to use non-cuDNN model (default: False)")
     parser.add_argument("-e", "--epochs", type=int, default=10, help="The number of epochs (default: 10)")
     # Arguments for generation
     parser.add_argument("--start_string", type=str, help="Generation start with this string (default: None (generate from the random string in the input text))")
     parser.add_argument("--model_dir", type=str, help="Path to the learned model directory. Training of the model will be skipped.")
-    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of character that you want to generate (default: 1)")
+    parser.add_argument("-g", "--gen_size", type=int, default=1000, help="The number of character that you want to generate (default: 1000)")
     parser.add_argument("-t", "--temperature", type=float, default=1.0, help="Set randomness of text generation (default: 1.0)")
     args = parser.parse_args()
 
