@@ -25,11 +25,19 @@ class MCModel(object):
     def build_model(self, states=2):
         self.model = markovify.NewlineText(self.dataset)
 
-    def generate_sentence(self, gen_size=1):
-        return self.model.make_sentence()
+    def generate_sentence(self, gen_size=None):
+        if gen_size is None:
+            generated_sentence = self.model.make_sentence()
+        else:
+            print('short_sentence mode')
+            generated_sentence = self.model.make_short_sentence(gen_size)
+
+        return generated_sentence
 
     def save(self, file_path):
-        pass
+        with Path(file_path).open('w', encoding='utf-8') as out:
+            out.write(self.model.to_json())
 
     def load(self, file_path):
-        pass
+        with Path(file_path).open(encoding='utf-8') as input:
+            self.model = markovify.NewlineText.from_json(input.read())
