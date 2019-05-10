@@ -1,5 +1,4 @@
 import functools
-import time
 
 from tensorflow import keras
 
@@ -28,17 +27,17 @@ class S2SModel(TextModel):
 
         # Encoder layers
         enc_in = keras.layers.Input(shape=(None,))
-        enc_emb = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(enc_in)
-        enc_lstm, state_h, state_c = lstm(return_state=True)(enc_emb)
+        encoder = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(enc_in)
+        encoder, state_h, state_c = lstm(return_state=True)(encoder)
         enc_states = [state_h, state_c]
 
         # Decoder layers
         dec_in = keras.layers.Input(shape=(None,))
-        dec_emb = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(dec_in)
-        dec_lstm = lstm()(dec_emb, initial_state=enc_states)
-        dec_dense = keras.layers.Dense(self.vocab_size, activation='softmax')(enc_lstm)
+        decoder = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(dec_in)
+        decoder = lstm()(decoder, initial_state=enc_states)
+        dec_out = keras.layers.Dense(self.vocab_size, activation='softmax')(decoder)
 
-        return keras.Model([enc_in, dec_in], dec_dense)
+        return keras.Model([enc_in, dec_in], dec_out)
 
 
 # Word-based Seq2seq model
@@ -64,14 +63,14 @@ class WS2SModel(WordModel):
 
         # Encoder layers
         enc_in = keras.layers.Input(shape=(None,))
-        enc_emb = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(enc_in)
-        enc_lstm, state_h, state_c = lstm(return_state=True)(enc_emb)
+        encoder = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(enc_in)
+        encoder, state_h, state_c = lstm(return_state=True)(encoder)
         enc_states = [state_h, state_c]
 
         # Decoder layers
         dec_in = keras.layers.Input(shape=(None,))
-        dec_emb = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(dec_in)
-        dec_lstm = lstm()(dec_emb, initial_state=enc_states)
-        dec_dense = keras.layers.Dense(self.vocab_size, activation='softmax')(enc_lstm)
+        decoder = keras.layers.Embedding(self.vocab_size, self.embedding_dim)(dec_in)
+        decoder = lstm()(decoder, initial_state=enc_states)
+        dec_out = keras.layers.Dense(self.vocab_size, activation='softmax')(decoder)
 
-        return keras.Model([enc_in, dec_in], dec_dense)
+        return keras.Model([enc_in, dec_in], dec_out)

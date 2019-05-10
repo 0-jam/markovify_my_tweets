@@ -3,6 +3,15 @@ import MeCab
 m = MeCab.Tagger('-Owakati')
 
 
-# 文sentenceを分かち書き
+# Split sentence by word
 def divide_word(sentence):
-    return m.parse(sentence.strip()).split()
+    return m.parse(sentence).strip().split()
+
+
+def divide_text(text):
+    sentences = []
+
+    for line in text.split('\n'):
+        sentences += divide_word(line)
+
+    return sentences
