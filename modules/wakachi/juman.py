@@ -3,7 +3,7 @@ from pyknp import Juman
 juman = Juman()
 
 
-# 文sentenceを分かち書き
+# Split sentence by word
 # BUG: "ダブルクオーテーション"を含む文字列（'".'など）を投げるとその部分が二重になって返ってくる
 def divide_word(sentence):
     sentence = sentence.strip()

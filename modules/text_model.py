@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
 
-from modules.wakachi.mecab import divide_word
+from modules.wakachi.mecab import divide_word, divide_text
 
 config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
@@ -39,7 +39,7 @@ class TextModel(object):
             text = data.read()
 
         if not char_level:
-            text = divide_word(text)
+            text = divide_text(text)
 
         # Vectorize the text
         self.tokenizer.char_level = char_level
@@ -125,34 +125,6 @@ class TextModel(object):
 
         return history
 
-    # Train model from the dataset
-    # TODO: Early stopping during the training
-    def train(self):
-        optimizer = tf.train.AdamOptimizer()
-        loss_f = tf.losses.sparse_softmax_cross_entropy
-
-        start = time.time()
-        for (batch, (input, target)) in enumerate(self.dataset):
-            with tf.GradientTape() as tape:
-                # feeding the hidden state back into the model
-                predictions = self.model(input)
-
-                # reshape target to make loss function expect the target
-                loss = loss_f(target, predictions)
-
-            gradients = tape.gradient(loss, self.model.variables)
-            optimizer.apply_gradients(zip(gradients, self.model.variables))
-
-            print("Batch: {}, Loss: {:.4f}".format(batch + 1, loss), end="\r")
-
-        elapsed_time = time.time() - start
-        print("Time taken for this epoch: {:.3f} sec, Loss: {:.3f}".format(
-            elapsed_time,
-            loss
-        ))
-
-        return loss.numpy()
-
     def save(self, model_dir):
         if Path.is_dir(model_dir) is not True:
             Path.mkdir(model_dir, parents=True)
@@ -233,4 +205,12 @@ class TextModel(object):
 
     # Convert string to numbers
     def vocab_to_indices(self, sentence):
-        return np.array(self.tokenizer.texts_to_sequences(sentence.lower())).reshape(-1,)
+        if not self.tokenizer.char_level:
+            if type(sentence) == str:
+                sentence = divide_word(sentence.lower())
+
+            sentence = [sentence]
+        else:
+            sentence = sentence.lower()
+
+        return np.array(self.tokenizer.texts_to_sequences(sentence)).reshape(-1,)
