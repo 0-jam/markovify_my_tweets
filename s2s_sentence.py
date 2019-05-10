@@ -1,21 +1,10 @@
 # BUG: CURRENTLY NOT WORKING
 import argparse
-import json
 from pathlib import Path
 
 from modules.plot_result import save_result, show_result
 from modules.s2smodel import S2SModel
-
-
-def load_settings(params_json='settings/default.json'):
-    with Path(params_json).open(encoding='utf-8') as params:
-        parameters = json.load(params)
-
-    return parameters
-
-
-def load_test_settings():
-    return load_settings('settings/test.json')
+from modules.settings_loader import load_settings, load_test_settings
 
 
 # Evaluation methods

@@ -51,7 +51,8 @@
     - ~~The program seems to work successfully, but output does not make any sense ...~~
     - [ ] Currently not working due to some changes of parent Model class
 - [ ] Separate RNN trainer and generator
-- [ ] Some cleanup tasks for RNN text generation
+- [x] Some cleanup tasks for RNN text generation
+    - Unified RNN text generator between character-based and word-based
 - [x] ROCm 2.x
 - [x] Move benchmarking to the another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
@@ -162,7 +163,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 
 ```bash
 # Give filename to "-o" option if you want to save generated text
-$ python markovify_sentence.py souseki_wakachi.txt -n 100
+$ python markovify_sentence.py souseki_wakachi.txt
 ```
 
 ### rnn_sentence.py & wrnn_sentence.py

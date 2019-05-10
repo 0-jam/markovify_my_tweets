@@ -51,7 +51,8 @@
     - ~~プログラムは動いているが，意味のある出力は得られていない…~~
     - [ ] 現在親クラスの変更により動作せず
 - [ ] RNN版の訓練とテキスト生成を分離
-- [ ] RNNテキスト生成いろいろ整理
+- [x] RNNテキスト生成いろいろ整理
+    - 文字ベースと単語ベースで生成スクリプトを統合した
 - [x] ベンチマークを別リポジトリに分ける
 - [x] ROCm 2.x
 - [x] TensorFlow 1.13 + CUDA 10.0
@@ -162,7 +163,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 
 ```bash
 # "-o"オプションにファイル名を指定すると生成された文章が保存される
-$ python markovify_sentence.py souseki_wakachi.txt -n 100
+$ python markovify_sentence.py souseki_wakachi.txt
 ```
 
 ### rnn_sentence.py & wrnn_sentence.py
