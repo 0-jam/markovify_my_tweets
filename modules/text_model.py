@@ -23,8 +23,6 @@ NUM_HIDDEN_LAYERS = 1
 
 # Character-based model
 class TextModel(object):
-    tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>')
-
     def __init__(self):
         self.dataset = None
         self.model = None
@@ -35,6 +33,8 @@ class TextModel(object):
         self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
 
     def build_dataset(self, text_path, char_level=True, encoding='utf-8'):
+        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=char_level)
+
         with Path(text_path).open(encoding=encoding) as data:
             text = data.read()
 
@@ -42,12 +42,11 @@ class TextModel(object):
             text = divide_text(text)
 
         # Vectorize the text
-        self.tokenizer.char_level = char_level
         self.tokenizer.fit_on_texts(text)
         vocab2idx = self.tokenizer.word_index
         # Index 0 is preserved in the Keras tokenizer for the unknown word, but it's not included in vocab2idx
-        self.idx2vocab = dict([(i, v) for v, i in vocab2idx.items()])
-        self.idx2vocab[0] = '<oov>'
+        self.idx2vocab = {i: v for v, i in vocab2idx.items()}
+        # self.idx2vocab[0] = '<oov>'
         self.vocab_size = len(vocab2idx) + 1
         text_size = len(text)
         print("Text has {} characters ({} unique characters)".format(text_size, self.vocab_size - 1))
