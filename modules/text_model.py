@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
 
-from modules.wakachi.mecab import divide_word, divide_text
+from modules.wakachi.mecab import divide_text, divide_word
 
 config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
@@ -43,11 +43,10 @@ class TextModel(object):
 
         # Vectorize the text
         self.tokenizer.fit_on_texts(text)
-        vocab2idx = self.tokenizer.word_index
         # Index 0 is preserved in the Keras tokenizer for the unknown word, but it's not included in vocab2idx
-        self.idx2vocab = {i: v for v, i in vocab2idx.items()}
+        self.idx2vocab = {i: v for v, i in self.tokenizer.word_index.items()}
         # self.idx2vocab[0] = '<oov>'
-        self.vocab_size = len(vocab2idx) + 1
+        self.vocab_size = len(self.idx2vocab) + 1
         text_size = len(text)
         print("Text has {} characters ({} unique characters)".format(text_size, self.vocab_size - 1))
 

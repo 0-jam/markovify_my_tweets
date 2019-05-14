@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from modules.text_model import TextModel
 from modules.plot_result import save_result, show_result
 from modules.settings_loader import load_settings, load_test_settings
+from modules.text_model import TextModel
 
 
 def main():
@@ -65,8 +65,11 @@ def main():
         losses = history.history['loss']
         model.save(model_dir)
 
-    model.build_generator(model_dir)
-    model.save_generator(model_dir)
+        model.build_generator(model_dir)
+        model.save_generator(model_dir)
+    else:
+        model.load_generator(model_dir)
+
     if args.word_based:
         delimiter = ' '
     else:
