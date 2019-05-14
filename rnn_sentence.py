@@ -67,7 +67,11 @@ def main():
 
     model.build_generator(model_dir)
     model.save_generator(model_dir)
-    generated_text = ''.join(model.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
+    if args.word_based:
+        delimiter = ' '
+    else:
+        delimiter = ''
+    generated_text = delimiter.join(model.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
 
     if args.output:
         print('Saving generated text...')
