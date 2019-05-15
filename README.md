@@ -42,6 +42,8 @@
 
 ## Todo
 
+- [ ] Generic Doc2vec classifier
+- [ ] Remove unneeded words on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Separate building the dataset and the model
     - There is a lot of duplicated code around them
@@ -57,6 +59,7 @@
 - [x] Move benchmarking to the another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
+    - It seems there is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
 - [x] ~~Try word2vec~~

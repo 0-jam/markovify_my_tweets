@@ -42,6 +42,8 @@
 
 ## Todo
 
+- [ ] Generic Doc2vec classifier
+- [ ] Remove unneeded words on Uta-net classifier
 - [ ] パラメーター指定のしかたをもっと簡単にする
 - [ ] データセットとモデルの生成処理を分離する
     - 生成処理周辺に重複コードが多い
@@ -57,6 +59,7 @@
 - [x] ROCm 2.x
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1には`libcublas.so`が含まれておらずエラー
+    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があるらしい
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
 - [x] ~~word2vec試す~~
