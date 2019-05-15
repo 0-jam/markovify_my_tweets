@@ -40,6 +40,7 @@ class TextModel(object):
 
         if not char_level:
             text = divide_text(text)
+            self.tokenizer.num_words = 15000
 
         # Vectorize the text
         self.tokenizer.fit_on_texts(text)
