@@ -4,6 +4,7 @@ from pathlib import Path
 from modules.plot_result import save_result, show_result
 from modules.settings_loader import load_settings, load_test_settings
 from modules.text_model import TextModel
+from modules.combine_sentence import combine_sentence
 
 
 def main():
@@ -70,17 +71,18 @@ def main():
     else:
         model.load_generator(model_dir)
 
+    generated_text = model.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature)
+
     if args.word_based:
-        delimiter = ' '
+        generated_text = combine_sentence(generated_text)
     else:
-        delimiter = ''
-    generated_text = delimiter.join(model.generate_text(args.start_string, gen_size=gen_size, temp=args.temperature))
+        generated_text = ''.join(generated_text)
 
     if args.output:
         print('Saving generated text...')
         outpath = Path(args.output)
         with outpath.open('w', encoding='utf-8') as out:
-            out.write(generated_text)
+            out.write(generated_text + '\n')
 
         try:
             save_result(losses, outpath)
