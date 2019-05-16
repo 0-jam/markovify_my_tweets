@@ -16,15 +16,19 @@ def main():
     args = parser.parse_args()
 
     model = MCModel()
-    model.build_dataset(args.input, char_level=args.char_level, encoding=args.encoding)
-    model.build_model(states=args.states)
-
-    if args.out_path:
-        out_path = args.out_path
+    if args.mcmodel:
+        # BUG: When specified pre-trained MCModel JSON, there is no need to specify an input text file
+        model.load_model(args.mcmodel)
     else:
-        out_path = str(Path(args.input).stem) + '_mc.json'
+        model.build_dataset(args.input, char_level=args.char_level, encoding=args.encoding)
+        model.build_model(states=args.states)
 
-    model.save_model(out_path)
+        if args.out_path:
+            out_path = args.out_path
+        else:
+            out_path = str(Path(args.input).stem) + '_mc.json'
+
+        model.save_model(out_path)
 
     generated_sentence = model.generate_sentence(args.gen_size)
     print(generated_sentence)
