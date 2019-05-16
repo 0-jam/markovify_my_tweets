@@ -16,7 +16,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -45,14 +45,10 @@
 - [ ] Generic Doc2vec classifier
 - [ ] Remove unneeded words on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
-- [ ] Separate building the dataset and the model
-    - There is a lot of duplicated code around them
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
-    - ~~The program seems to work successfully, but output does not make any sense ...~~
-    - [ ] Currently not working due to some changes of parent Model class
 - [ ] Separate RNN trainer and generator
+- [x] Separate building the dataset and the model
 - [x] Some cleanup tasks for RNN text generation
     - Unified RNN text generator between character-based and word-based
 - [x] ROCm 2.x
@@ -62,7 +58,6 @@
     - It seems there is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
-- [x] ~~Try word2vec~~
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
     - [x] [Juman++][jumanpp]
@@ -122,7 +117,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py and wrnn_sentence.py
+## rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
@@ -169,7 +164,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt
 ```
 
-### rnn_sentence.py & wrnn_sentence.py
+### rnn_sentence.py
 
 - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
 - It takes very long time for execution ...
@@ -178,22 +173,17 @@ $ python markovify_sentence.py souseki_wakachi.txt
 
 ```bash
 # If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
-# Character-based training
-# No preprocessing needed for input file
-# If you don't specify start_string, generator will use a random charactor in the text
-$ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
-
-# Word-based training
-# It requires text that is divided by words
-$ python wrnn_sentence.py souseki_wakachi.txt --start_string "吾輩" -e 10
+# If you don't specify start_string, generator will use a random charactor/word in the text
+# Add -w option to word-based training
+$ python rnn_sentence.py souseki.txt --start_string "吾輩" -e 10
 
 # Specifying learned model
 # Example: Learned model exists in directory "./learned_models/Latin-Lipsum.txt"
-$ ls learned_models/Latin-Lipsum.txt/
-Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+$ ls learned_models/Latin-Lipsum/
+Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # Specify the directory name
 # Training model is automatically skipped
-$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum
 ```
 
 ### utanet_scraper.py

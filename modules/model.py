@@ -1,3 +1,4 @@
+# OLD VERSION of the text generator model
 import functools
 import json
 import time

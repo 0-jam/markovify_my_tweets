@@ -16,7 +16,7 @@
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -42,17 +42,13 @@
 
 ## Todo
 
-- [ ] Generic Doc2vec classifier
-- [ ] Remove unneeded words on Uta-net classifier
+- [ ] Doc2vec分類器の一般化
+- [ ] 歌ネット分類器で、不要な単語を削除する
 - [ ] パラメーター指定のしかたをもっと簡単にする
-- [ ] データセットとモデルの生成処理を分離する
-    - 生成処理周辺に重複コードが多い
 - [ ] どこでも実行できるようにWeb API化できたらいいな
 - [ ] TensorFlow 2.0へのアップデート準備
-- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)試す
-    - ~~プログラムは動いているが，意味のある出力は得られていない…~~
-    - [ ] 現在親クラスの変更により動作せず
 - [ ] RNN版の訓練とテキスト生成を分離
+- [x] データセットとモデルの生成処理を分離する
 - [x] RNNテキスト生成いろいろ整理
     - 文字ベースと単語ベースで生成スクリプトを統合した
 - [x] ベンチマークを別リポジトリに分ける
@@ -62,7 +58,6 @@
     - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があるらしい
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
-- [x] ~~word2vec試す~~
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
     - [x] [Juman++][jumanpp]
@@ -122,7 +117,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py, wrnn_sentence.py
+## rnn_sentence.py
 # pyenv環境ではPythonビルド前にliblzmaのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
@@ -169,7 +164,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt
 ```
 
-### rnn_sentence.py & wrnn_sentence.py
+### rnn_sentence.py
 
 - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)がベース
 - GPUが使える環境での実行を推奨
@@ -178,22 +173,17 @@ $ python markovify_sentence.py souseki_wakachi.txt
 
 ```bash
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
-# 文字ベースの学習
-# 特に前処理は必要ない
-# If you don't specify start_string, generator will use a random charactor in the text
+# start_stringを指定しなかった場合，テキスト内のランダムに選ばれた文字/単語から生成が始まる
+# "-w"オプションをつけると単語ベースでの学習になる
 $ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
-
-# 単語ベースの学習
-# 事前に分かち書きをしておく必要がある
-$ python wrnn_sentence.py souseki_wakachi.txt --start_string "吾輩" -e 10
 
 # 学習済みモデルを指定
 # 例：ディレクトリ"./learned_models/Latin-Lipsum.txt"内にモデルがあるとする
-$ ls learned_models/Latin-Lipsum.txt/
-Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+$ ls learned_models/Latin-Lipsum/
+Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # ディレクトリ名を指定
 # モデルの訓練はスキップされる
-$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum
 ```
 
 ### utanet_scraper.py

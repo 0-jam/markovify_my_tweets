@@ -21,7 +21,6 @@ BUFFER_SIZE = 10000
 NUM_HIDDEN_LAYERS = 1
 
 
-# Character-based model
 class TextModel(object):
     def __init__(self):
         self.dataset = None
