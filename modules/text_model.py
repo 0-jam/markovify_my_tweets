@@ -19,6 +19,7 @@ tf.logging.set_verbosity(tf.logging.WARN)
 SEQ_LENGTH = 100
 BUFFER_SIZE = 10000
 NUM_HIDDEN_LAYERS = 1
+WORD_LIMIT = 15000
 
 
 class TextModel(object):
@@ -32,14 +33,13 @@ class TextModel(object):
         self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
 
     def build_dataset(self, text_path, char_level=True, encoding='utf-8'):
-        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=char_level)
+        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=char_level, num_words=WORD_LIMIT)
 
         with Path(text_path).open(encoding=encoding) as data:
             text = data.read()
 
         if not char_level:
             text = divide_text(text)
-            self.tokenizer.num_words = 15000
 
         # Vectorize the text
         self.tokenizer.fit_on_texts(text)

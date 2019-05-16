@@ -24,7 +24,7 @@ def main():
     else:
         out_path = str(Path(args.input).stem) + '_mc.json'
 
-    model.save(out_path)
+    model.save_model(out_path)
 
     generated_sentence = model.generate_sentence(args.gen_size)
     print(generated_sentence)
