@@ -23,7 +23,7 @@ def main():
     parser.add_argument('-e', '--epochs', type=int, default=10, help='The number of epochs (default: 10)')
     # Arguments for generation
     parser.add_argument('--start_string', type=str, help='Generation start with this string (default: None (generate from the random string in the input text))')
-    parser.add_argument('--model_dir', type=str, help='Path to the learned model directory. Training of the model will be skipped.')
+    parser.add_argument('--load_dir', type=str, help='Path to the learned model directory. Training of the model will be skipped.')
     parser.add_argument('-g', '--gen_size', type=int, default=1000, help='The number of character that you want to generate (default: 1000)')
     parser.add_argument('-t', '--temperature', type=float, default=1.0, help='Set randomness of text generation (default: 1.0)')
     args = parser.parse_args()
@@ -47,8 +47,8 @@ def main():
     # Specify directory to save model
     if args.save_dir:
         model_dir = Path(args.save_dir)
-    elif args.model_dir:
-        model_dir = Path(args.model_dir)
+    elif args.load_dir:
+        model_dir = Path(args.load_dir)
     else:
         model_dir = Path('./learned_models').joinpath(input_path.stem)
 
@@ -57,14 +57,14 @@ def main():
     model.build_dataset(str(input_path), encoding=args.encoding, char_level=not args.word_based)
 
     # Training
-    if not args.model_dir:
+    if not args.load_dir:
         # Create the model
         model.build_trainer()
 
         model.compile()
         history = model.fit(model_dir, epochs)
         losses = history.history['loss']
-        model.save(model_dir)
+        model.save_trainer(model_dir)
 
         model.build_generator(model_dir)
         model.save_generator(model_dir)

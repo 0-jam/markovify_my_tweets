@@ -25,7 +25,7 @@ WORD_LIMIT = 15000
 class TextModel(object):
     def __init__(self):
         self.dataset = None
-        self.model = None
+        self.trainer = None
         self.generator = None
 
     # Set hyper parameters from arguments
@@ -89,51 +89,51 @@ class TextModel(object):
         )
 
     def build_trainer(self):
-        self.model = self.build_model()
+        self.trainer = self.build_model()
 
-    def build_generator(self, model_dir):
+    def build_generator(self, load_dir):
         self.generator = self.build_model(batch_size=1)
-        self.generator.load_weights(self.path(Path(model_dir)))
+        self.generator.load_weights(self.path(Path(load_dir)))
 
-    def save_generator(self, model_dir):
-        self.generator.save(str(Path(model_dir).joinpath('generator.h5')))
+    def save_generator(self, save_dir):
+        self.generator.save(str(Path(save_dir).joinpath('generator.h5')))
 
-    def load_generator(self, model_dir):
-        self.generator = keras.models.load_model(str(Path(model_dir).joinpath('generator.h5')))
+    def load_generator(self, load_dir):
+        self.generator = keras.models.load_model(str(Path(load_dir).joinpath('generator.h5')))
 
     @staticmethod
     def loss(labels, logits):
         return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
     @staticmethod
-    def callbacks(model_dir):
+    def callbacks(save_dir):
         return [
-            keras.callbacks.ModelCheckpoint(str(Path(model_dir).joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
+            keras.callbacks.ModelCheckpoint(str(Path(save_dir).joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
             keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
         ]
 
     def compile(self):
-        self.model.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
+        self.trainer.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
 
-    def fit(self, model_dir, epochs):
+    def fit(self, save_dir, epochs):
         start_time = time.time()
-        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=self.callbacks(model_dir))
+        history = self.trainer.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=self.callbacks(save_dir))
         elapsed_time = time.time() - start_time
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
         return history
 
-    def save(self, model_dir):
-        if Path.is_dir(model_dir) is not True:
-            Path.mkdir(model_dir, parents=True)
+    def save_trainer(self, save_dir):
+        if Path.is_dir(save_dir) is not True:
+            Path.mkdir(save_dir, parents=True)
 
-        with model_dir.joinpath('parameters.json').open('w', encoding='utf-8') as params:
+        with save_dir.joinpath('parameters.json').open('w', encoding='utf-8') as params:
             params.write(json.dumps(self.parameters()))
 
-        self.model.save_weights(str(Path(model_dir.joinpath('weights'))))
+        self.trainer.save_weights(str(Path(save_dir.joinpath('weights'))))
 
-    def load(self, model_dir):
-        self.model.load_weights(self.path(Path(model_dir)))
+    def load_trainer(self, load_dir):
+        self.trainer.load_weights(self.path(Path(load_dir)))
 
     def generate_text(self, start_string=None, gen_size=1, temp=1.0, delimiter=None):
         if not start_string:

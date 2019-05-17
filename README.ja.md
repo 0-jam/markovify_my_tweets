@@ -183,7 +183,7 @@ $ ls learned_models/Latin-Lipsum/
 Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # ディレクトリ名を指定
 # モデルの訓練はスキップされる
-$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum
+$ python rnn_sentence.py text/Latin-Lipsum.txt --load_dir learned_models/Latin-Lipsum
 ```
 
 ### utanet_scraper.py
