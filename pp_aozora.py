@@ -35,7 +35,6 @@ def replace_text(text):
 
 
 def main():
-    # オプション設定・取得
     parser = argparse.ArgumentParser(description="Preprocessing for Aozora Bunko.")
     parser.add_argument("input", type=str, help="Input file path")
     parser.add_argument("output", type=str, help="Output file path")
@@ -47,7 +46,6 @@ def main():
         text = replace_text(input.read())
 
     with Path(args.output).open('w', encoding='utf-8') as out:
-        # 改行区切りでファイルに書き込む
         out.write("\n".join(text) + "\n")
 
 

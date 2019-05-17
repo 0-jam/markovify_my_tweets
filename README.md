@@ -43,7 +43,7 @@
 ## Todo
 
 - [ ] Generic Doc2vec classifier
-- [ ] Remove unneeded words on Uta-net classifier
+- [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
