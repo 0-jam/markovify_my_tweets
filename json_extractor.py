@@ -1,25 +1,8 @@
 import argparse
 import json
-import unicodedata
 from pathlib import Path
 
-from modules.multi_sub import replace_str
-
-
-def normalize(text):
-    # すべての全角英数字，丸カッコ（），全角スペース　，！，？などをそれぞれ半角に置換
-    text = unicodedata.normalize('NFKC', text)
-    # 3つ以上続くピリオド..., 全角ピリオド・・・を三点リーダー…に置換
-    # （上記normalize()で三点リーダーがピリオド3つに置換されているのをここで戻している）
-    # 2回以上続く三点リーダー……を1つ…にする
-    # 波ダッシュ〜（上記normalize()で半角~に変換済み）をダッシューに置換
-    # すべての半角カッコ{}[]()<>を丸カッコ()に統一
-    # すべての全角かぎかっこ「」『』｢｣をこれ「」に統一
-    # 各要素：(置換したい文字, 置換先の文字)
-    patterns = [(r'\.{3,}', '…'), (r'・{3,}', '…'), (r'…{2,}', '…'), (r'~', 'ー'), (r'\[|{|<', r'\('), (r'\]|}|>', r'\)'), (r'｢|『', '「'), (r'』|｣', '」')]
-    text = replace_str(text, patterns)
-
-    return text
+from modules.normalize_text import normalize
 
 
 def main():
