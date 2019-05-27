@@ -1,5 +1,6 @@
 import functools
 import json
+import pickle
 import time
 from pathlib import Path
 from random import choice
@@ -58,6 +59,15 @@ class TextModel(object):
         chunks = tf.data.Dataset.from_tensor_slices(text_as_int).batch(SEQ_LENGTH + 1, drop_remainder=True)
         self.dataset = chunks.map(self.split_into_target).shuffle(BUFFER_SIZE).batch(self.batch_size, drop_remainder=True)
         self.steps_per_epoch = text_size // SEQ_LENGTH // self.batch_size
+
+    # Save/Load the tokenizer as pickle
+    def save_tokenizer(self, save_dir):
+        with save_dir.joinpath('tokenizer.pickle').open('wb') as tokenizer_fp:
+            pickle.dump(self.tokenizer, tokenizer_fp)
+
+    def load_tokenizer(self, load_dir):
+        with load_dir.joinpath('tokenizer.pickle').open('rb') as tokenizer_fp:
+            self.tokenizer = pickle.load(tokenizer_fp)
 
     # Return model settings as dict
     def parameters(self):
@@ -153,6 +163,7 @@ class TextModel(object):
             params.write(json.dumps(self.parameters()))
 
         self.trainer.save_weights(str(Path(save_dir.joinpath('weights'))))
+        self.save_tokenizer(save_dir)
 
     def load_trainer(self, load_dir):
         self.trainer.load_weights(self.path(Path(load_dir)))

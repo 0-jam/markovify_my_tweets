@@ -9,9 +9,12 @@
 1. [環境](#環境)
    1. [ソフトウェア](#ソフトウェア)
 1. [Todo](#todo)
-1. [インストール](#インストール)
-   1. [前処理スクリプト](#前処理スクリプト)
-   1. [テキスト生成スクリプト](#テキスト生成スクリプト)
+1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
+   1. [前処理](#前処理)
+   1. [テキスト生成](#テキスト生成)
+1. [インストール (Arch Linux)](#インストール-arch-linux)
+   1. [前処理](#前処理-1)
+   1. [テキスト生成](#テキスト生成-1)
 1. [使用法](#使用法)
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
@@ -36,26 +39,28 @@
 
 - Python 3.7.3
 - テスト済みOS
-    - Ubuntu 18.04.2 + ROCm 2.1
-    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+    - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
+    - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
+    - Arch Linux (Linux 5.1.4 + NVIDIA 430.14) + CUDA 10.1.168 + CuDNN 7.5.1.10
 - TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] SeqGAN試す
 - [ ] Doc2vec分類器の一般化
 - [ ] 歌ネット分類器で，不要な単語（ストップワードなど）を削除する
 - [ ] パラメーター指定のしかたをもっと簡単にする
 - [ ] どこでも実行できるようにWeb API化できたらいいな
 - [ ] TensorFlow 2.0へのアップデート準備
 - [ ] RNN版の訓練とテキスト生成を分離
+- [ ] ROCm 2.4 + Arch Linux
 - [x] データセットとモデルの生成処理を分離する
 - [x] RNNテキスト生成いろいろ整理
     - 文字ベースと単語ベースで生成スクリプトを統合した
 - [x] ベンチマークを別リポジトリに分ける
-- [x] ROCm 2.x
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1には`libcublas.so`が含まれておらずエラー
-    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があるらしい
+    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があって、試したら動いた
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
 - [x] RNN版の分かち書き対応
@@ -74,9 +79,9 @@
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 
-## インストール
+## インストール (Ubuntu 18.04)
 
-### 前処理スクリプト
+### 前処理
 
 - [Juman++ダウンロードページ][jumanpp]
 - `json_extractor.py`に外部モジュールは必要ない
@@ -92,7 +97,7 @@ $ pip install janome
 ## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# （任意，Linuxのみ）Mecab追加辞書をインストール
+# （任意）Mecab追加辞書をインストール
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
@@ -111,7 +116,7 @@ $ export PATH="$HOME/.local/bin:$PATH"
 $ pip install beautifulscraper
 ```
 
-### テキスト生成スクリプト
+### テキスト生成
 
 ```bash
 ## markovify_sentence.py
@@ -126,6 +131,46 @@ $ pyenv install 3.7.3
 $ pip install tensorflow numpy matplotlib
 ## classify_lyric.py
 $ pip install gensim
+```
+
+## インストール (Arch Linux)
+
+- AURヘルパーにyayを使用
+
+### 前処理
+
+```bash
+# 先にpipをインストールしておく
+$ yay -S python-pip
+
+# 共通
+$ pip install --user tqdm
+
+### wakachi.py
+## MeCabを分かち書きエンジンに使う場合
+$ yay -S mecab mecab-ipadic-neologd-git
+$ pip install --user mecab-python3
+# （任意）Mecab追加辞書をインストール
+# Ubuntuと同じようにやっても可
+$ yay -S mecab-ipadic-neologd-git
+
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
+
+### テキスト生成
+
+```bash
+## markovify_sentence.py
+$ pip install --user markovify
+
+## rnn_sentence.py
+# NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらpython-tensorflowではなくpython-tensorflow-cudaをインストール
+# pipでインストールできるTensorFlowやオリジナルのソースコードはCUDA 10.1に対応していない (2019/5/27)
+$ yay -S python-tensorflow-cuda
+$ pip install --user matplotlib
+## classify_lyric.py
+$ pip install --user gensim
 ```
 
 ## 使用法

@@ -9,9 +9,12 @@
 1. [Environment](#environment)
    1. [Software](#software)
 1. [Todo](#todo)
-1. [Installation](#installation)
+1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
    1. [Preprocessing scripts](#preprocessing-scripts)
    1. [Text generating scripts](#text-generating-scripts)
+1. [Installation (Arch Linux)](#installation-arch-linux)
+   1. [Preprocessing scripts](#preprocessing-scripts-1)
+   1. [Text generating scripts](#text-generating-scripts-1)
 1. [Usage](#usage)
    1. [pp_aozora.py](#pp_aozorapy)
    1. [wakachi.py](#wakachipy)
@@ -36,26 +39,28 @@
 
 - Python 3.7.3
 - Tested OSs
-    - Ubuntu 18.04.2 + ROCm 2.1
-    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+    - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
+    - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
+    - Arch Linux (Linux 5.1.4 + NVIDIA 430.14) + CUDA 10.1.168 + CuDNN 7.5.1.10
 - TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] Try SeqGAN
 - [ ] Generic Doc2vec classifier
 - [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
 - [ ] Separate RNN trainer and generator
+- [ ] ROCm 2.4 + Arch Linux
 - [x] Separate building the dataset and the model
 - [x] Some cleanup tasks for RNN text generation
     - Unified RNN text generator between character-based and word-based
-- [x] ROCm 2.x
 - [x] Move benchmarking to the another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
-    - It seems there is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)
+    - There is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/) and it works
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
 - [x] Enable function to use word as a token for RNN-based generation
@@ -74,7 +79,7 @@
 - [x] Multiprocessing
     - The script gets about 2.5x faster when it spawns 4 processes
 
-## Installation
+## Installation (Ubuntu 18.04)
 
 ### Preprocessing scripts
 
@@ -92,7 +97,7 @@ $ pip install janome
 ## Use MeCab as the word dividing engine
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# (Optional, only works on Linux) Install additional dictionary for Mecab
+# (Optional) Install additional dictionary for Mecab
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
@@ -126,6 +131,49 @@ $ pyenv install 3.7.3
 $ pip install tensorflow matplotlib
 ## classify_lyric.py
 $ pip install gensim
+```
+
+## Installation (Arch Linux)
+
+- yay as AUR helper
+
+### Preprocessing scripts
+
+```bash
+# If you doesn't install pip, install it at first
+$ yay -S python-pip
+
+# Common
+$ pip install --user tqdm
+
+### wakachi.py
+## Use Janome as the word dividing engine
+$ pip install --user janome
+
+## Use MeCab as the word dividing engine
+$ yay -S mecab mecab-ipadic-neologd-git
+$ pip install --user mecab-python3
+# (Optional) Install additional dictionary for Mecab
+# Same way as Ubuntu is also OK
+$ yay -S mecab-ipadic-neologd-git
+
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
+
+### Text generating scripts
+
+```bash
+## markovify_sentence.py
+$ pip install --user markovify
+
+## rnn_sentence.py
+# If you have NVIDIA GPU, install python-tensorflow-cuda instead of python-tensorflow to enable CUDA-based computing
+# TensorFlow in pip package and the original source code is not compatible with CUDA 10.1 (2019/5/27)
+$ yay -S python-tensorflow-cuda
+$ pip install --user matplotlib
+## classify_lyric.py
+$ pip install --user gensim
 ```
 
 ## Usage
