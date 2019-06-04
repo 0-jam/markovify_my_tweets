@@ -26,7 +26,6 @@ def main():
     parser = argparse.ArgumentParser(description='Preprocessing for Aozora Bunko.')
     parser.add_argument('input', type=str, help='Input file path')
     parser.add_argument('output', type=str, help='Output file path')
-    parser.add_argument('-e', '--engine', type=str, default='', choices=['', 'janome', 'mecab', 'juman'], help='Tokenize engine (default: none)')
 
     args = parser.parse_args()
 

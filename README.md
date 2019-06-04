@@ -11,13 +11,14 @@
 1. [Todo](#todo)
 1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
    1. [Preprocessing scripts](#preprocessing-scripts)
+   1. [Word dividing engine](#word-dividing-engine)
    1. [Text generating scripts](#text-generating-scripts)
 1. [Installation (Arch Linux)](#installation-arch-linux)
    1. [Preprocessing scripts](#preprocessing-scripts-1)
+   1. [Word dividing engine](#word-dividing-engine-1)
    1. [Text generating scripts](#text-generating-scripts-1)
 1. [Usage](#usage)
    1. [pp_aozora.py](#pp_aozorapy)
-   1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
    1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
@@ -46,7 +47,7 @@
 
 ## Todo
 
-- [ ] Try SeqGAN
+- [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 - [ ] Generic Doc2vec classifier
 - [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
@@ -83,17 +84,21 @@
 
 ### Preprocessing scripts
 
-- [Juman++ download page][jumanpp]
 - No external modules needed for `json_extractor.py`
 
 ```bash
 # Common
 $ pip install tqdm
 
-### wakachi.py
-## Use Janome as the word dividing engine
-$ pip install janome
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
 
+### Word dividing engine
+
+- [Juman++ download page][jumanpp]
+
+```bash
 ## Use MeCab as the word dividing engine
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
@@ -103,7 +108,7 @@ $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/meca
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
 
-## Use Juman++ as the word dividing engine
+## (UNUSED) Use Juman++ as the word dividing engine
 # Install Juman++
 # Download tarball from official page, extract it, and enter to the extracted directory
 $ ./configure --prefix=$HOME/.local
@@ -111,9 +116,6 @@ $ make -j$(nproc)
 $ make install
 $ pip install pyknp
 $ export PATH="$HOME/.local/bin:$PATH"
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ### Text generating scripts
@@ -135,7 +137,7 @@ $ pip install gensim
 
 ## Installation (Arch Linux)
 
-- yay as AUR helper
+- yay as an AUR helper
 
 ### Preprocessing scripts
 
@@ -146,19 +148,19 @@ $ yay -S python-pip
 # Common
 $ pip install --user tqdm
 
-### wakachi.py
-## Use Janome as the word dividing engine
-$ pip install --user janome
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
 
+### Word dividing engine
+
+```bash
 ## Use MeCab as the word dividing engine
 $ yay -S mecab mecab-ipadic-neologd-git
 $ pip install --user mecab-python3
 # (Optional) Install additional dictionary for Mecab
 # Same way as Ubuntu is also OK
 $ yay -S mecab-ipadic-neologd-git
-
-### utanet_scraper.py
-$ pip install --user beautifulscraper
 ```
 
 ### Text generating scripts
@@ -183,33 +185,20 @@ Execute with `-h` option when you want to see the help.
 ### pp_aozora.py
 
 - Preprocessing script for Aozora Bunko
-- ~~Enable word dividing with `-e` option~~ Temporarily removed
-    - ~~This function is also available in `run_pp_aozora.sh`~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # Execute pp_aozora.py for specific directory
 $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
-```
-
-### wakachi.py
-
-- Preprocessing script for Japanese text
-
-```bash
-$ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
-
-# Execute wakachi.py for specific directory
-$ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ```
 
 ### markovify_sentence.py
 
 ```bash
 # Give filename to "-o" option if you want to save generated text
-$ python markovify_sentence.py souseki_wakachi.txt
+# Add -c option to character-based training
+$ python markovify_sentence.py souseki.txt
 ```
 
 ### rnn_sentence.py

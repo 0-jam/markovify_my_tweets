@@ -11,13 +11,14 @@
 1. [Todo](#todo)
 1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
    1. [前処理](#前処理)
+   1. [分かち書きエンジン](#分かち書きエンジン)
    1. [テキスト生成](#テキスト生成)
 1. [インストール (Arch Linux)](#インストール-arch-linux)
    1. [前処理](#前処理-1)
+   1. [分かち書きエンジン](#分かち書きエンジン-1)
    1. [テキスト生成](#テキスト生成-1)
 1. [使用法](#使用法)
    1. [pp_aozora.py](#pp_aozorapy)
-   1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
    1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
@@ -46,7 +47,7 @@
 
 ## Todo
 
-- [ ] SeqGAN試す
+- [ ] [SeqGAN](https://github.com/LantaoYu/SeqGAN)試す
 - [ ] Doc2vec分類器の一般化
 - [ ] 歌ネット分類器で，不要な単語（ストップワードなど）を削除する
 - [ ] パラメーター指定のしかたをもっと簡単にする
@@ -60,7 +61,7 @@
 - [x] ベンチマークを別リポジトリに分ける
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1には`libcublas.so`が含まれておらずエラー
-    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があって、試したら動いた
+    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があって，試したら動いた
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
 - [x] RNN版の分かち書き対応
@@ -83,17 +84,21 @@
 
 ### 前処理
 
-- [Juman++ダウンロードページ][jumanpp]
 - `json_extractor.py`に外部モジュールは必要ない
 
 ```bash
 # 共通
 $ pip install tqdm
 
-### wakachi.py
-## Janomeを分かち書きエンジンに使う場合
-$ pip install janome
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
 
+### 分かち書きエンジン
+
+- [Juman++ダウンロードページ][jumanpp]
+
+```bash
 ## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
@@ -103,7 +108,7 @@ $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/meca
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
 
-## Juman++を分かち書きエンジンに使う場合
+## （未使用）Juman++を分かち書きエンジンに使う場合
 # Juman++をインストール
 # tarballを公式ページ（上記）からダウンロードし，それを展開して展開先のディレクトリに入る
 $ ./configure --prefix=$HOME/.local
@@ -111,9 +116,6 @@ $ make -j$(nproc)
 $ make install
 $ pip install pyknp
 $ export PATH="$HOME/.local/bin:$PATH"
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ### テキスト生成
@@ -146,16 +148,19 @@ $ yay -S python-pip
 # 共通
 $ pip install --user tqdm
 
-### wakachi.py
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
+
+### 分かち書きエンジン
+
+```bash
 ## MeCabを分かち書きエンジンに使う場合
 $ yay -S mecab mecab-ipadic-neologd-git
 $ pip install --user mecab-python3
 # （任意）Mecab追加辞書をインストール
 # Ubuntuと同じようにやっても可
 $ yay -S mecab-ipadic-neologd-git
-
-### utanet_scraper.py
-$ pip install --user beautifulscraper
 ```
 
 ### テキスト生成
@@ -180,26 +185,12 @@ $ pip install --user gensim
 ### pp_aozora.py
 
 - 前処理スクリプト（青空文庫用）
-- ~~`-e`オプションにエンジン名を指定すると単語の分かち書きもする~~ 一時的に削除
-    - ~~一括実行スクリプト`run_pp_aozora.sh`も同様~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # 指定されたディレクトリに対して実行
 $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
-```
-
-### wakachi.py
-
-- 前処理スクリプト（日本語文書用）
-
-```bash
-$ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
-
-# 指定されたディレクトリに対して実行
-$ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ```
 
 ### markovify_sentence.py
