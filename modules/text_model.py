@@ -66,8 +66,14 @@ class TextModel(object):
             pickle.dump(self.tokenizer, tokenizer_fp)
 
     def load_tokenizer(self, load_dir):
-        with load_dir.joinpath('tokenizer.pickle').open('rb') as tokenizer_fp:
+        with Path(load_dir).joinpath('tokenizer.pickle').open('rb') as tokenizer_fp:
             self.tokenizer = pickle.load(tokenizer_fp)
+
+        self.vocab_size = len(self.tokenizer.word_index) + 1
+        self.idx2vocab = {i: v for v, i in self.tokenizer.word_index.items()}
+
+    def is_word_based(self):
+        return not self.tokenizer.char_level
 
     # Return model settings as dict
     def parameters(self):
@@ -88,7 +94,7 @@ class TextModel(object):
 
     # Convert string to numbers
     def vocab_to_indices(self, sentence):
-        if not self.tokenizer.char_level:
+        if self.is_word_based():
             if type(sentence) == str:
                 sentence = divide_word(sentence.lower())
 
@@ -170,6 +176,9 @@ class TextModel(object):
 
     # Generating tasks
     def build_generator(self, load_dir):
+        with Path(load_dir).joinpath('parameters.json').open() as parameters:
+            self.set_parameters(**json.load(parameters))
+
         self.generator = self.build_model(batch_size=1)
         self.generator.load_weights(self.path(Path(load_dir)))
 
@@ -177,6 +186,7 @@ class TextModel(object):
         self.generator.save(str(Path(save_dir).joinpath('generator.h5')))
 
     def load_generator(self, load_dir):
+        self.load_tokenizer(load_dir)
         self.generator = keras.models.load_model(str(Path(load_dir).joinpath('generator.h5')))
 
     def generate_text(self, start_string=None, gen_size=1, temp=1.0, delimiter=None):
