@@ -47,15 +47,16 @@
 
 ## Todo
 
-- [ ] Saving/loading tokenizer to enable text generation without specifying original text
 - [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 - [ ] Generic Doc2vec classifier
 - [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] Separate RNN trainer and generator
 - [ ] ROCm 2.4 + Arch Linux
+- [x] Saving/loading tokenizer to enable text generation without specifying original text
+- [x] Separate RNN trainer and generator
+    - Added generation-only script
 - [x] Separate building the dataset and the model
 - [x] Some cleanup tasks for RNN text generation
     - Unified RNN text generator between character-based and word-based

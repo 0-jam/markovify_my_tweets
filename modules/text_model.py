@@ -72,6 +72,9 @@ class TextModel(object):
         self.vocab_size = len(self.tokenizer.word_index) + 1
         self.idx2vocab = {i: v for v, i in self.tokenizer.word_index.items()}
 
+    def is_word_based(self):
+        return not self.tokenizer.char_level
+
     # Return model settings as dict
     def parameters(self):
         return {
@@ -91,7 +94,7 @@ class TextModel(object):
 
     # Convert string to numbers
     def vocab_to_indices(self, sentence):
-        if not self.tokenizer.char_level:
+        if self.is_word_based():
             if type(sentence) == str:
                 sentence = divide_word(sentence.lower())
 
