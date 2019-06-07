@@ -47,6 +47,7 @@
 
 ## Todo
 
+- [ ] Saving/loading tokenizer to enable text generation without specifying original text
 - [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 - [ ] Generic Doc2vec classifier
 - [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier

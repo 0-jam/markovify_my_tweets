@@ -54,10 +54,10 @@ def main():
 
     model = TextModel()
     model.set_parameters(embedding_dim=embedding_dim, units=units, batch_size=batch_size, cpu_mode=cpu_mode)
-    model.build_dataset(str(input_path), encoding=args.encoding, char_level=not args.word_based)
 
     # Training
     if not args.load_dir:
+        model.build_dataset(str(input_path), encoding=args.encoding, char_level=not args.word_based)
         # Create the model
         model.build_trainer()
 
