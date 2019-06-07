@@ -9,14 +9,18 @@
 1. [Environment](#environment)
    1. [Software](#software)
 1. [Todo](#todo)
-1. [Installation](#installation)
+1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
    1. [Preprocessing scripts](#preprocessing-scripts)
+   1. [Word dividing engine](#word-dividing-engine)
    1. [Text generating scripts](#text-generating-scripts)
+1. [Installation (Arch Linux)](#installation-arch-linux)
+   1. [Preprocessing scripts](#preprocessing-scripts-1)
+   1. [Word dividing engine](#word-dividing-engine-1)
+   1. [Text generating scripts](#text-generating-scripts-1)
 1. [Usage](#usage)
    1. [pp_aozora.py](#pp_aozorapy)
-   1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -36,30 +40,30 @@
 
 - Python 3.7.3
 - Tested OSs
-    - Ubuntu 18.04.2 + ROCm 2.1
-    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+    - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
+    - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
+    - Arch Linux (Linux 5.1.4 + NVIDIA 430.14) + CUDA 10.1.168 + CuDNN 7.5.1.10
 - TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
+- [ ] Generic Doc2vec classifier
+- [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
-- [ ] Separate building the dataset and the model
-    - There is a lot of duplicated code around them
 - [ ] Make executable from anywhere as the Web API
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] Try [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)
-    - ~~The program seems to work successfully, but output does not make any sense ...~~
-    - [ ] Currently not working due to some changes of parent Model class
 - [ ] Separate RNN trainer and generator
+- [ ] ROCm 2.4 + Arch Linux
+- [x] Separate building the dataset and the model
 - [x] Some cleanup tasks for RNN text generation
     - Unified RNN text generator between character-based and word-based
-- [x] ROCm 2.x
 - [x] Move benchmarking to the another repository
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1 doesn't work because `libcublas.so` is missing
+    - There is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/) and it works
 - [x] Add search options to Utanet scraper
     - Added option to set attribute to search
-- [x] ~~Try word2vec~~
 - [x] Enable function to use word as a token for RNN-based generation
 - [x] Enable using various engine for word dividing
     - [x] [Juman++][jumanpp]
@@ -76,31 +80,35 @@
 - [x] Multiprocessing
     - The script gets about 2.5x faster when it spawns 4 processes
 
-## Installation
+## Installation (Ubuntu 18.04)
 
 ### Preprocessing scripts
 
-- [Juman++ download page][jumanpp]
 - No external modules needed for `json_extractor.py`
 
 ```bash
 # Common
 $ pip install tqdm
 
-### wakachi.py
-## Use Janome as the word dividing engine
-$ pip install janome
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
 
+### Word dividing engine
+
+- [Juman++ download page][jumanpp]
+
+```bash
 ## Use MeCab as the word dividing engine
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# (Optional, only works on Linux) Install additional dictionary for Mecab
+# (Optional) Install additional dictionary for Mecab
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
 
-## Use Juman++ as the word dividing engine
+## (UNUSED) Use Juman++ as the word dividing engine
 # Install Juman++
 # Download tarball from official page, extract it, and enter to the extracted directory
 $ ./configure --prefix=$HOME/.local
@@ -108,9 +116,6 @@ $ make -j$(nproc)
 $ make install
 $ pip install pyknp
 $ export PATH="$HOME/.local/bin:$PATH"
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
 ### Text generating scripts
@@ -119,7 +124,7 @@ $ pip install beautifulscraper
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py and wrnn_sentence.py
+## rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
@@ -130,6 +135,49 @@ $ pip install tensorflow matplotlib
 $ pip install gensim
 ```
 
+## Installation (Arch Linux)
+
+- yay as an AUR helper
+
+### Preprocessing scripts
+
+```bash
+# If you doesn't install pip, install it at first
+$ yay -S python-pip
+
+# Common
+$ pip install --user tqdm
+
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
+
+### Word dividing engine
+
+```bash
+## Use MeCab as the word dividing engine
+$ yay -S mecab mecab-ipadic-neologd-git
+$ pip install --user mecab-python3
+# (Optional) Install additional dictionary for Mecab
+# Same way as Ubuntu is also OK
+$ yay -S mecab-ipadic-neologd-git
+```
+
+### Text generating scripts
+
+```bash
+## markovify_sentence.py
+$ pip install --user markovify
+
+## rnn_sentence.py
+# If you have NVIDIA GPU, install python-tensorflow-cuda instead of python-tensorflow to enable CUDA-based computing
+# TensorFlow in pip package and the original source code is not compatible with CUDA 10.1 (2019/5/27)
+$ yay -S python-tensorflow-cuda
+$ pip install --user matplotlib
+## classify_lyric.py
+$ pip install --user gensim
+```
+
 ## Usage
 
 Execute with `-h` option when you want to see the help.
@@ -137,36 +185,23 @@ Execute with `-h` option when you want to see the help.
 ### pp_aozora.py
 
 - Preprocessing script for Aozora Bunko
-- ~~Enable word dividing with `-e` option~~ Temporarily removed
-    - ~~This function is also available in `run_pp_aozora.sh`~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # Execute pp_aozora.py for specific directory
 $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
-```
-
-### wakachi.py
-
-- Preprocessing script for Japanese text
-
-```bash
-$ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
-
-# Execute wakachi.py for specific directory
-$ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ```
 
 ### markovify_sentence.py
 
 ```bash
 # Give filename to "-o" option if you want to save generated text
-$ python markovify_sentence.py souseki_wakachi.txt
+# Add -c option to character-based training
+$ python markovify_sentence.py souseki.txt
 ```
 
-### rnn_sentence.py & wrnn_sentence.py
+### rnn_sentence.py
 
 - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
 - It takes very long time for execution ...
@@ -175,22 +210,17 @@ $ python markovify_sentence.py souseki_wakachi.txt
 
 ```bash
 # If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
-# Character-based training
-# No preprocessing needed for input file
-# If you don't specify start_string, generator will use a random charactor in the text
-$ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
-
-# Word-based training
-# It requires text that is divided by words
-$ python wrnn_sentence.py souseki_wakachi.txt --start_string "吾輩" -e 10
+# If you don't specify start_string, generator will use a random charactor/word in the text
+# Add -w option to word-based training
+$ python rnn_sentence.py souseki.txt --start_string "吾輩" -e 10
 
 # Specifying learned model
 # Example: Learned model exists in directory "./learned_models/Latin-Lipsum.txt"
-$ ls learned_models/Latin-Lipsum.txt/
-Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+$ ls learned_models/Latin-Lipsum/
+Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # Specify the directory name
 # Training model is automatically skipped
-$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt --load_dir learned_models/Latin-Lipsum
 ```
 
 ### utanet_scraper.py

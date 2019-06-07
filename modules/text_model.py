@@ -1,5 +1,6 @@
 import functools
 import json
+import pickle
 import time
 from pathlib import Path
 from random import choice
@@ -9,7 +10,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tqdm import tqdm
 
-from modules.wakachi.mecab import divide_word, divide_text
+from modules.wakachi.mecab import divide_text, divide_word
 
 config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
 config.gpu_options.allow_growth = True
@@ -19,21 +20,22 @@ tf.logging.set_verbosity(tf.logging.WARN)
 SEQ_LENGTH = 100
 BUFFER_SIZE = 10000
 NUM_HIDDEN_LAYERS = 1
+WORD_LIMIT = 15000
 
 
-# Character-based model
 class TextModel(object):
     def __init__(self):
         self.dataset = None
-        self.model = None
+        self.trainer = None
         self.generator = None
 
     # Set hyper parameters from arguments
     def set_parameters(self, embedding_dim=256, units=1024, batch_size=64, cpu_mode=False):
         self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
 
+    # Preparing the dataset
     def build_dataset(self, text_path, char_level=True, encoding='utf-8'):
-        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=char_level)
+        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t\n', oov_token='<oov>', char_level=char_level, num_words=WORD_LIMIT)
 
         with Path(text_path).open(encoding=encoding) as data:
             text = data.read()
@@ -43,11 +45,10 @@ class TextModel(object):
 
         # Vectorize the text
         self.tokenizer.fit_on_texts(text)
-        vocab2idx = self.tokenizer.word_index
         # Index 0 is preserved in the Keras tokenizer for the unknown word, but it's not included in vocab2idx
-        self.idx2vocab = {i: v for v, i in vocab2idx.items()}
+        self.idx2vocab = {i: v for v, i in self.tokenizer.word_index.items()}
         # self.idx2vocab[0] = '<oov>'
-        self.vocab_size = len(vocab2idx) + 1
+        self.vocab_size = len(self.idx2vocab) + 1
         text_size = len(text)
         print("Text has {} characters ({} unique characters)".format(text_size, self.vocab_size - 1))
 
@@ -59,6 +60,45 @@ class TextModel(object):
         self.dataset = chunks.map(self.split_into_target).shuffle(BUFFER_SIZE).batch(self.batch_size, drop_remainder=True)
         self.steps_per_epoch = text_size // SEQ_LENGTH // self.batch_size
 
+    # Save/Load the tokenizer as pickle
+    def save_tokenizer(self, save_dir):
+        with save_dir.joinpath('tokenizer.pickle').open('wb') as tokenizer_fp:
+            pickle.dump(self.tokenizer, tokenizer_fp)
+
+    def load_tokenizer(self, load_dir):
+        with load_dir.joinpath('tokenizer.pickle').open('rb') as tokenizer_fp:
+            self.tokenizer = pickle.load(tokenizer_fp)
+
+    # Return model settings as dict
+    def parameters(self):
+        return {
+            'embedding_dim': self.embedding_dim,
+            'units': self.units,
+            'batch_size': self.batch_size,
+            'cpu_mode': self.cpu_mode
+        }
+
+    # Create input and target texts from the text
+    @staticmethod
+    def split_into_target(chunk):
+        input_text = chunk[:-1]
+        target_text = chunk[1:]
+
+        return input_text, target_text
+
+    # Convert string to numbers
+    def vocab_to_indices(self, sentence):
+        if not self.tokenizer.char_level:
+            if type(sentence) == str:
+                sentence = divide_word(sentence.lower())
+
+            sentence = [sentence]
+        else:
+            sentence = sentence.lower()
+
+        return np.array(self.tokenizer.texts_to_sequences(sentence)).reshape(-1,)
+
+    # Preparing the model (both trainer/generator)
     def build_model(self, batch_size=None):
         # Hyper parameters
         if not batch_size:
@@ -89,52 +129,55 @@ class TextModel(object):
             + [keras.layers.Dense(self.vocab_size)]
         )
 
+    # Training tasks
     def build_trainer(self):
-        self.model = self.build_model()
-
-    def build_generator(self, model_dir):
-        self.generator = self.build_model(batch_size=1)
-        self.generator.load_weights(self.path(Path(model_dir)))
-
-    def save_generator(self, model_dir):
-        self.generator.save(str(Path(model_dir).joinpath('generator.h5')))
-
-    def load_generator(self, model_dir):
-        self.generator = keras.models.load_model(str(Path(model_dir).joinpath('generator.h5')))
+        self.trainer = self.build_model()
 
     @staticmethod
     def loss(labels, logits):
         return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
+    def compile(self):
+        self.trainer.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
+
     @staticmethod
-    def callbacks(model_dir):
+    def callbacks(save_dir):
         return [
-            keras.callbacks.ModelCheckpoint(str(Path(model_dir).joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
+            keras.callbacks.ModelCheckpoint(str(Path(save_dir).joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
             keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
         ]
 
-    def compile(self):
-        self.model.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
-
-    def fit(self, model_dir, epochs):
+    def fit(self, save_dir, epochs):
         start_time = time.time()
-        history = self.model.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=self.callbacks(model_dir))
+        history = self.trainer.fit(self.dataset.repeat(), epochs=epochs, steps_per_epoch=self.steps_per_epoch, callbacks=self.callbacks(save_dir))
         elapsed_time = time.time() - start_time
         print("Time taken for learning {} epochs: {:.3f} minutes ({:.3f} minutes / epoch )".format(epochs, elapsed_time / 60, (elapsed_time / epochs) / 60))
 
         return history
 
-    def save(self, model_dir):
-        if Path.is_dir(model_dir) is not True:
-            Path.mkdir(model_dir, parents=True)
+    def save_trainer(self, save_dir):
+        if Path.is_dir(save_dir) is not True:
+            Path.mkdir(save_dir, parents=True)
 
-        with model_dir.joinpath('parameters.json').open('w', encoding='utf-8') as params:
+        with save_dir.joinpath('parameters.json').open('w', encoding='utf-8') as params:
             params.write(json.dumps(self.parameters()))
 
-        self.model.save_weights(str(Path(model_dir.joinpath('weights'))))
+        self.trainer.save_weights(str(Path(save_dir.joinpath('weights'))))
+        self.save_tokenizer(save_dir)
 
-    def load(self, model_dir):
-        self.model.load_weights(self.path(Path(model_dir)))
+    def load_trainer(self, load_dir):
+        self.trainer.load_weights(self.path(Path(load_dir)))
+
+    # Generating tasks
+    def build_generator(self, load_dir):
+        self.generator = self.build_model(batch_size=1)
+        self.generator.load_weights(self.path(Path(load_dir)))
+
+    def save_generator(self, save_dir):
+        self.generator.save(str(Path(save_dir).joinpath('generator.h5')))
+
+    def load_generator(self, load_dir):
+        self.generator = keras.models.load_model(str(Path(load_dir).joinpath('generator.h5')))
 
     def generate_text(self, start_string=None, gen_size=1, temp=1.0, delimiter=None):
         if not start_string:
@@ -184,32 +227,3 @@ class TextModel(object):
     @staticmethod
     def path(ckpt_dir):
         return tf.train.latest_checkpoint(str(Path(ckpt_dir)))
-
-    # Return model settings as dict
-    def parameters(self):
-        return {
-            'embedding_dim': self.embedding_dim,
-            'units': self.units,
-            'batch_size': self.batch_size,
-            'cpu_mode': self.cpu_mode
-        }
-
-    # Create input and target texts from the text
-    @staticmethod
-    def split_into_target(chunk):
-        input_text = chunk[:-1]
-        target_text = chunk[1:]
-
-        return input_text, target_text
-
-    # Convert string to numbers
-    def vocab_to_indices(self, sentence):
-        if not self.tokenizer.char_level:
-            if type(sentence) == str:
-                sentence = divide_word(sentence.lower())
-
-            sentence = [sentence]
-        else:
-            sentence = sentence.lower()
-
-        return np.array(self.tokenizer.texts_to_sequences(sentence)).reshape(-1,)

@@ -9,14 +9,18 @@
 1. [環境](#環境)
    1. [ソフトウェア](#ソフトウェア)
 1. [Todo](#todo)
-1. [インストール](#インストール)
-   1. [前処理スクリプト](#前処理スクリプト)
-   1. [テキスト生成スクリプト](#テキスト生成スクリプト)
+1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
+   1. [前処理](#前処理)
+   1. [分かち書きエンジン](#分かち書きエンジン)
+   1. [テキスト生成](#テキスト生成)
+1. [インストール (Arch Linux)](#インストール-arch-linux)
+   1. [前処理](#前処理-1)
+   1. [分かち書きエンジン](#分かち書きエンジン-1)
+   1. [テキスト生成](#テキスト生成-1)
 1. [使用法](#使用法)
    1. [pp_aozora.py](#pp_aozorapy)
-   1. [wakachi.py](#wakachipy)
    1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py & wrnn_sentence.py](#rnn_sentencepy--wrnn_sentencepy)
+   1. [rnn_sentence.py](#rnn_sentencepy)
    1. [utanet_scraper.py](#utanet_scraperpy)
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
@@ -36,30 +40,30 @@
 
 - Python 3.7.3
 - テスト済みOS
-    - Ubuntu 18.04.2 + ROCm 2.1
-    - Ubuntu 18.04.2 + CUDA 10.0 + CuDNN 7.5.0.56
+    - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
+    - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
+    - Arch Linux (Linux 5.1.4 + NVIDIA 430.14) + CUDA 10.1.168 + CuDNN 7.5.1.10
 - TensorFlow 1.13.1 (< 2.0)
 
 ## Todo
 
+- [ ] [SeqGAN](https://github.com/LantaoYu/SeqGAN)試す
+- [ ] Doc2vec分類器の一般化
+- [ ] 歌ネット分類器で，不要な単語（ストップワードなど）を削除する
 - [ ] パラメーター指定のしかたをもっと簡単にする
-- [ ] データセットとモデルの生成処理を分離する
-    - 生成処理周辺に重複コードが多い
 - [ ] どこでも実行できるようにWeb API化できたらいいな
 - [ ] TensorFlow 2.0へのアップデート準備
-- [ ] [Seq2Seq](https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html)試す
-    - ~~プログラムは動いているが，意味のある出力は得られていない…~~
-    - [ ] 現在親クラスの変更により動作せず
 - [ ] RNN版の訓練とテキスト生成を分離
+- [ ] ROCm 2.4 + Arch Linux
+- [x] データセットとモデルの生成処理を分離する
 - [x] RNNテキスト生成いろいろ整理
     - 文字ベースと単語ベースで生成スクリプトを統合した
 - [x] ベンチマークを別リポジトリに分ける
-- [x] ROCm 2.x
 - [x] TensorFlow 1.13 + CUDA 10.0
     - CUDA 10.1には`libcublas.so`が含まれておらずエラー
+    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があって，試したら動いた
 - [x] 歌ネットスクレイパーの検索条件
     - 検索時に属性を指定するオプションを追加した
-- [x] ~~word2vec試す~~
 - [x] RNN版の分かち書き対応
 - [x] 分かち書きスクリプトをいろいろなエンジンに対応
     - [x] [Juman++][jumanpp]
@@ -76,31 +80,35 @@
 - [x] マルチプロセス化
     - 4プロセスで平均2.5倍くらい速くなった
 
-## インストール
+## インストール (Ubuntu 18.04)
 
-### 前処理スクリプト
+### 前処理
 
-- [Juman++ダウンロードページ][jumanpp]
 - `json_extractor.py`に外部モジュールは必要ない
 
 ```bash
 # 共通
 $ pip install tqdm
 
-### wakachi.py
-## Janomeを分かち書きエンジンに使う場合
-$ pip install janome
+### utanet_scraper.py
+$ pip install beautifulscraper
+```
 
+### 分かち書きエンジン
+
+- [Juman++ダウンロードページ][jumanpp]
+
+```bash
 ## MeCabを分かち書きエンジンに使う場合
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
 $ pip install mecab-python3
-# （任意，Linuxのみ）Mecab追加辞書をインストール
+# （任意）Mecab追加辞書をインストール
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
 
-## Juman++を分かち書きエンジンに使う場合
+## （未使用）Juman++を分かち書きエンジンに使う場合
 # Juman++をインストール
 # tarballを公式ページ（上記）からダウンロードし，それを展開して展開先のディレクトリに入る
 $ ./configure --prefix=$HOME/.local
@@ -108,18 +116,15 @@ $ make -j$(nproc)
 $ make install
 $ pip install pyknp
 $ export PATH="$HOME/.local/bin:$PATH"
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
 
-### テキスト生成スクリプト
+### テキスト生成
 
 ```bash
 ## markovify_sentence.py
 $ pip install markovify
 
-## rnn_sentence.py, wrnn_sentence.py
+## rnn_sentence.py
 # pyenv環境ではPythonビルド前にliblzmaのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.3
@@ -130,6 +135,49 @@ $ pip install tensorflow numpy matplotlib
 $ pip install gensim
 ```
 
+## インストール (Arch Linux)
+
+- AURヘルパーにyayを使用
+
+### 前処理
+
+```bash
+# 先にpipをインストールしておく
+$ yay -S python-pip
+
+# 共通
+$ pip install --user tqdm
+
+### utanet_scraper.py
+$ pip install --user beautifulscraper
+```
+
+### 分かち書きエンジン
+
+```bash
+## MeCabを分かち書きエンジンに使う場合
+$ yay -S mecab mecab-ipadic-neologd-git
+$ pip install --user mecab-python3
+# （任意）Mecab追加辞書をインストール
+# Ubuntuと同じようにやっても可
+$ yay -S mecab-ipadic-neologd-git
+```
+
+### テキスト生成
+
+```bash
+## markovify_sentence.py
+$ pip install --user markovify
+
+## rnn_sentence.py
+# NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらpython-tensorflowではなくpython-tensorflow-cudaをインストール
+# pipでインストールできるTensorFlowやオリジナルのソースコードはCUDA 10.1に対応していない (2019/5/27)
+$ yay -S python-tensorflow-cuda
+$ pip install --user matplotlib
+## classify_lyric.py
+$ pip install --user gensim
+```
+
 ## 使用法
 
 すべてのスクリプトは，-hオプションでヘルプが表示される
@@ -137,26 +185,12 @@ $ pip install gensim
 ### pp_aozora.py
 
 - 前処理スクリプト（青空文庫用）
-- ~~`-e`オプションにエンジン名を指定すると単語の分かち書きもする~~ 一時的に削除
-    - ~~一括実行スクリプト`run_pp_aozora.sh`も同様~~
 
 ```bash
 $ python pp_aozora.py wagahaiwa_nekodearu_{,noruby_}utf8.txt
-$ python pp_aozora.py wagahaiwa_nekodearu_{,wakachi_}utf8.txt
 
 # 指定されたディレクトリに対して実行
 $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
-```
-
-### wakachi.py
-
-- 前処理スクリプト（日本語文書用）
-
-```bash
-$ python wakachi.py wagahaiwa_nekodearu_noruby_utf8.txt wagahaiwa_nekodearu_wakachi_utf8.txt
-
-# 指定されたディレクトリに対して実行
-$ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 ```
 
 ### markovify_sentence.py
@@ -166,7 +200,7 @@ $ bash run_wakachi.sh -i text/novel/souseki -o text/novel_wakachi/souseki -m
 $ python markovify_sentence.py souseki_wakachi.txt
 ```
 
-### rnn_sentence.py & wrnn_sentence.py
+### rnn_sentence.py
 
 - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)がベース
 - GPUが使える環境での実行を推奨
@@ -175,22 +209,17 @@ $ python markovify_sentence.py souseki_wakachi.txt
 
 ```bash
 # "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
-# 文字ベースの学習
-# 特に前処理は必要ない
-# If you don't specify start_string, generator will use a random charactor in the text
+# start_stringを指定しなかった場合，テキスト内のランダムに選ばれた文字/単語から生成が始まる
+# "-w"オプションをつけると単語ベースでの学習になる
 $ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
-
-# 単語ベースの学習
-# 事前に分かち書きをしておく必要がある
-$ python wrnn_sentence.py souseki_wakachi.txt --start_string "吾輩" -e 10
 
 # 学習済みモデルを指定
 # 例：ディレクトリ"./learned_models/Latin-Lipsum.txt"内にモデルがあるとする
-$ ls learned_models/Latin-Lipsum.txt/
-Latin-Lipsum.txt.data-00000-of-00001  Latin-Lipsum.txt.index  checkpoint
+$ ls learned_models/Latin-Lipsum/
+Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # ディレクトリ名を指定
 # モデルの訓練はスキップされる
-$ python rnn_sentence.py text/Latin-Lipsum.txt --model_dir learned_models/Latin-Lipsum.txt
+$ python rnn_sentence.py text/Latin-Lipsum.txt --load_dir learned_models/Latin-Lipsum
 ```
 
 ### utanet_scraper.py
