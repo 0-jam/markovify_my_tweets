@@ -24,7 +24,7 @@ def main():
     # Generate-only
     model.load_generator(model_dir)
 
-    generated_text = model.generate_text(args.start_string, gen_size=args.gen_size, temp=args.temperature)
+    generated_text = model.generate_text(args.start_string, gen_size=args.gen_size, temperature=args.temperature)
 
     if model.is_word_based():
         generated_text = combine_sentence(generated_text)
