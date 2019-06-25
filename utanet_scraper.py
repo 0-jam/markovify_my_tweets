@@ -122,7 +122,7 @@ def main():
 
     with open(args.output, 'w', encoding='utf-8') as out:
         # json.dumps(results, out)だと最後の波カッコが閉じられない
-        out.write(json.dumps(results, ensure_ascii=False, indent=4))
+        out.write(json.dumps(results, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
