@@ -18,6 +18,12 @@ attributes = {
     # 作曲者名
     'composer': '8',
 }
+match_modes = {
+    # 完全一致
+    'exact': '4',
+    # 部分一致
+    'partial': '3',
+}
 
 
 # ページをBeautifulSoupオブジェクトとして取得
@@ -32,10 +38,11 @@ def bs_get_text(elem):
     return elem.get_text()
 
 
-def search(query, attribute='lyricist'):
+def search(query, attribute='lyricist', match_mode='exact'):
     # 検索URLを生成
     # クエリが日本語だと正しく処理されないのでエンコード
-    search_url = domain + '/search/?Aselect=' + attributes[attribute] + '&Keyword=' + urllib.parse.quote(query) + '&Bselect=4&sort='
+    search_url = domain + '/search/?Aselect=' + attributes[attribute] + '&Keyword=' + urllib.parse.quote(query) + '&Bselect=' + match_modes[match_mode] + '&sort='
+    print('Retrieving lyrics list from:', search_url)
 
     bodies = [get_page(search_url)]
 
@@ -107,9 +114,10 @@ def main():
     parser.add_argument('query', type=str, help='検索したい名前')
     parser.add_argument('-o', '--output', type=str, default='songs.json', help="出力ファイル名（デフォルト：'./songs.json'）")
     parser.add_argument('-a', '--attribute', type=str, default='lyricist', choices=['title', 'artist', 'lyricist', 'composer'], help="検索したい属性（デフォルト：'lyricist'（作詞者））")
+    parser.add_argument('-m', '--match_mode', type=str, default='exact', choices=['exact', 'partial'], help="検索モード（デフォルト：'exact'（完全一致））")
     args = parser.parse_args()
 
-    (song_ids, titles, artists, lyricists, composers) = search(args.query, attribute=args.attribute)
+    (song_ids, titles, artists, lyricists, composers) = search(args.query, attribute=args.attribute, match_mode=args.match_mode)
     results = {
         song_id: {
             'title': title,
