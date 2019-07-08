@@ -8,12 +8,12 @@
 
 1. [環境](#環境)
    1. [ソフトウェア](#ソフトウェア)
-1. [Todo](#todo)
-1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
+1. [Todo](#Todo)
+1. [インストール (Ubuntu 18.04)](#インストール-Ubuntu-1804)
    1. [前処理](#前処理)
    1. [分かち書きエンジン](#分かち書きエンジン)
    1. [テキスト生成](#テキスト生成)
-1. [インストール (Arch Linux)](#インストール-arch-linux)
+1. [インストール (Arch Linux)](#インストール-Arch-Linux)
    1. [前処理](#前処理-1)
    1. [分かち書きエンジン](#分かち書きエンジン-1)
    1. [テキスト生成](#テキスト生成-1)
@@ -42,8 +42,8 @@
 - テスト済みOS
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.1.4 + NVIDIA 430.14) + CUDA 10.1.168 + CuDNN 7.5.1.10
-- TensorFlow 1.13.1 (< 2.0)
+    - Arch Linux (Linux 5.1.16 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.1.34
+- TensorFlow 1.14.0rc1 (< 2.0)
 
 ## Todo
 

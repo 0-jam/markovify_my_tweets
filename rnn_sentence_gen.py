@@ -17,14 +17,14 @@ def main():
     parser.add_argument('-t', '--temperature', type=float, default=1.0, help='Set randomness of text generation (default: 1.0)')
     args = parser.parse_args()
 
-    # Specify directory to save model
+    # Specify directory to load the model
     model_dir = Path(args.load_dir)
     model = TextModel()
 
     # Generate-only
     model.load_generator(model_dir)
 
-    generated_text = model.generate_text(args.start_string, gen_size=args.gen_size, temp=args.temperature)
+    generated_text = model.generate_text(args.start_string, gen_size=args.gen_size, temperature=args.temperature)
 
     if model.is_word_based():
         generated_text = combine_sentence(generated_text)

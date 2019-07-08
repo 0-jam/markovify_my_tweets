@@ -14,7 +14,7 @@ def main():
         out_data.update(fdic)
 
     with Path(args.output).open('w', encoding='utf-8') as out:
-        out.write(json.dumps(out_data, ensure_ascii=False, indent=4))
+        out.write(json.dumps(out_data, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
