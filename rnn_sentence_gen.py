@@ -17,7 +17,7 @@ def main():
     parser.add_argument('-t', '--temperature', type=float, default=1.0, help='Set randomness of text generation (default: 1.0)')
     args = parser.parse_args()
 
-    # Specify directory to save model
+    # Specify directory to load the model
     model_dir = Path(args.load_dir)
     model = TextModel()
 

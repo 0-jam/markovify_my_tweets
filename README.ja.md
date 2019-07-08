@@ -42,7 +42,7 @@
 - テスト済みOS
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.1.12 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.0.64
+    - Arch Linux (Linux 5.1.16 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.1.34
 - TensorFlow 1.14.0rc1 (< 2.0)
 
 ## Todo
