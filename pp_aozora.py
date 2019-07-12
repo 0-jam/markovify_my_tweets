@@ -5,11 +5,10 @@ from pathlib import Path
 from modules.normalize_text import normalize
 
 
-# 引数sentenceを整形
 def replace_sentence(sentence):
-    # 不要な記号を削除
+    # Remove unneeded characters
     sentence = re.sub('《.+?》|［.+?］|｜|　', '', sentence.strip())
-    # 不要な記号を半角スペースに置換
+    # Replace unneeded characters with whitespaces
     sentence = re.sub('〔|〕', ' ', sentence)
 
     return normalize(sentence)
@@ -18,7 +17,7 @@ def replace_sentence(sentence):
 def replace_text(text):
     text = re.sub('.*---\n|底本：.*', '', text, flags=(re.MULTILINE | re.DOTALL))
     text = [replace_sentence(line) for line in text.splitlines()]
-    # 空行（もともと空行だったものと処理の結果空行になったもの）を削除して返す
+    # Remove empty lines
     return list(filter(lambda line: line != '', text))
 
 

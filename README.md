@@ -42,7 +42,7 @@
 - Tested OSs
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.1.16 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.1.34
+    - Arch Linux (Linux 5.2.0 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.1.34
 - TensorFlow 1.14.0 (< 2.0)
 
 ## Todo
@@ -52,7 +52,7 @@
 - [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] ROCm 2.x + Arch Linux
+- [ ] ROCm 2.6 + Arch Linux
 - [x] Saving/loading tokenizer to enable text generation without specifying original text
 - [x] Separate RNN trainer and generator
     - Added generation-only script
