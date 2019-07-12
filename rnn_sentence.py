@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from modules.plot_result import save_result, show_result
+from modules.plot_result import save_result
 from modules.settings_loader import load_settings, load_test_settings
 from modules.text_model import TextModel
 from modules.combine_sentence import combine_sentence
@@ -45,9 +45,9 @@ def main():
 
     # Specify directory to save model
     if args.save_dir:
-        model_dir = Path(args.save_dir)
+        save_dir = Path(args.save_dir)
     else:
-        model_dir = Path('./learned_models').joinpath(input_path.stem)
+        save_dir = Path('./learned_models').joinpath(input_path.stem)
 
     model = TextModel()
     model.set_parameters(embedding_dim=embedding_dim, units=units, batch_size=batch_size, cpu_mode=cpu_mode)
@@ -58,12 +58,12 @@ def main():
     model.build_trainer()
 
     model.compile()
-    history = model.fit(model_dir, epochs)
+    history = model.fit(save_dir, epochs)
     losses = history.history['loss']
-    model.save_trainer(model_dir)
+    model.save_trainer(save_dir)
 
-    model.build_generator(model_dir)
-    model.save_generator(model_dir)
+    model.build_generator(save_dir)
+    model.save_generator(save_dir)
 
     generated_text = model.generate_text(args.start_string, gen_size=gen_size, temperature=args.temperature)
 
@@ -77,12 +77,11 @@ def main():
         outpath = Path(args.output)
         with outpath.open('w', encoding='utf-8') as out:
             out.write(generated_text + '\n')
-
-        save_result(losses, outpath)
     else:
         print(generated_text)
 
-        show_result(losses)
+    print('Saving losses graph ...')
+    save_result(losses, str(save_dir.joinpath('losses.png')))
 
 
 if __name__ == '__main__':
