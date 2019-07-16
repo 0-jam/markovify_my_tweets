@@ -43,7 +43,7 @@ class TextModel(object):
 
     # Preparing the dataset
     def build_dataset(self, text_path, char_level=True, encoding='utf-8'):
-        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t', oov_token='<oov>', char_level=char_level, num_words=WORD_LIMIT)
+        self.tokenizer = keras.preprocessing.text.Tokenizer(filters='\\\t', char_level=char_level, num_words=WORD_LIMIT)
 
         with Path(text_path).open(encoding=encoding) as data:
             text = data.read()
@@ -55,7 +55,6 @@ class TextModel(object):
         self.tokenizer.fit_on_texts(text)
         # Index 0 is preserved in the Keras tokenizer for the unknown word, but it's not included in vocab2idx
         self.idx2vocab = {i: v for v, i in self.tokenizer.word_index.items()}
-        # self.idx2vocab[0] = '<oov>'
         self.vocab_size = len(self.idx2vocab) + 1
         text_size = len(text)
         print("Text has {} characters ({} unique characters)".format(text_size, self.vocab_size - 1))
@@ -158,7 +157,7 @@ class TextModel(object):
     def callbacks(save_dir):
         return [
             keras.callbacks.ModelCheckpoint(str(Path(save_dir).joinpath("ckpt_{epoch}")), save_weights_only=True, period=5, verbose=1),
-            keras.callbacks.EarlyStopping(monitor='loss', patience=3, verbose=1)
+            keras.callbacks.EarlyStopping(monitor='loss', patience=2, verbose=1)
         ]
 
     def fit(self, save_dir, epochs):
