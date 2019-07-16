@@ -12,9 +12,10 @@ from tqdm import tqdm
 
 from modules.wakachi.mecab import divide_word
 
-config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+config = tf.compat.v1.ConfigProto()
 config.gpu_options.allow_growth = True
-tf.enable_eager_execution(config=config)
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.WARN)
+tf.compat.v1.enable_eager_execution(config=config)
 
 SEQ_LENGTH = 100
 BUFFER_SIZE = 10000
@@ -122,6 +123,7 @@ class TextModel(object):
             gru = functools.partial(
                 keras.layers.GRU,
                 recurrent_activation='sigmoid',
+                reset_after=True,
             )
         else:
             gru = keras.layers.CuDNNGRU
@@ -148,10 +150,10 @@ class TextModel(object):
 
     @staticmethod
     def loss(labels, logits):
-        return tf.keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
+        return keras.losses.sparse_categorical_crossentropy(labels, logits, from_logits=True)
 
     def compile(self):
-        self.trainer.compile(optimizer=tf.train.AdamOptimizer(), loss=self.loss)
+        self.trainer.compile(optimizer=keras.optimizers.Adam(), loss=self.loss)
 
     @staticmethod
     def callbacks(save_dir):
