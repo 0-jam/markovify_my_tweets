@@ -12,10 +12,14 @@ from tqdm import tqdm
 
 from modules.wakachi.mecab import divide_word
 
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.allow_growth = True
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.WARN)
-tf.compat.v1.enable_eager_execution(config=config)
+# It returns an error on fitting the model when not enabled v1 eager execution
+tf.compat.v1.enable_eager_execution()
+
+tf.config.set_soft_device_placement(True)
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
+tf.enable_v2_behavior()
 
 SEQ_LENGTH = 100
 BUFFER_SIZE = 10000
