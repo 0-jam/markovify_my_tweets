@@ -36,6 +36,13 @@ def divide_text(text):
     return sentences
 
 
+def load_settings(params_json):
+    with Path(params_json).open(encoding='utf-8') as params:
+        parameters = json.load(params)
+
+    return parameters
+
+
 class TextModel(object):
     def __init__(self):
         self.dataset = None
@@ -45,6 +52,9 @@ class TextModel(object):
     # Set hyper parameters from arguments
     def set_parameters(self, embedding_dim=256, units=1024, batch_size=64, cpu_mode=False):
         self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
+
+    def set_parameters_from_json(self, json):
+        self.set_parameters(**load_settings(json))
 
     # Preparing the dataset
     def build_dataset(self, text_path, char_level=True, encoding='utf-8'):
