@@ -7,7 +7,7 @@ from pathlib import Path
 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-from modules.wakachi.mecab import divide_word
+from modules.transform_text import deconjugate_sentence
 
 NUM_CPU = mp.cpu_count()
 D2V_EPOCHS = 100
@@ -44,14 +44,14 @@ def main():
         label_attrs = ['artist']
 
         print('Generating doc2vec model...')
-        docs = [TaggedDocument(divide_word(replace_sentence(data[data_attr])), tags=[unicodedata.normalize('NFKC', data[attr]) for attr in label_attrs]) for data in dataset]
+        docs = [TaggedDocument(deconjugate_sentence(replace_sentence(data[data_attr])), tags=[unicodedata.normalize('NFKC', data[attr]) for attr in label_attrs]) for data in dataset]
         d2vmodel = Doc2Vec(docs, vector_size=256, window=5, min_count=3, epochs=D2V_EPOCHS, workers=NUM_CPU)
         d2vmodel.save(input_path.stem + '.model')
 
     with Path(args.generated_file).open() as generated_lyrics:
         for i, generated_lyric in enumerate(generated_lyrics):
             print('Song', i)
-            print(d2vmodel.docvecs.most_similar([d2vmodel.infer_vector(divide_word(replace_sentence(generated_lyric)))]))
+            print(d2vmodel.docvecs.most_similar([d2vmodel.infer_vector(deconjugate_sentence(replace_sentence(generated_lyric)))]))
 
 
 if __name__ == '__main__':
