@@ -49,9 +49,9 @@
 
 - [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 - [ ] Generic Doc2vec classifier
-- [ ] Remove stopwords on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Prepare for upgrading to TensorFlow 2.0
+- [x] Remove stopwords on Uta-net classifier
 - [x] ROCm 2.6
 - [x] Saving/loading tokenizer to enable text generation without specifying original text
 - [x] Separate RNN trainer and generator
