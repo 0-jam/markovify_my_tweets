@@ -8,6 +8,7 @@ from pathlib import Path
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
 from modules.transform_text import deconjugate_sentence, remove_stopwords
+# from modules.transform_text import extract_nouns, remove_stopwords
 
 NUM_CPU = mp.cpu_count()
 D2V_EPOCHS = 100
@@ -18,15 +19,16 @@ def replace_sentence(sentence):
     # unicode正規化
     sentence = unicodedata.normalize('NFKC', sentence)
     # 不要な記号を削除
-    sentence = re.sub(r'\W', '', sentence.strip())
+    sentence = re.sub(r'\W', '', sentence)
 
     return sentence
 
 
 # Preprocess the text for Doc2Vec
 def preprocess_text(text):
-    normalized_text = replace_sentence(text)
+    normalized_text = replace_sentence(text.strip())
     divided_text = deconjugate_sentence(normalized_text)
+    # divided_text = extract_nouns(normalized_text)
 
     return remove_stopwords(divided_text)
 
