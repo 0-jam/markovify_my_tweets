@@ -6,18 +6,18 @@
 
 ---
 
-1. [Environment](#Environment)
-   1. [Software](#Software)
-1. [Todo](#Todo)
-1. [Installation (Ubuntu 18.04)](#Installation-Ubuntu-1804)
-   1. [Preprocessing scripts](#Preprocessing-scripts)
-   1. [Word dividing engine](#Word-dividing-engine)
-   1. [Text generating scripts](#Text-generating-scripts)
-1. [Installation (Arch Linux)](#Installation-Arch-Linux)
-   1. [Preprocessing scripts](#Preprocessing-scripts-1)
-   1. [Word dividing engine](#Word-dividing-engine-1)
-   1. [Text generating scripts](#Text-generating-scripts-1)
-1. [Usage](#Usage)
+1. [Environment](#environment)
+   1. [Software](#software)
+1. [Todo](#todo)
+1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
+   1. [Preprocessing scripts](#preprocessing-scripts)
+   1. [Word dividing engine](#word-dividing-engine)
+   1. [Text generating scripts](#text-generating-scripts)
+1. [Installation (Arch Linux)](#installation-arch-linux)
+   1. [Preprocessing scripts](#preprocessing-scripts-1)
+   1. [Word dividing engine](#word-dividing-engine-1)
+   1. [Text generating scripts](#text-generating-scripts-1)
+1. [Usage](#usage)
    1. [pp_aozora.py](#pp_aozorapy)
    1. [markovify_sentence.py](#markovify_sentencepy)
    1. [rnn_sentence.py](#rnn_sentencepy)
@@ -25,12 +25,12 @@
    1. [json_extractor.py](#json_extractorpy)
    1. [cat_json.py](#cat_jsonpy)
    1. [classify_lyric.py](#classify_lyricpy)
-1. [Preprocessing (markovify_sentence.py)](#Preprocessing-markovify_sentencepy)
-   1. [Aozora Bunko](#Aozora-Bunko)
-      1. [Remove manually](#Remove-manually)
-      1. [Remove using pp_aozora.py](#Remove-using-pp_aozorapy)
-      1. [Replace with whitespace](#Replace-with-whitespace)
-1. [Benchmarking](#Benchmarking)
+1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
+   1. [Aozora Bunko](#aozora-bunko)
+      1. [Remove manually](#remove-manually)
+      1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
+      1. [Replace with whitespace](#replace-with-whitespace)
+1. [Benchmarking](#benchmarking)
 
 ---
 
@@ -42,17 +42,17 @@
 - Tested OSs
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.1
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.2.0 + NVIDIA 430.26) + CUDA 10.1.168 + CuDNN 7.6.1.34
+    - Arch Linux (Linux 5.2.4 + NVIDIA 430.34) + CUDA 10.1.168 + CuDNN 7.6.1.34
 - TensorFlow 1.14.0 (< 2.0)
 
 ## Todo
 
 - [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
 - [ ] Generic Doc2vec classifier
-- [ ] Remove unneeded words (i.e. stopwords) on Uta-net classifier
 - [ ] Simplify specifying hyper parameters
 - [ ] Prepare for upgrading to TensorFlow 2.0
-- [ ] ROCm 2.6 + Arch Linux
+- [x] Remove stopwords on Uta-net classifier
+- [x] ROCm 2.6
 - [x] Saving/loading tokenizer to enable text generation without specifying original text
 - [x] Separate RNN trainer and generator
     - Added generation-only script
@@ -78,8 +78,6 @@
     - [x] Create directory to save learned model
 - [x] Enable saving model for RNN-based generation
 - [x] Recurrent Neural Network
-- [x] Multiprocessing
-    - The script gets about 2.5x faster when it spawns 4 processes
 
 ## Installation (Ubuntu 18.04)
 

@@ -7,7 +7,8 @@ from pathlib import Path
 
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 
-from modules.wakachi.mecab import divide_word
+from modules.transform_text import deconjugate_sentence, remove_stopwords
+# from modules.transform_text import extract_nouns, remove_stopwords
 
 NUM_CPU = mp.cpu_count()
 D2V_EPOCHS = 100
@@ -18,9 +19,18 @@ def replace_sentence(sentence):
     # unicode正規化
     sentence = unicodedata.normalize('NFKC', sentence)
     # 不要な記号を削除
-    sentence = re.sub(r'\W', '', sentence.strip())
+    sentence = re.sub(r'\W', '', sentence)
 
     return sentence
+
+
+# Preprocess the text for Doc2Vec
+def preprocess_text(text):
+    normalized_text = replace_sentence(text.strip())
+    divided_text = deconjugate_sentence(normalized_text)
+    # divided_text = extract_nouns(normalized_text)
+
+    return remove_stopwords(divided_text)
 
 
 def main():
@@ -44,14 +54,14 @@ def main():
         label_attrs = ['artist']
 
         print('Generating doc2vec model...')
-        docs = [TaggedDocument(divide_word(replace_sentence(data[data_attr])), tags=[unicodedata.normalize('NFKC', data[attr]) for attr in label_attrs]) for data in dataset]
+        docs = [TaggedDocument(preprocess_text(data[data_attr]), tags=[unicodedata.normalize('NFKC', data[attr]) for attr in label_attrs]) for data in dataset]
         d2vmodel = Doc2Vec(docs, vector_size=256, window=5, min_count=3, epochs=D2V_EPOCHS, workers=NUM_CPU)
         d2vmodel.save(input_path.stem + '.model')
 
     with Path(args.generated_file).open() as generated_lyrics:
         for i, generated_lyric in enumerate(generated_lyrics):
             print('Song', i)
-            print(d2vmodel.docvecs.most_similar([d2vmodel.infer_vector(divide_word(replace_sentence(generated_lyric)))]))
+            print(d2vmodel.docvecs.most_similar([d2vmodel.infer_vector(preprocess_text(generated_lyric))]))
 
 
 if __name__ == '__main__':
