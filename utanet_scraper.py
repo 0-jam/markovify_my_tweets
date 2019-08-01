@@ -2,6 +2,7 @@ import argparse
 import json
 import time
 import urllib
+from pathlib import Path
 
 from beautifulscraper import BeautifulScraper
 from tqdm import tqdm
@@ -38,11 +39,11 @@ def bs_get_text(elem):
     return elem.get_text()
 
 
-def search(query, attribute='lyricist', match_mode='exact'):
+def search_song_ids(query, attribute='lyricist', match_mode='exact'):
     # 検索URLを生成
     # クエリが日本語だと正しく処理されないのでエンコード
     search_url = domain + '/search/?Aselect=' + attributes[attribute] + '&Keyword=' + urllib.parse.quote(query) + '&Bselect=' + match_modes[match_mode] + '&sort='
-    print('Retrieving lyrics list from:', search_url)
+    print('曲リストを取得しています：', search_url)
 
     bodies = [get_page(search_url)]
 
@@ -53,7 +54,7 @@ def search(query, attribute='lyricist', match_mode='exact'):
         last_page = page_urls[-1]
         last_page_num = max([int(query['pnum'][0]) for query in queries])
         lpq = queries[-1]
-        print(last_page_num, 'pages found')
+        print(last_page_num, 'ページ見つかりました')
 
         for pnum in tqdm(range(2, last_page_num + 1)):
             # ページ番号だけ変えて新しくURLを生成
@@ -70,7 +71,7 @@ def search(query, attribute='lyricist', match_mode='exact'):
 
             bodies.append(get_page(page_url))
     else:
-        print('1 page found')
+        print('1ページ見つかりました')
 
     song_ids = []
     for body in bodies:
@@ -103,20 +104,33 @@ def extract_song(song_id):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='引数に指定した名前で作詞家を検索して曲情報を抽出')
+    parser = argparse.ArgumentParser(description='引数に指定した名前で検索して曲情報を抽出')
     parser.add_argument('query', type=str, help='検索したい名前')
     parser.add_argument('-o', '--output', type=str, default='songs.json', help="出力ファイル名（デフォルト：'./songs.json'）")
     parser.add_argument('-a', '--attribute', type=str, default='lyricist', choices=['title', 'artist', 'lyricist', 'composer'], help="検索したい属性（デフォルト：'lyricist'（作詞者））")
-    parser.add_argument('-m', '--match_mode', type=str, default='exact', choices=['exact', 'partial'], help="検索モード（デフォルト：'exact'（完全一致））")
+    parser.add_argument('-m', '--match_mode', type=str, default='exact', choices=['exact', 'partial'], help="検索モード （exact: 完全一致（デフォルト） partial: 部分一致）")
     args = parser.parse_args()
 
-    song_ids = search(args.query, attribute=args.attribute, match_mode=args.match_mode)
+    song_ids = set(search_song_ids(args.query, attribute=args.attribute, match_mode=args.match_mode))
+    songs_json = Path(args.output)
+    existing_songs = {}
 
-    songs = {song_id: extract_song(song_id) for song_id in tqdm(song_ids)}
+    if songs_json.is_file():
+        with songs_json.open() as out_json:
+            existing_songs = json.load(out_json)
 
-    with open(args.output, 'w', encoding='utf-8') as out:
-        # json.dumps(songs, out)だと最後の波カッコが閉じられない
-        out.write(json.dumps(songs, ensure_ascii=False, indent=2))
+        existing_song_ids = set(existing_songs.keys())
+        song_ids = song_ids - existing_song_ids
+
+    if len(song_ids) == 0:
+        print('見つかった曲データはすでにファイル内にすべて存在しています')
+    else:
+        songs = {song_id: extract_song(song_id) for song_id in tqdm(song_ids)}
+        songs.update(existing_songs)
+
+        with songs_json.open('w', encoding='utf-8') as out:
+            # json.dumps(songs, out)だと最後の波カッコが閉じられない
+            out.write(json.dumps(songs, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
