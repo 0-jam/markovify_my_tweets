@@ -73,40 +73,33 @@ def search(query, attribute='lyricist', match_mode='exact'):
         print('1 page found')
 
     song_ids = []
-    titles = []
-    artists = []
-    lyricists = []
-    composers = []
     for body in bodies:
-        # 曲名と歌詞ページのURLを抽出
+        # 歌詞ページのURLを抽出
         for td in body.select('.td1'):
             song_ids.append(td.find_all('a')[0].get('href'))
-            titles.append(bs_get_text(td))
 
-        # 歌手名を抽出
-        for td in body.select('.td2'):
-            artists.append(bs_get_text(td))
-
-        # 作詞者名を抽出
-        for td in body.select('.td3'):
-            lyricists.append(bs_get_text(td))
-
-        # 作曲者名を抽出
-        for td in body.select('.td4'):
-            composers.append(bs_get_text(td))
-
-    return (song_ids, titles, artists, lyricists, composers)
+    return song_ids
 
 
-# song_idから歌詞を抽出
-def extract_lyric(song_id):
+# song_idから歌詞などの情報を抽出
+def extract_song(song_id):
     song_url = domain + song_id
 
     body = get_page(song_url)
+    title = body.select('.title h2')[0].text
     # 歌詞内の改行を半角スラッシュ/に置換して抽出
     lyric = body.find(id='kashi_area').get_text('/')
+    artist = body.select('h3[itemprop="recordedAs"]')[0].text
+    lyricist = body.select('h4[itemprop="lyricist"]')[0].text
+    composer = body.select('h4[itemprop="composer"]')[0].text
 
-    return lyric
+    return {
+        'title': title,
+        'lyric': lyric,
+        'artist': artist,
+        'lyricist': lyricist,
+        'composer': composer,
+    }
 
 
 def main():
@@ -117,20 +110,13 @@ def main():
     parser.add_argument('-m', '--match_mode', type=str, default='exact', choices=['exact', 'partial'], help="検索モード（デフォルト：'exact'（完全一致））")
     args = parser.parse_args()
 
-    (song_ids, titles, artists, lyricists, composers) = search(args.query, attribute=args.attribute, match_mode=args.match_mode)
-    results = {
-        song_id: {
-            'title': title,
-            'artist': artist,
-            'lyricist': lyricist,
-            'composer': composer,
-            'lyric': extract_lyric(song_id)
-        } for song_id, title, artist, lyricist, composer in zip(tqdm(song_ids), titles, artists, lyricists, composers)
-    }
+    song_ids = search(args.query, attribute=args.attribute, match_mode=args.match_mode)
+
+    songs = {song_id: extract_song(song_id) for song_id in tqdm(song_ids)}
 
     with open(args.output, 'w', encoding='utf-8') as out:
-        # json.dumps(results, out)だと最後の波カッコが閉じられない
-        out.write(json.dumps(results, ensure_ascii=False, indent=2))
+        # json.dumps(songs, out)だと最後の波カッコが閉じられない
+        out.write(json.dumps(songs, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':

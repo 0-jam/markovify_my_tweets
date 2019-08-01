@@ -10,7 +10,7 @@ def main():
     # Required arguments
     parser.add_argument('load_dir', type=str, help='Path to the learned model directory')
     # Common arguments
-    parser.add_argument('-o', '--output', type=str, help='Path to save losses graph and the generated text (default: None (show without saving))')
+    parser.add_argument('-o', '--output', type=str, help='Path to save the generated text (default: None (show without saving))')
     # Arguments for generation
     parser.add_argument('--start_string', type=str, help='Generation start with this string (default: None (generate from the random string in the input text))')
     parser.add_argument('-g', '--gen_size', type=int, default=1000, help='The number of character that you want to generate (default: 1000)')
