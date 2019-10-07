@@ -41,8 +41,9 @@
 - Tested OSs
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.6
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.2.5 + NVIDIA 430.40) + CUDA 10.1.168 + CuDNN 7.6.1.34
+    - Arch Linux (Linux 5.3.4 + NVIDIA 430.40) + CUDA 10.1.243 + CuDNN 7.6.4.38
 - TensorFlow 1.14.0 (< 2.0)
+    - It works on TF 2.0 but returns a lot of deprecation warnings
 
 ## Installation (Ubuntu 18.04)
 
@@ -135,7 +136,6 @@ $ pip install --user markovify
 
 ## rnn_sentence.py
 # If you have NVIDIA GPU, install python-tensorflow-cuda instead of python-tensorflow to enable CUDA-based computing
-# TensorFlow in pip package and the original source code is not compatible with CUDA 10.1 (2019/5/27)
 $ yay -S python-tensorflow-cuda
 $ pip install --user matplotlib
 ## classify_lyric.py
@@ -171,7 +171,6 @@ $ python markovify_sentence.py souseki.txt
 - Recommends to execute on GPU-enabled environment
 
 ```bash
-# If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
 # If you don't specify start_string, generator will use a random charactor/word in the text
 # Add -w option to word-based training
 $ python rnn_sentence.py souseki.txt --start_string "吾輩" -e 10
