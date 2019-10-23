@@ -41,9 +41,9 @@
 - Tested OSs
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.6
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.3.4 + NVIDIA 430.40) + CUDA 10.1.243 + CuDNN 7.6.4.38
-- TensorFlow 1.14.0 (< 2.0)
-    - It works on TF 2.0 but returns a lot of deprecation warnings
+    - Arch Linux (Linux 5.3.7 + NVIDIA 435.21) + CUDA 10.1.243 + CuDNN 7.6.4.38
+- TensorFlow 2.0.0
+    - ... with a lot of deprecation warnings
 
 ## Installation (Ubuntu 18.04)
 

@@ -46,8 +46,8 @@ class TextModel(object):
         self.generator = None
 
     # Set hyper parameters from arguments
-    def set_parameters(self, embedding_dim=256, units=1024, batch_size=64, cpu_mode=False):
-        self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
+    def set_parameters(self, embedding_dim=256, units=1024, batch_size=64):
+        self.embedding_dim, self.units, self.batch_size = embedding_dim, units, batch_size
 
     def set_parameters_from_json(self, json):
         self.set_parameters(**load_settings(json))
@@ -99,7 +99,6 @@ class TextModel(object):
             'embedding_dim': self.embedding_dim,
             'units': self.units,
             'batch_size': self.batch_size,
-            'cpu_mode': self.cpu_mode
         }
 
     # Create input and target texts from the text
