@@ -8,7 +8,6 @@
 
 1. [Environment](#environment)
    1. [Software](#software)
-1. [Todo](#todo)
 1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
    1. [Preprocessing scripts](#preprocessing-scripts)
    1. [Word dividing engine](#word-dividing-engine)
@@ -38,46 +37,13 @@
 
 ### Software
 
-- Python 3.7.3
+- Python 3.7.4
 - Tested OSs
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.6
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.2.5 + NVIDIA 430.40) + CUDA 10.1.168 + CuDNN 7.6.1.34
-- TensorFlow 1.14.0 (< 2.0)
-
-## Todo
-
-- [ ] Try [SeqGAN](https://github.com/LantaoYu/SeqGAN)
-- [ ] Generic Doc2vec classifier
-- [ ] Simplify specifying hyper parameters
-- [ ] Prepare for upgrading to TensorFlow 2.0
-- [x] Remove stopwords on Uta-net classifier
-- [x] ROCm 2.6
-- [x] Saving/loading tokenizer to enable text generation without specifying original text
-- [x] Separate RNN trainer and generator
-    - Added generation-only script
-- [x] Separate building the dataset and the model
-- [x] Some cleanup tasks for RNN text generation
-    - Unified RNN text generator between character-based and word-based
-- [x] Move benchmarking to the another repository
-- [x] TensorFlow 1.13 + CUDA 10.0
-    - CUDA 10.1 doesn't work because `libcublas.so` is missing
-    - There is CUDA 10.1 convertible build in [Arch Linux repo](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/) and it works
-- [x] Add search options to Utanet scraper
-    - Added option to set attribute to search
-- [x] Enable function to use word as a token for RNN-based generation
-- [x] Enable using various engine for word dividing
-    - [x] [Juman++][jumanpp]
-        - Juman++ cannot build on WSL
-    - [x] [MeCab][mecab]
-- [x] Text formatter for [Aozora bunko][aozora]
-    - [x] Remove title, author and footnotes
-    - [x] Remove annotation symbols
-- [x] Windows port
-    - [x] Text encoding
-    - [x] Create directory to save learned model
-- [x] Enable saving model for RNN-based generation
-- [x] Recurrent Neural Network
+    - Arch Linux (Linux 5.3.7 + NVIDIA 435.21) + CUDA 10.1.243 + CuDNN 7.6.4.38
+- TensorFlow 2.0.0
+    - ... with a lot of deprecation warnings
 
 ## Installation (Ubuntu 18.04)
 
@@ -126,7 +92,7 @@ $ pip install markovify
 ## rnn_sentence.py
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
-$ pyenv install 3.7.3
+$ pyenv install 3.7.4
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 # If you have AMD GPU, install tensorflow-rocm instead of tensorflow to enable HIP + MIOpen-based computing
 $ pip install tensorflow matplotlib
@@ -170,7 +136,6 @@ $ pip install --user markovify
 
 ## rnn_sentence.py
 # If you have NVIDIA GPU, install python-tensorflow-cuda instead of python-tensorflow to enable CUDA-based computing
-# TensorFlow in pip package and the original source code is not compatible with CUDA 10.1 (2019/5/27)
 $ yay -S python-tensorflow-cuda
 $ pip install --user matplotlib
 ## classify_lyric.py
@@ -203,12 +168,9 @@ $ python markovify_sentence.py souseki.txt
 ### rnn_sentence.py
 
 - Based on [this script](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)
-- It takes very long time for execution ...
-    - The text worte in Japanese, precision improves a little by converting all sentences into Katakana
-        - `$ mecab -O yomi`
+- Recommends to execute on GPU-enabled environment
 
 ```bash
-# If you want to force to use Non-CuDNN GRU layer, give "--cpu_mode" option
 # If you don't specify start_string, generator will use a random charactor/word in the text
 # Add -w option to word-based training
 $ python rnn_sentence.py souseki.txt --start_string "吾輩" -e 10

@@ -12,14 +12,10 @@ from tqdm import tqdm
 
 from modules.wakachi.mecab import divide_word
 
-# It returns an error on fitting the model when not enabled v1 eager execution
-tf.compat.v1.enable_eager_execution()
-
 tf.config.set_soft_device_placement(True)
 physical_devices = tf.config.experimental.list_physical_devices('GPU')
 assert len(physical_devices) > 0, "Not enough GPU hardware devices available"
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
-tf.enable_v2_behavior()
 
 SEQ_LENGTH = 100
 BUFFER_SIZE = 10000
@@ -50,8 +46,8 @@ class TextModel(object):
         self.generator = None
 
     # Set hyper parameters from arguments
-    def set_parameters(self, embedding_dim=256, units=1024, batch_size=64, cpu_mode=False):
-        self.embedding_dim, self.units, self.batch_size, self.cpu_mode = embedding_dim, units, batch_size, cpu_mode
+    def set_parameters(self, embedding_dim=256, units=1024, batch_size=64):
+        self.embedding_dim, self.units, self.batch_size = embedding_dim, units, batch_size
 
     def set_parameters_from_json(self, json):
         self.set_parameters(**load_settings(json))
@@ -103,7 +99,6 @@ class TextModel(object):
             'embedding_dim': self.embedding_dim,
             'units': self.units,
             'batch_size': self.batch_size,
-            'cpu_mode': self.cpu_mode
         }
 
     # Create input and target texts from the text
@@ -132,15 +127,12 @@ class TextModel(object):
         if not batch_size:
             batch_size = self.batch_size
 
-        # Disable CuDNN if GPU is not available
-        if self.cpu_mode or not tf.test.is_gpu_available():
-            gru = functools.partial(
-                keras.layers.GRU,
-                recurrent_activation='sigmoid',
-                reset_after=True,
-            )
-        else:
-            gru = keras.layers.CuDNNGRU
+        # There is no CuDNNGRU layer in TF 2.0
+        gru = functools.partial(
+            keras.layers.GRU,
+            recurrent_activation='sigmoid',
+            reset_after=True,
+        )
 
         grus = []
         for _ in range(NUM_HIDDEN_LAYERS):

@@ -8,7 +8,6 @@
 
 1. [環境](#環境)
    1. [ソフトウェア](#ソフトウェア)
-1. [Todo](#todo)
 1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
    1. [前処理](#前処理)
    1. [分かち書きエンジン](#分かち書きエンジン)
@@ -38,46 +37,13 @@
 
 ### ソフトウェア
 
-- Python 3.7.3
+- Python 3.7.4
 - テスト済みOS
     - Ubuntu 18.04.2 (Linux 4.18.0) + ROCm 2.6
     - Ubuntu 18.04.2 (Linux 4.18.0 + NVIDIA 410.48) + CUDA 10.0 + CuDNN 7.5.0.56
-    - Arch Linux (Linux 5.2.5 + NVIDIA 430.40) + CUDA 10.1.168 + CuDNN 7.6.1.34
-- TensorFlow 1.14.0 (< 2.0)
-
-## Todo
-
-- [ ] [SeqGAN](https://github.com/LantaoYu/SeqGAN)試す
-- [ ] Doc2vec分類器の一般化
-- [ ] パラメーター指定のしかたをもっと簡単にする
-- [ ] TensorFlow 2.0へのアップデート準備
-- [x] 歌ネット分類器で，ストップワードなどを削除する
-- [x] ROCm 2.6
-- [x] テキスト生成時にもとのテキストを指定しなくていいようにトークナイザーの保存・読み込みに対応する
-- [x] RNN版の訓練とテキスト生成を分離
-    - 生成のみするスクリプト追加
-- [x] データセットとモデルの生成処理を分離する
-- [x] RNNテキスト生成いろいろ整理
-    - 文字ベースと単語ベースで生成スクリプトを統合した
-- [x] ベンチマークを別リポジトリに分ける
-- [x] TensorFlow 1.13 + CUDA 10.0
-    - CUDA 10.1には`libcublas.so`が含まれておらずエラー
-    - [Arch Linuxのリポジトリ](https://www.archlinux.org/packages/community/x86_64/tensorflow-cuda/)にはCUDA 10.1対応版があって，試したら動いた
-- [x] 歌ネットスクレイパーの検索条件
-    - 検索時に属性を指定するオプションを追加した
-- [x] RNN版の分かち書き対応
-- [x] 分かち書きスクリプトをいろいろなエンジンに対応
-    - [x] [Juman++][jumanpp]
-        - WSLでビルドできず
-    - [x] [MeCab][mecab]
-- [x] [青空文庫][aozora]テキスト整形用スクリプト
-    - [x] タイトル，作者名，底本除去
-    - [x] 注釈記号などの除去
-- [x] Windows対応
-    - [x] 文字コード
-    - [x] 学習済みモデルディレクトリ作成
-- [x] RNN版でモデルを保存できるようにする
-- [x] Recurrent Neural Networkに対応
+    - Arch Linux (Linux 5.3.7 + NVIDIA 435.21) + CUDA 10.1.243 + CuDNN 7.6.4.38
+- TensorFlow 2.0.0
+    - …deprecation warningがたくさん出るが
 
 ## インストール (Ubuntu 18.04)
 
@@ -126,7 +92,7 @@ $ pip install markovify
 ## rnn_sentence.py
 # pyenv環境ではPythonビルド前にliblzmaのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
-$ pyenv install 3.7.3
+$ pyenv install 3.7.4
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 # AMD GPUを持っていて，HIP + MIOpenで計算できるようにしたかったらtensorflowではなくtensorflow-rocmをインストール
 $ pip install tensorflow numpy matplotlib
@@ -170,7 +136,6 @@ $ pip install --user markovify
 
 ## rnn_sentence.py
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらpython-tensorflowではなくpython-tensorflow-cudaをインストール
-# pipでインストールできるTensorFlowやオリジナルのソースコードはCUDA 10.1に対応していない (2019/5/27)
 $ yay -S python-tensorflow-cuda
 $ pip install --user matplotlib
 ## classify_lyric.py
@@ -196,6 +161,7 @@ $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 
 ```bash
 # "-o"オプションにファイル名を指定すると生成された文章が保存される
+# "-c"オプションをつけると文字ベースでの学習になる
 $ python markovify_sentence.py souseki_wakachi.txt
 ```
 
@@ -203,11 +169,8 @@ $ python markovify_sentence.py souseki_wakachi.txt
 
 - [これ](https://github.com/0-jam/tf_tutorials/blob/master/text_generation.py)がベース
 - GPUが使える環境での実行を推奨
-    - 前処理後のファイルをカタカナに変換すると多少マシになる
-        - `$ mecab -O yomi`
 
 ```bash
-# "--cpu_mode"オプションをつけると強制的にCuDNNでないGRU Layerを使った学習になる
 # start_stringを指定しなかった場合，テキスト内のランダムに選ばれた文字/単語から生成が始まる
 # "-w"オプションをつけると単語ベースでの学習になる
 $ python rnn_sentence.py souseki_utf8.txt --start_string "吾輩" -e 10
