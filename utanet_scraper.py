@@ -90,7 +90,7 @@ def extract_song(song_id):
     title = body.select('.title h2')[0].text
     # 歌詞内の改行を半角スラッシュ/に置換して抽出
     lyric = body.find(id='kashi_area').get_text('/')
-    artist = body.select('h3[itemprop="recordedAs"]')[0].text
+    artist = body.select('h2[itemprop="recordedAs"]')[0].text
     lyricist = body.select('h4[itemprop="lyricist"]')[0].text
     composer = body.select('h4[itemprop="composer"]')[0].text
 
