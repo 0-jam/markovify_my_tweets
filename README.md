@@ -7,28 +7,32 @@
 ---
 
 1. [Environment](#environment)
-   1. [Software](#software)
+    1. [Software](#software)
+1. [Installation (Common)](#installation-common)
+    1. [pip modules](#pip-modules)
 1. [Installation (Ubuntu 18.04)](#installation-ubuntu-1804)
-   1. [Preprocessing scripts](#preprocessing-scripts)
-   1. [Word dividing engine](#word-dividing-engine)
-   1. [Text generating scripts](#text-generating-scripts)
+    1. [Word dividing engine](#word-dividing-engine)
+        1. [MeCab](#mecab)
+        1. [(UNUSED) Juman++](#unused-juman)
+    1. [Text generating scripts](#text-generating-scripts)
+        1. [rnn_sentence.py](#rnn_sentencepy)
+        1. [classify_lyric.py](#classify_lyricpy)
 1. [Installation (Arch Linux)](#installation-arch-linux)
-   1. [Preprocessing scripts](#preprocessing-scripts-1)
-   1. [Word dividing engine](#word-dividing-engine-1)
-   1. [Text generating scripts](#text-generating-scripts-1)
+    1. [Word dividing engine](#word-dividing-engine-1)
+    1. [Text generating scripts](#text-generating-scripts-1)
 1. [Usage](#usage)
-   1. [pp_aozora.py](#pp_aozorapy)
-   1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py](#rnn_sentencepy)
-   1. [utanet_scraper.py](#utanet_scraperpy)
-   1. [json_extractor.py](#json_extractorpy)
-   1. [cat_json.py](#cat_jsonpy)
-   1. [classify_lyric.py](#classify_lyricpy)
+    1. [pp_aozora.py](#pp_aozorapy)
+    1. [markovify_sentence.py](#markovify_sentencepy)
+    1. [rnn_sentence.py](#rnn_sentencepy-1)
+    1. [utanet_scraper.py](#utanet_scraperpy)
+    1. [json_extractor.py](#json_extractorpy)
+    1. [cat_json.py](#cat_jsonpy)
+    1. [classify_lyric.py](#classify_lyricpy-1)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
-   1. [Aozora Bunko](#aozora-bunko)
-      1. [Remove manually](#remove-manually)
-      1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
-      1. [Replace with whitespace](#replace-with-whitespace)
+    1. [Aozora Bunko](#aozora-bunko)
+        1. [Remove manually](#remove-manually)
+        1. [Remove using pp_aozora.py](#remove-using-pp_aozorapy)
+        1. [Replace with whitespace](#replace-with-whitespace)
 1. [Benchmarking](#benchmarking)
 
 ---
@@ -45,37 +49,38 @@
 - TensorFlow 2.0.0
     - ... with a lot of deprecation warnings
 
-## Installation (Ubuntu 18.04)
+## Installation (Common)
 
-### Preprocessing scripts
+### pip modules
 
-- No external modules needed for `json_extractor.py`
-
-```bash
-# Common
-$ pip install tqdm
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
+$ pipenv install
+```
+
+## Installation (Ubuntu 18.04)
 
 ### Word dividing engine
 
-- [Juman++ download page][jumanpp]
+#### MeCab
 
-```bash
-## Use MeCab as the word dividing engine
+```
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
-$ pip install mecab-python3
-# (Optional) Install additional dictionary for Mecab
+```
+
+To install additional dictionary for Mecab
+
+```
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
+```
 
-## (UNUSED) Use Juman++ as the word dividing engine
-# Install Juman++
-# Download tarball from official page, extract it, and enter to the extracted directory
+#### (UNUSED) Juman++
+
+Download tarball from [the official page](http://nlp.ist.i.kyoto-u.ac.jp/index.php?JUMAN++), extract it, and enter to the extracted directory
+
+```
 $ ./configure --prefix=$HOME/.local
 $ make -j$(nproc)
 $ make install
@@ -85,37 +90,26 @@ $ export PATH="$HOME/.local/bin:$PATH"
 
 ### Text generating scripts
 
-```bash
-## markovify_sentence.py
-$ pip install markovify
+#### rnn_sentence.py
 
-## rnn_sentence.py
+```bash
 # If you use pyenv, install liblzma header before building Python
 $ sudo apt install liblzma-dev
 $ pyenv install 3.7.4
 # If you have NVIDIA GPU, install tensorflow-gpu instead of tensorflow to enable CUDA-based computing
 # If you have AMD GPU, install tensorflow-rocm instead of tensorflow to enable HIP + MIOpen-based computing
 $ pip install tensorflow matplotlib
-## classify_lyric.py
+```
+
+#### classify_lyric.py
+
+```
 $ pip install gensim
 ```
 
 ## Installation (Arch Linux)
 
 - yay as an AUR helper
-
-### Preprocessing scripts
-
-```bash
-# If you doesn't install pip, install it at first
-$ yay -S python-pip
-
-# Common
-$ pip install --user tqdm
-
-### utanet_scraper.py
-$ pip install --user beautifulscraper
-```
 
 ### Word dividing engine
 
@@ -131,9 +125,6 @@ $ yay -S mecab-ipadic-neologd-git
 ### Text generating scripts
 
 ```bash
-## markovify_sentence.py
-$ pip install --user markovify
-
 ## rnn_sentence.py
 # If you have NVIDIA GPU, install python-tensorflow-cuda instead of python-tensorflow to enable CUDA-based computing
 $ yay -S python-tensorflow-cuda
@@ -162,7 +153,7 @@ $ bash run_pp_aozora.sh -i text/novel_orig/souseki -o text/novel/souseki
 ```bash
 # Give filename to "-o" option if you want to save generated text
 # Add -c option to character-based training
-$ python markovify_sentence.py souseki.txt
+$ python markovify_sentence.py souseki_wakachi.txt
 ```
 
 ### rnn_sentence.py

@@ -7,28 +7,30 @@
 ---
 
 1. [環境](#環境)
-   1. [ソフトウェア](#ソフトウェア)
+    1. [ソフトウェア](#ソフトウェア)
+1. [インストール（共通）](#インストール共通)
+    1. [pip モジュール](#pip-モジュール)
 1. [インストール (Ubuntu 18.04)](#インストール-ubuntu-1804)
-   1. [前処理](#前処理)
-   1. [分かち書きエンジン](#分かち書きエンジン)
-   1. [テキスト生成](#テキスト生成)
+    1. [分かち書きエンジン](#分かち書きエンジン)
+        1. [MeCab](#mecab)
+        1. [（未使用）Juman++](#未使用juman)
+    1. [テキスト生成](#テキスト生成)
 1. [インストール (Arch Linux)](#インストール-arch-linux)
-   1. [前処理](#前処理-1)
-   1. [分かち書きエンジン](#分かち書きエンジン-1)
-   1. [テキスト生成](#テキスト生成-1)
+    1. [分かち書きエンジン](#分かち書きエンジン-1)
+    1. [テキスト生成](#テキスト生成-1)
 1. [使用法](#使用法)
-   1. [pp_aozora.py](#pp_aozorapy)
-   1. [markovify_sentence.py](#markovify_sentencepy)
-   1. [rnn_sentence.py](#rnn_sentencepy)
-   1. [utanet_scraper.py](#utanet_scraperpy)
-   1. [json_extractor.py](#json_extractorpy)
-   1. [cat_json.py](#cat_jsonpy)
-   1. [classify_lyric.py](#classify_lyricpy)
+    1. [pp_aozora.py](#pp_aozorapy)
+    1. [markovify_sentence.py](#markovify_sentencepy)
+    1. [rnn_sentence.py](#rnn_sentencepy)
+    1. [utanet_scraper.py](#utanet_scraperpy)
+    1. [json_extractor.py](#json_extractorpy)
+    1. [cat_json.py](#cat_jsonpy)
+    1. [classify_lyric.py](#classify_lyricpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
-   1. [青空文庫](#青空文庫)
-      1. [手動で削除](#手動で削除)
-      1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
-      1. [半角スペースに置き換える](#半角スペースに置き換える)
+    1. [青空文庫](#青空文庫)
+        1. [手動で削除](#手動で削除)
+        1. [pp_aozora.pyで削除](#pp_aozorapyで削除)
+        1. [半角スペースに置き換える](#半角スペースに置き換える)
 1. [ベンチマーク](#ベンチマーク)
 
 ---
@@ -45,37 +47,40 @@
 - TensorFlow 2.0.0
     - …deprecation warningがたくさん出るが
 
-## インストール (Ubuntu 18.04)
+## インストール（共通）
 
-### 前処理
+### pip モジュール
 
-- `json_extractor.py`に外部モジュールは必要ない
-
-```bash
-# 共通
-$ pip install tqdm
-
-### utanet_scraper.py
-$ pip install beautifulscraper
 ```
+$ pipenv install
+```
+
+## インストール (Ubuntu 18.04)
 
 ### 分かち書きエンジン
 
 - [Juman++ダウンロードページ][jumanpp]
 
-```bash
-## MeCabを分かち書きエンジンに使う場合
+#### MeCab
+
+```
 $ sudo apt install mecab-ipadic-utf8 mecab libmecab-dev swig
-$ pip install mecab-python3
-# （任意）Mecab追加辞書をインストール
+```
+
+（任意）Mecab追加辞書をインストール
+
+```
 $ sudo apt install curl
 $ git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git ~/mecab-ipadic-neologd
 $ cd ~/mecab-ipadic-neologd
 $ ./bin/install-mecab-ipadic-neologd -n -a -y
+```
 
-## （未使用）Juman++を分かち書きエンジンに使う場合
-# Juman++をインストール
-# tarballを公式ページ（上記）からダウンロードし，それを展開して展開先のディレクトリに入る
+#### （未使用）Juman++
+
+tarballを公式ページ（上記）からダウンロードし，それを展開して展開先のディレクトリに入る
+
+```
 $ ./configure --prefix=$HOME/.local
 $ make -j$(nproc)
 $ make install
@@ -86,9 +91,6 @@ $ export PATH="$HOME/.local/bin:$PATH"
 ### テキスト生成
 
 ```bash
-## markovify_sentence.py
-$ pip install markovify
-
 ## rnn_sentence.py
 # pyenv環境ではPythonビルド前にliblzmaのヘッダーをインストールする必要がある
 $ sudo apt install liblzma-dev
@@ -96,26 +98,11 @@ $ pyenv install 3.7.4
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらtensorflowではなくtensorflow-gpuをインストール
 # AMD GPUを持っていて，HIP + MIOpenで計算できるようにしたかったらtensorflowではなくtensorflow-rocmをインストール
 $ pip install tensorflow numpy matplotlib
-## classify_lyric.py
-$ pip install gensim
 ```
 
 ## インストール (Arch Linux)
 
 - AURヘルパーにyayを使用
-
-### 前処理
-
-```bash
-# 先にpipをインストールしておく
-$ yay -S python-pip
-
-# 共通
-$ pip install --user tqdm
-
-### utanet_scraper.py
-$ pip install --user beautifulscraper
-```
 
 ### 分かち書きエンジン
 
@@ -131,9 +118,6 @@ $ yay -S mecab-ipadic-neologd-git
 ### テキスト生成
 
 ```bash
-## markovify_sentence.py
-$ pip install --user markovify
-
 ## rnn_sentence.py
 # NVIDIA GPUを持っていて，CUDAで計算できるようにしたかったらpython-tensorflowではなくpython-tensorflow-cudaをインストール
 $ yay -S python-tensorflow-cuda
