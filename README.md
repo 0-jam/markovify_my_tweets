@@ -24,9 +24,6 @@
     1. [pp_aozora.py](#pp_aozorapy)
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy-1)
-    1. [utanet_scraper.py](#utanet_scraperpy)
-    1. [json_extractor.py](#json_extractorpy)
-    1. [cat_json.py](#cat_jsonpy)
     1. [classify_lyric.py](#classify_lyricpy-1)
 1. [Preprocessing (markovify_sentence.py)](#preprocessing-markovify_sentencepy)
     1. [Aozora Bunko](#aozora-bunko)
@@ -173,57 +170,6 @@ Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # Specify the directory name
 # Training model is automatically skipped
 $ python rnn_sentence.py text/Latin-Lipsum.txt --load_dir learned_models/Latin-Lipsum
-```
-
-### utanet_scraper.py
-
-- Do scraping and extract song informations from [Utanet（歌ネット）](https://www.uta-net.com/)
-- Song information is saved as JSON
-    - key: song_id from original URL
-    - values:
-        - title
-        - artist
-        - lyricist
-        - composer
-        - lyric
-- Available attributes to search
-    - 'title'
-    - 'artist'
-    - 'lyricist'
-    - 'composer'
-
-```bash
-# Extracted song information is saved as "songs.json" by default (It can be specified with -o option)
-$ python utanet_scraper.py "秋元康"
-$ python utanet_scraper.py "AKB48" -a 'artist'
-```
-
-### json_extractor.py
-
-- Extract specified attributes from [utanet_scraper.py](#utanet_scraperpy)
-    - Specifing multiple attributes are **not** available
-- Extracted attributes are saved as plain text
-    - Each songs are delimited by line break
-- Available attributes
-    - 'id'
-    - 'title'
-    - 'artist'
-    - 'lyricist'
-    - 'composer'
-    - 'lyric'
-
-```bash
-# Default attribute: lyrics
-$ python json_extractor.py akimoto.json akimoto_lyrics.txt
-```
-
-### cat_json.py
-
-- Combine multiple JSON files in the specified directory
-
-```bash
-# Input as the directory, output as the file name
-$ python cat_json.py text/lyrics_json lyrics_all.json
 ```
 
 ### classify_lyric.py

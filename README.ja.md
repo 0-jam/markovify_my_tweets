@@ -22,9 +22,6 @@
     1. [pp_aozora.py](#pp_aozorapy)
     1. [markovify_sentence.py](#markovify_sentencepy)
     1. [rnn_sentence.py](#rnn_sentencepy)
-    1. [utanet_scraper.py](#utanet_scraperpy)
-    1. [json_extractor.py](#json_extractorpy)
-    1. [cat_json.py](#cat_jsonpy)
     1. [classify_lyric.py](#classify_lyricpy)
 1. [前処理 (markovify_sentence.py)](#前処理-markovify_sentencepy)
     1. [青空文庫](#青空文庫)
@@ -166,57 +163,6 @@ Latin-Lipsum.data-00000-of-00001  Latin-Lipsum.index  checkpoint
 # ディレクトリ名を指定
 # モデルの訓練はスキップされる
 $ python rnn_sentence.py text/Latin-Lipsum.txt --load_dir learned_models/Latin-Lipsum
-```
-
-### utanet_scraper.py
-
-- [歌ネット](https://www.uta-net.com/)を検索して曲情報を抽出
-- 抽出結果はJSONで保存される
-    - key: song_id（抽出元のURL）
-    - values:
-        - title（曲名）
-        - artist（歌手名）
-        - lyricist（作詞者名）
-        - composer（作曲者名）
-        - lyric（歌詞）
-- 検索できる属性
-    - 'title'（曲名）
-    - 'artist'（歌手名）
-    - 'lyricist'（作詞者名）
-    - 'composer'（作曲者名）
-
-```bash
-# 抽出されたテキストはデフォルトで"songs.json"に保存される（-oオプションで指定できる）
-$ python utanet_scraper.py "秋元康"
-$ python utanet_scraper.py "AKB48" -a 'artist'
-```
-
-### json_extractor.py
-
-- 指定した属性を[utanet_scraper.py](#utanet_scraperpy)で出力したJSONから抽出
-    - Specifing multiple attributes are **not** available
-- 抽出された属性はテキストで保存される
-    - 曲ごとに改行
-- 指定できる属性：
-    - 'id'
-    - 'title'
-    - 'artist'
-    - 'lyricist'
-    - 'composer'
-    - 'lyric'
-
-```bash
-# デフォルトの属性：lyrics
-$ python json_extractor.py akimoto.json akimoto_lyrics.txt
-```
-
-### cat_json.py
-
-- 指定したディレクトリ内のJSONファイルを結合する
-
-```bash
-# 入力はディレクトリ名，出力はファイル名
-$ python cat_json.py text/lyrics_json lyrics_all.json
 ```
 
 ### classify_lyric.py
